@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Dark Theme Page with Table</title>
+
+    <style>
+        * {
+            font-family: Arial, Helvetica, sans-serif !important;
+            box-sizing: border-box;
+            border: none !important;
+            box-shadow: none !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul, ol {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        body {
+            background-color: #000000 !important;
+            color: #FFFFFF !important;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF !important;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+
+        a {
+            color: #4CAF50 !important;
+            text-decoration: underline;
+        }
+
+        a:hover {
+            color: #66BB6A !important;
+        }
+
+
+        input[type="text"], input[type="email"], textarea, select {
+            background-color: #111111 !important;
+            color: #FFFFFF !important;
+            border: 1px solid #333333 !important;
+            padding: 8px;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #222222 !important;
+            color: #FFFFFF !important;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #333333 !important;
+        }
+
+        table {
+            width: 80%; 
+            border-collapse: collapse; 
+            margin: 20px 0;
+        }
+
+        th, td {
+            color: #FFFFFF !important;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #333333 !important; 
+        }
+
+
+        th {
+            background-color: #111111 !important; 
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #080808 !important; 
+        }
+
+        tr:hover {
+            background-color: #1a1a1a !important; 
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Admin Page</h1>
+        <hr style="border-top: 1px solid #333333; margin: 15px 0;">
+    </header>
+
+    <main>
+        <h2>Users</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Hashed Password</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for credential in user_credentials %}
+                <tr>
+                    <td>{{ credential.0 }}</td>
+                    <td>{{ credential.1 }}</td>
+                    <td>{{ credential.2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No users found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <br>
+        
+        <h2>File Info</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Sender</th>
+                    <th>Unique Text</th>
+                    <th>Receiver</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for info in file_info %}
+                <tr>
+                    <td>{{ info.0 }}</td>
+                    <td>{{ info.1 }}</td>
+                    <td>{{ info.2 }}</td>
+                    <td>{{ info.3 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No data found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>
