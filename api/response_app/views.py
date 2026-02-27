@@ -21,7 +21,7 @@ def get_connection():
 def index(request):
     conn = get_connection()
     if not conn:
-        return HttpResponse("<h1>Database connection failed.</h1>")
+        return HttpResponse("<h1 style='color: red;'>Database connection failed.</h1>")
     
     cursor = conn.cursor()
     try:
@@ -44,12 +44,12 @@ def index(request):
         cursor.execute("SHOW TABLES;")
         result = cursor.fetchall()
     except mysql.connector.Error as err:
-        return HttpResponse(f"<h1>Database table creation failed: {err}</h1>")
+        return HttpResponse(f"<h1 style='color: red;'>Database table creation failed: {err}</h1>")
     cursor.close()
     conn.close()
 
     tables = str(result)
-    return HttpResponse("<h1>Database Ready. TABLES: " + tables + "</h1>")
+    return HttpResponse("<h1 style='color: green;'>Database Ready. TABLES: </h1>" + "<h1 style='color: blue;'>" + tables + "</h1>")
 
 def admin_view(request):
     conn = get_connection()
