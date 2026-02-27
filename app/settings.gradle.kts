@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Android_API_Project"
+rootProject.name = "My Application"
 include(":app")
  
