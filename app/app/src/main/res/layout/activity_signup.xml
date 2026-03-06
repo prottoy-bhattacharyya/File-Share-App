@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="32dp"
-    android:background="@color/white"
+    android:background="?attr/colorSurface"
     tools:context=".signupActivity">
 
     <TextView
@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="64dp"
-        android:textColor="#132F97"
+        android:textColor="?attr/colorPrimary"
         android:text="Create an Account"
         android:textSize="28sp"
         android:textStyle="bold"
@@ -27,10 +27,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        app:boxStrokeColor="@color/black"
-        android:textColorHint="@color/gray"
-        app:hintTextColor="@color/black"
-        app:cursorColor="#2657AD"
+        app:boxStrokeColor="?attr/colorPrimary"
+        android:textColorHint="?android:attr/textColorSecondary"
+        app:hintTextColor="?attr/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_title_signup">
@@ -40,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Username"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurface"
             android:inputType="textPersonName" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -51,11 +50,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:boxStrokeColor="@color/black"
-        android:textColorHint="@color/gray"
-        app:hintTextColor="@color/black"
-        app:passwordToggleTint="@color/gray"
-        app:cursorColor="#2657AD"
+        app:boxStrokeColor="?attr/colorPrimary"
+        android:textColorHint="?android:attr/textColorSecondary"
+        app:hintTextColor="?attr/colorPrimary"
+        app:passwordToggleTint="?android:attr/textColorSecondary"
         app:passwordToggleEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +64,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Create Password (min. 6 characters)"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurface"
             android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -77,11 +75,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:boxStrokeColor="@color/black"
-        android:textColorHint="@color/gray"
-        app:hintTextColor="@color/black"
-        app:passwordToggleTint="@color/gray"
-        app:cursorColor="#2657AD"
+        app:boxStrokeColor="?attr/colorPrimary"
+        android:textColorHint="?android:attr/textColorSecondary"
+        app:hintTextColor="?attr/colorPrimary"
+        app:passwordToggleTint="?android:attr/textColorSecondary"
         app:passwordToggleEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -92,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Confirm Password"
-            android:textColor="@color/black"
+            android:textColor="?attr/colorOnSurface"
             android:inputType="textPassword" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -102,14 +99,13 @@
         android:layout_width="173dp"
         android:layout_height="50dp"
         android:layout_marginTop="24dp"
-        android:backgroundTint="#4CAF50"
+        android:backgroundTint="?attr/colorSecondary"
         android:fontFamily="sans-serif-medium"
         android:text="Sign Up"
+        android:textColor="@color/white"
         android:textAllCaps="false"
         android:textSize="18sp"
         app:cornerRadius="12dp"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/input_password_layout_signup2" />
@@ -124,7 +120,7 @@
         android:textStyle="bold"
         android:clickable="true"
         android:focusable="true"
-        android:textColor="#132F97"
+        android:textColor="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

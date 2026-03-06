@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
+    android:background="?attr/colorSurface"
     android:paddingStart="32dp"
     android:paddingEnd="32dp"
     tools:context=".MainActivity">
@@ -29,7 +29,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        app:cardBackgroundColor="#F3F5F9"
+        app:cardBackgroundColor="?attr/colorSurfaceVariant"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +65,7 @@
                     tools:text="Guest"
                     android:textStyle="bold"
                     android:textSize="18sp"
-                    android:textColor="#1A237E" />
+                    android:textColor="?attr/colorOnSurface" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -74,10 +74,9 @@
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
         android:fontFamily="sans-serif-medium"
         android:text="File Transfer"
-        android:textColor="#1A237E"
+        android:textColor="?attr/colorPrimary"
         android:textSize="40sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -129,7 +128,7 @@
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:layout_marginBottom="16dp"
-        android:backgroundTint="#3F51B5"
+        android:backgroundTint="#687CED"
         android:fontFamily="sans-serif-medium"
         android:text="Direct Transfer (Local)"
         android:textAllCaps="false"
@@ -151,7 +150,7 @@
         android:fontFamily="sans-serif-medium"
         android:text="Receive Files"
         android:textAllCaps="false"
-        android:textColor="#1A237E"
+        android:textColor="?attr/colorPrimary"
         android:textSize="18sp"
         app:cornerRadius="12dp"
         app:icon="@drawable/download"
@@ -159,7 +158,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="#1A237E"
+        app:strokeColor="?attr/colorPrimary"
         app:strokeWidth="2dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
