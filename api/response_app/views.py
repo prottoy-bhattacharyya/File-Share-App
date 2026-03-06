@@ -159,6 +159,16 @@ def signup(request):
     hashed_password = make_password(password)
 
     cursor = conn.cursor()
+    cursor.execute("""SELECT username FROM user_credentials WHERE username = %s""", (username,))
+    if cursor.fetchone():
+        response = {
+            'status': 'user error',
+            'message': 'Username already exists.'
+        }
+        cursor.close()
+        conn.close()
+        return JsonResponse(response, status=400)
+    
     cursor.execute("INSERT INTO user_credentials (username, hashed_password) VALUES (%s, %s)", (username, hashed_password))
     conn.commit()
     cursor.close()

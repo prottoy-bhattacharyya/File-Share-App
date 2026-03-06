@@ -1,7 +1,11 @@
 package com.example.myapplication;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -15,6 +19,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -24,7 +30,7 @@ import okhttp3.Response;
 
 public class signupActivity extends AppCompatActivity {
     Button signup;
-    TextView login;
+    TextView login, text_isStrongPassword;
     EditText input_username, input_password, input_password2;
     String url;
 
@@ -40,8 +46,39 @@ public class signupActivity extends AppCompatActivity {
 
         signup = findViewById(R.id.button_signup);
         login = findViewById(R.id.text_login);
+        text_isStrongPassword = findViewById(R.id.text_isStrongPassword);
 
         url =  getResources().getString(R.string.server_url) + "/signup/?username=";
+
+
+        input_password.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String password = s.toString();
+                ArrayList<String> errors = isStrongPassword(password);
+                text_isStrongPassword.setText("");
+
+                if (password.isEmpty()) {
+                    text_isStrongPassword.setVisibility(View.GONE);
+                } else if (!errors.isEmpty()) {
+                    text_isStrongPassword.setVisibility(View.VISIBLE);
+                    text_isStrongPassword.setTextColor(Color.RED);
+                    for (String error : errors) {
+                        text_isStrongPassword.append("• " + error + "\n");
+                    }
+                } else {
+                    text_isStrongPassword.setVisibility(View.VISIBLE);
+                    text_isStrongPassword.setText("Password is strong");
+                    text_isStrongPassword.setTextColor(Color.GREEN);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
 
         login.setOnClickListener(v -> {
             Intent loginPage = new Intent(signupActivity.this, loginActivity.class);
@@ -55,7 +92,43 @@ public class signupActivity extends AppCompatActivity {
         });
 
     }
+    private ArrayList<String> isStrongPassword(String password) {
+        String containsNumber = ".*[0-9].*";
+        String containsSpecialChar = ".*[@#$%^&+=!].*";
+        String containsUpperCase = ".*[A-Z].*";
+        String containsLowerCase = ".*[a-z].*";
+        String containsEightChar = ".{8,}";
+        String containsSpace = "^[^\\s]+$";
 
+        ArrayList<String> result = new ArrayList<>();
+
+        Pattern numberPattern = Pattern.compile(containsNumber);
+        Pattern specialCharPattern = Pattern.compile(containsSpecialChar);
+        Pattern upperCasePattern = Pattern.compile(containsUpperCase);
+        Pattern lowerCasePattern = Pattern.compile(containsLowerCase);
+        Pattern eightCharPattern = Pattern.compile(containsEightChar);
+        Pattern spacePattern = Pattern.compile(containsSpace);
+
+        if (!numberPattern.matcher(password).matches()) {
+            result.add("Password must contain at least one number");
+        }
+        if (!specialCharPattern.matcher(password).matches()) {
+            result.add("Password must contain at least one special character");
+        }
+        if (!upperCasePattern.matcher(password).matches()) {
+            result.add("Password must contain at least one uppercase letter");
+        }
+        if (!lowerCasePattern.matcher(password).matches()) {
+            result.add("Password must contain at least one lowercase letter");
+        }
+        if (!eightCharPattern.matcher(password).matches()) {
+            result.add("Password must contain at least 8 characters");
+        }
+        if (!spacePattern.matcher(password).matches()) {
+            result.add("Password cannot contain spaces");
+        }
+        return result;
+    }
     public void startSignupProcess() {
         String username = input_username.getText().toString();
         String password = input_password.getText().toString();
@@ -67,12 +140,18 @@ public class signupActivity extends AppCompatActivity {
             signup.setEnabled(true);
             return;
         }
-        if (password.length() < 6) {
-            Toast.makeText(this, "password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+        ArrayList<String> result = isStrongPassword(password);
+        if (!result.isEmpty()) {
+            text_isStrongPassword.setText("");
+            for (String s : result) {
+                text_isStrongPassword.append("• " + s + "\n");
+            }
+            text_isStrongPassword.setVisibility(TextView.VISIBLE);
             signup.setAlpha(1f);
             signup.setEnabled(true);
             return;
         }
+
         if (!password.equals(password2)) {
             Toast.makeText(this, "passwords do not match", Toast.LENGTH_SHORT).show();
             signup.setAlpha(1f);
