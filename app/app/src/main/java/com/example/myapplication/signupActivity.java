@@ -24,14 +24,17 @@ import java.util.regex.Pattern;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
+import retrofit2.Retrofit;
 
 public class signupActivity extends AppCompatActivity {
     Button signup;
     TextView login, text_isStrongPassword;
-    EditText input_username, input_password, input_password2;
+    EditText input_username, input_fullname, input_email, input_password, input_password2;
     String url;
 
     @Override
@@ -41,6 +44,8 @@ public class signupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
 
         input_username = findViewById(R.id.input_username);
+        input_fullname = findViewById(R.id.input_fullname);
+        input_email = findViewById(R.id.input_email);
         input_password = findViewById(R.id.input_password);
         input_password2 = findViewById(R.id.input_password2);
 
@@ -131,6 +136,8 @@ public class signupActivity extends AppCompatActivity {
     }
     public void startSignupProcess() {
         String username = input_username.getText().toString();
+        String fullname = input_fullname.getText().toString();
+        String email = input_email.getText().toString();
         String password = input_password.getText().toString();
         String password2 = input_password2.getText().toString();
 
@@ -159,59 +166,55 @@ public class signupActivity extends AppCompatActivity {
             return;
         }
 
-        String local_url = url + username + "&password=" + password;
+        RequestBody fullnameBody = RequestBody.create(MediaType.parse("text/plain"), fullname);
+        RequestBody emailBody = RequestBody.create(MediaType.parse("text/plain"), email);
+        RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), username);
+        RequestBody passwordBody = RequestBody.create(MediaType.parse("text/plain"), password);
 
-        final String[] status = new String[2];
+        Retrofit retrofit = NetworkClient.getRetrofit(getApplicationContext());
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(local_url)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+        retrofit2.Call<UploadResponse> call = uploadApis.signup(fullnameBody, usernameBody, emailBody, passwordBody);
+        call.enqueue(new retrofit2.Callback<UploadResponse>() {
             @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+            public void onResponse(retrofit2.Call<UploadResponse> call, retrofit2.Response<UploadResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UploadResponse ServerResponse = response.body();
+                    if (ServerResponse.getStatus().equals("success")) {
+                        UserLocalStore userLocalStore = new UserLocalStore(getApplicationContext());
+                        userLocalStore.setUser(username, password);
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), "Account Created Successfully", Toast.LENGTH_LONG).show();
+                            launchMainActivity();
+                        });
+
+                    } else {
+                        String message = ServerResponse.getMessage();
+                        runOnUiThread(()->{
+                            signup.setAlpha(1f);
+                            signup.setEnabled(true);
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                        });
+                    }
+                }
+                else {
+                    runOnUiThread(() -> {
+                        signup.setAlpha(1f);
+                        signup.setEnabled(true);
+                        Toast.makeText(getApplicationContext(), "No Server Response", Toast.LENGTH_LONG).show();
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure (retrofit2.Call < UploadResponse > call, Throwable t){
                 runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), "Failed to Signup " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Failed to Signup " + t.getMessage(), Toast.LENGTH_LONG).show();
                     signup.setAlpha(1f);
                     signup.setEnabled(true);
                 });
             }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                String responseBody = response.body().string();
-                try {
-                    JSONObject jsonObject = new JSONObject(responseBody);
-                    status[0] = jsonObject.getString("status");
-                    status[1] = jsonObject.getString("message");
-                }
-
-                catch (JSONException e) {
-                    runOnUiThread(() -> {
-                        Toast.makeText(getApplicationContext(), "Failed to get status" + e.getMessage(), Toast.LENGTH_LONG).show();
-                        signup.setAlpha(1f);
-                        signup.setEnabled(true);
-                    });
-                }
-                if (status[0].equals("success")) {
-                    UserLocalStore userLocalStore = new UserLocalStore(getApplicationContext());
-                    userLocalStore.setUser(username, password);
-                    runOnUiThread(() -> {
-                        Toast.makeText(getApplicationContext(), "Account Created Successfully", Toast.LENGTH_LONG).show();
-                        launchMainActivity();
-                    });
-                }
-                else {
-                    runOnUiThread(() -> {
-                        Toast.makeText(getApplicationContext(), status[1], Toast.LENGTH_LONG).show();
-                        signup.setAlpha(1f);
-                        signup.setEnabled(true);
-                    });
-                }
-            }
         });
-
     }
 
     public void launchMainActivity() {

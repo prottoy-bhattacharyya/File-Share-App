@@ -109,7 +109,9 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Fullname</th>
                     <th>Username</th>
+                    <th>Email</th>
                     <th>Hashed Password</th>
                 </tr>
             </thead>
@@ -119,10 +121,12 @@
                     <td>{{ credential.0 }}</td>
                     <td>{{ credential.1 }}</td>
                     <td>{{ credential.2 }}</td>
+                    <td>{{ credential.3 }}</td>
+                    <td>{{ credential.4 }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3">No users found.</td>
+                    <td colspan="5">No users found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

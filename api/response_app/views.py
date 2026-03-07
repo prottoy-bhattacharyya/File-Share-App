@@ -1,3 +1,5 @@
+import re
+
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -28,8 +30,10 @@ def index(request):
 
         cursor.execute("""create table if not exists user_credentials(
                         id int primary key auto_increment, 
+                        fullname text,
                         username text,
-                        hashed_password text	
+                        email text,
+                        hashed_password text
                         );""")
         
         cursor.execute("""create table if not exists file_info(
@@ -77,10 +81,11 @@ def admin_view(request):
 
 def check_login(request):
 
-    username = request.GET.get('username')
+    username_or_email = request.GET.get('username')
     password = request.GET.get('password')
 
-    if not username or not password:
+
+    if not username_or_email or not password:
         response = {
             'status': 'data error',
             'message': 'Username and password are required.'
@@ -96,17 +101,32 @@ def check_login(request):
         return JsonResponse(response, status=500)
     
     cursor = conn.cursor()
-    cursor.execute("""SELECT username, hashed_password
-                    FROM user_credentials
-                    WHERE username = %s""", 
-                    (username,)
-                )
+
+    email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._%+-]+\.[a-zA-Z]{2,}$"
+
+    if re.match(email_pattern, username_or_email):
+        email = username_or_email
+        cursor.execute("""SELECT username, email hashed_password
+                        FROM user_credentials
+                        WHERE email = %s""", 
+                        (email,)
+                    )
+        
+        
+    else:
+        username = username_or_email
+        cursor.execute("""SELECT username, email, hashed_password
+                        FROM user_credentials
+                        WHERE username = %s""", 
+                        (username,)
+                    )
+    
     result = cursor.fetchone()
     cursor.close()
     conn.close()
 
     if result:
-        valid_username, valid_hashed_password = result
+        valid_username, _ , valid_hashed_password = result
     else:
         response = {
             'status': 'user error',
@@ -137,21 +157,24 @@ def check_login(request):
     return JsonResponse(response)
 
 
+@csrf_exempt
 def signup(request):
-    username = request.GET.get('username')
-    password = request.GET.get('password')
+    fullname = request.POST.get('fullname')
+    email = request.POST.get('email')
+    username = request.POST.get('username')
+    password = request.POST.get('password')
 
-    if not username or not password:
+    if not fullname or not email or not username or not password:
         response = {
             'status': 'data error',
-            'message': 'Username and password are required.'
+            'message': 'All fields are required.'
         }
         return JsonResponse(response, status=400)
     
     conn = get_connection()
     if not conn:
         response = {
-            'status': 'DB error',
+            'status': 'DB conn error',
             'message': 'Database connection failed.'
         }
         return JsonResponse(response, status=500)
@@ -162,14 +185,24 @@ def signup(request):
     cursor.execute("""SELECT username FROM user_credentials WHERE username = %s""", (username,))
     if cursor.fetchone():
         response = {
-            'status': 'user error',
+            'status': 'username exists error',
             'message': 'Username already exists.'
         }
         cursor.close()
         conn.close()
         return JsonResponse(response, status=400)
     
-    cursor.execute("INSERT INTO user_credentials (username, hashed_password) VALUES (%s, %s)", (username, hashed_password))
+    cursor.execute("""SELECT email FROM user_credentials WHERE email = %s""", (email,))
+    if cursor.fetchone():
+        response = {
+            'status': 'email exists error',
+            'message': 'Email already exists.'
+        }
+        cursor.close()
+        conn.close()
+        return JsonResponse(response, status=400)
+    
+    cursor.execute("INSERT INTO user_credentials (fullname, email, username, hashed_password) VALUES (%s, %s, %s, %s)", (fullname, email, username, hashed_password))
     conn.commit()
     cursor.close()
     conn.close()

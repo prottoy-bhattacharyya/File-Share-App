@@ -145,7 +145,6 @@ public class directTransferActivity extends AppCompatActivity {
             openFile(file);
         });
 
-        // Start server thread to listen for incoming files
         new Thread(new ServerThread()).start();
     }
 

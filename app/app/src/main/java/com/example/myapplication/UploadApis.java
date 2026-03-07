@@ -11,6 +11,13 @@ import retrofit2.http.Part;
 
 public interface UploadApis {
 
+    @Multipart
+    @POST("signup/")
+    Call<UploadResponse> signup(@Part("fullname") RequestBody fullname,
+                                @Part("username") RequestBody username,
+                                @Part("email") RequestBody email,
+                                @Part("password") RequestBody password
+    );
 
     @Multipart
     @POST("post_files/")
