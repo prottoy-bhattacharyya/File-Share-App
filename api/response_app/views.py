@@ -78,11 +78,11 @@ def admin_view(request):
     return render(request, 'response_app/admin.html', context)
 
 
+@csrf_exempt
+def login(request):
 
-def check_login(request):
-
-    username_or_email = request.GET.get('username')
-    password = request.GET.get('password')
+    username_or_email = request.POST.get('username')
+    password = request.POST.get('password')
 
 
     if not username_or_email or not password:
@@ -106,16 +106,15 @@ def check_login(request):
 
     if re.match(email_pattern, username_or_email):
         email = username_or_email
-        cursor.execute("""SELECT username, email hashed_password
+        cursor.execute("""SELECT username, fullname, email, hashed_password
                         FROM user_credentials
                         WHERE email = %s""", 
                         (email,)
                     )
         
-        
     else:
         username = username_or_email
-        cursor.execute("""SELECT username, email, hashed_password
+        cursor.execute("""SELECT username, fullname, email, hashed_password
                         FROM user_credentials
                         WHERE username = %s""", 
                         (username,)
@@ -126,7 +125,7 @@ def check_login(request):
     conn.close()
 
     if result:
-        valid_username, _ , valid_hashed_password = result
+        valid_username, fullname, email, valid_hashed_password = result
     else:
         response = {
             'status': 'user error',
@@ -139,9 +138,12 @@ def check_login(request):
         return JsonResponse(response, status=404)
     
 
-    if username == valid_username and check_password(password, valid_hashed_password):
+    if check_password(password, valid_hashed_password):
         response = {
             'status': 'success',
+            'username': valid_username,
+            'email': email,
+            'fullname': fullname,
             'message': 'Login successful.'
         }
     else:
