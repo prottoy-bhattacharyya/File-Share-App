@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/text_view_file_transfer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Transfer History"
+        android:textColor="?attr/colorPrimary"
+        android:textAlignment="center"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TableLayout
+        android:id="@+id/file_transfer_table"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:stretchColumns="*"
+        app:layout_constraintTop_toBottomOf="@+id/text_view_file_transfer">
+
+        <TableRow
+            android:background="?attr/colorSurfaceVariant"
+            android:paddingVertical="8dp">
+            <TextView android:text="Sender" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
+            <TextView android:text="Type" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
+            <TextView android:text="Receiver" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
+        </TableRow>
+    </TableLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

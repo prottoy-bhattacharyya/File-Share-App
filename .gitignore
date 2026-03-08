@@ -1,0 +1,35 @@
+# Python-generated files
+/api/__pycache__/
+/api/*.py[oc]
+/api/build/
+/api/dist/
+/api/wheels/
+/api/*.egg-info
+
+# Virtual environments
+/api/.venv
+
+# sqlite database
+/api/db.sqlite3
+
+# Django media files
+/api/media/*
+
+# Android Studio files
+/app/*.iml
+/app/.gradle
+/app//local.properties
+/app//.idea/caches
+/app//.idea/libraries
+/app//.idea/modules.xml
+/app//.idea/workspace.xml
+/app//.idea/navEditor.xml
+/app//.idea/assetWizardSettings.xml
+/app/.DS_Store
+/app//build
+/app//captures
+/app/.externalNativeBuild
+/app/.cxx
+/app/local.properties
+/api/media
+/api/.venv
