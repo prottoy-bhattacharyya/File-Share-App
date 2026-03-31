@@ -62,7 +62,7 @@
             android:background="?attr/colorSurfaceVariant"
             android:paddingVertical="8dp">
             <TextView android:text="Sender" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
-            <TextView android:text="Type" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
+            <TextView android:text="Code" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
             <TextView android:text="Receiver" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
         </TableRow>
     </TableLayout>

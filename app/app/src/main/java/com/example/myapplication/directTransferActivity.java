@@ -49,9 +49,9 @@ import java.util.List;
 
 public class directTransferActivity extends AppCompatActivity {
 
-    private static final String TAG = "WiFiDirectApp";
+    private static final String TAG = "FileShareApp - DirectDownload";
     private static final int PORT = 8888;
-    private static final String SHARE_FOLDER = "wifi direct share";
+    private final String SHARE_FOLDER = getResources().getString(R.string.download_folder);
 
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;

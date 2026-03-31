@@ -47,7 +47,7 @@
                 android:id="@+id/icon_user"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/user"
+                android:src="@drawable/ic_user"
                 android:contentDescription="User Icon" />
 
             <LinearLayout
@@ -116,7 +116,7 @@
         android:textAllCaps="false"
         android:textSize="18sp"
         app:cornerRadius="12dp"
-        app:icon="@drawable/send"
+        app:icon="@drawable/ic_send"
         app:iconGravity="textStart"
         app:iconPadding="16dp"
         app:layout_constraintBottom_toTopOf="@+id/direct_transfer_btn"
@@ -153,7 +153,7 @@
         android:textColor="?attr/colorPrimary"
         android:textSize="18sp"
         app:cornerRadius="12dp"
-        app:icon="@drawable/download"
+        app:icon="@drawable/ic_download"
         app:iconGravity="textStart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

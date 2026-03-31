@@ -46,7 +46,8 @@ public class UserProfileActivity extends AppCompatActivity {
             startActivity(intent);
         });
         btn_received_files.setOnClickListener(view -> {
-
+            Intent intent = new Intent(UserProfileActivity.this, ReceivedFilesActivity.class);
+            startActivity(intent);
         });
     }
 }

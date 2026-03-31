@@ -100,7 +100,7 @@ public class receiveActivity extends AppCompatActivity {
                 .startScan()
                 .addOnSuccessListener(
                         barcode -> {
-                            unique_text_value = barcode.getRawValue(); // Store value globally
+                            unique_text_value = barcode.getRawValue();
                             type_text.setText(unique_text_value);
                             start_download_process();
                         })
@@ -264,6 +264,7 @@ public class receiveActivity extends AppCompatActivity {
     }
 
 
+
     private void enqueueDownload(String url, String filename) {
         try {
             DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
@@ -277,7 +278,7 @@ public class receiveActivity extends AppCompatActivity {
             request.setTitle(filename);
             request.setDescription("Downloading file...");
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, getResources().getString(R.string.download_folder) + "/" + filename);
             request.setAllowedOverMetered(true);
             request.setAllowedOverRoaming(true);
 

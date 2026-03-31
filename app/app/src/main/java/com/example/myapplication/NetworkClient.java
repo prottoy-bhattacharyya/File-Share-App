@@ -16,8 +16,8 @@ public class NetworkClient {
         BASE_URL = context.getString(R.string.server_url) + "/";
 
         OkHttpClient client = new OkHttpClient.Builder()
-
                 .build();
+
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)

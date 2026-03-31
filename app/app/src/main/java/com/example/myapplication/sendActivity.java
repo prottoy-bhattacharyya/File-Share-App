@@ -280,11 +280,11 @@ public class sendActivity extends AppCompatActivity {
         } else {
 
             if (fileName.endsWith(".pdf")) {
-                imageView.setImageResource(R.drawable.pdf);
+                imageView.setImageResource(R.drawable.ic_pdf);
             } else if (fileName.endsWith(".doc") || fileName.endsWith(".docx") || fileName.endsWith(".txt")) {
-                imageView.setImageResource(R.drawable.docs);
+                imageView.setImageResource(R.drawable.ic_docs);
             } else if (fileName.endsWith(".mp3") || fileName.endsWith(".wav") || fileName.endsWith(".flac")) {
-                imageView.setImageResource(R.drawable.audio);
+                imageView.setImageResource(R.drawable.ic_audio);
             } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
                  imageView.setImageResource(R.drawable.ic_launcher_foreground);
             } else {

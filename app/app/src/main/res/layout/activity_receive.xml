@@ -52,7 +52,7 @@
         android:fontFamily="sans-serif-medium"
         app:cornerRadius="12dp"
         android:backgroundTint="?attr/colorSecondary"
-        app:icon="@drawable/qr_code"
+        app:icon="@drawable/ic_qr_code"
         app:iconGravity="textStart"
         app:iconPadding="16dp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -53,7 +53,7 @@
             android:background="#FFFFFF"
             android:padding="16dp"
             android:scaleType="centerInside"
-            android:src="@drawable/loading" />
+            android:src="@drawable/ic_loading" />
 
     </androidx.cardview.widget.CardView>
 
@@ -97,7 +97,7 @@
         android:fontFamily="sans-serif-medium"
         app:cornerRadius="12dp"
         android:backgroundTint="?attr/colorSecondary"
-        app:icon="@drawable/share"
+        app:icon="@drawable/ic_share"
         app:iconGravity="textStart"
         app:iconPadding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
