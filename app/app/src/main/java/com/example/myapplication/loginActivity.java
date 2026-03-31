@@ -7,26 +7,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import retrofit2.Retrofit;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
 
 public class loginActivity extends AppCompatActivity {
 
@@ -44,15 +29,6 @@ public class loginActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                finishAffinity();
-            }
-        });
-
-        // The callback can be enabled or disabled here or in handleOnBackPressed()
         login = findViewById(R.id.button_login);
         guest_btn = findViewById(R.id.button_guest);
         signup = findViewById(R.id.text_signup);

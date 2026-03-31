@@ -135,7 +135,7 @@ def login(request):
             cursor.close()
         if conn:
             conn.close()
-        return JsonResponse(response, status=404)
+        return JsonResponse(response)
     
 
     if check_password(password, valid_hashed_password):

@@ -1,6 +1,5 @@
 package com.example.myapplication;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -10,11 +9,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import java.util.List;
 
@@ -25,15 +20,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class userInfoActivity extends AppCompatActivity {
+public class UserHistoryActivity extends AppCompatActivity {
 
     TableLayout file_transfer_table;
+    TextView empty_message;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_user_info);
+        setContentView(R.layout.activity_user_history);
         file_transfer_table = findViewById(R.id.file_transfer_table);
+        empty_message = findViewById(R.id.empty_message);
 
         UserLocalStore userLocalStore = new UserLocalStore(this);
         String username = userLocalStore.getUsername();
@@ -49,24 +47,26 @@ public class userInfoActivity extends AppCompatActivity {
         call.enqueue(new Callback<UserDataResponse>() {
             @Override
             public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
+                findViewById(R.id.fetching_history).setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     UserDataResponse userDataResponse = response.body();
                     if ("success".equals(userDataResponse.getStatus()) && userDataResponse.getData() != null) {
                         addUserDataRows(file_transfer_table, userDataResponse.getData());
                     }
                     else {
-                        Toast.makeText(userInfoActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserHistoryActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
                     }
                 }
                 else {
-                    Toast.makeText(userInfoActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserHistoryActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<UserDataResponse> call, Throwable t) {
+                findViewById(R.id.fetching_history).setVisibility(View.GONE);
                 runOnUiThread(()->{
-                    Toast.makeText(userInfoActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserHistoryActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
                 });
 
             }
@@ -76,9 +76,10 @@ public class userInfoActivity extends AppCompatActivity {
 
     public void addUserDataRows(TableLayout file_transfer_table, List<userInfo> dataList){
         if (dataList == null || dataList.isEmpty()) {
-            Toast.makeText(userInfoActivity.this, "no data", Toast.LENGTH_SHORT).show();
+            empty_message.setVisibility(View.VISIBLE);
             return;
         }
+        file_transfer_table.setVisibility(View.VISIBLE);
 
         for (int i = 0; i < dataList.size(); i++) {
             userInfo info = dataList.get(i);

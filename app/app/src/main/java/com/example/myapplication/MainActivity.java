@@ -13,7 +13,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     Button send_buton, receive_buton, direct_transfer_btn;
     ImageButton logout_btn;
     TextView username;
-    LinearLayout user_info_btn;
+    LinearLayout user_profile_btn;
     UserLocalStore userLocalStore;
 
     @Override
@@ -37,14 +36,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void init_works() {
-
-
         username = findViewById(R.id.text_username);
         send_buton = findViewById(R.id.send_btn);
         direct_transfer_btn = findViewById(R.id.direct_transfer_btn);
         receive_buton = findViewById(R.id.receive_btn);
         logout_btn = findViewById(R.id.button_logout);
-        user_info_btn = findViewById(R.id.user_info_btn);
+        user_profile_btn = findViewById(R.id.user_info_btn);
 
         userLocalStore = new UserLocalStore(MainActivity.this);
 
@@ -56,14 +53,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void exqListener() {
-        user_info_btn.setOnClickListener(view -> {
+        user_profile_btn.setOnClickListener(view -> {
             if(!userLocalStore.isLoggedIn()){
                 Intent intent = new Intent(MainActivity.this, loginActivity.class);
                 startActivity(intent);
                 return;
             }
 
-            Intent intent = new Intent(MainActivity.this, userInfoActivity.class);
+            Intent intent = new Intent(MainActivity.this, UserProfileActivity.class);
             startActivity(intent);
         });
 

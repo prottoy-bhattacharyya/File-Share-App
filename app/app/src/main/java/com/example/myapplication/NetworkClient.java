@@ -2,6 +2,8 @@ package com.example.myapplication;
 
 import android.content.Context;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -10,10 +12,12 @@ public class NetworkClient {
     private static Retrofit retrofit;
     private static String BASE_URL;
 
-    static Retrofit getRetrofit(Context context){
+    public static Retrofit getRetrofit(Context context){
         BASE_URL = context.getString(R.string.server_url) + "/";
 
-        OkHttpClient client = new OkHttpClient.Builder().build();
+        OkHttpClient client = new OkHttpClient.Builder()
+
+                .build();
         if(retrofit == null){
             retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
