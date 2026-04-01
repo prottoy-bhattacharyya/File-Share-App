@@ -30,6 +30,18 @@
         app:queryHint="Search your documents..."
         app:searchIcon="@drawable/ic_search" />
 
+    <TextView
+        android:id="@+id/empty_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No Received Files Found"
+        android:textStyle="bold"
+        android:textColor="?attr/colorOnSurface"
+        android:layout_marginTop="16dp"
+        android:textSize="18dp"
+        android:textAlignment="center"
+        android:visibility="gone" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -52,4 +64,5 @@
             android:indeterminateTint="?attr/colorPrimary" />
 
     </FrameLayout>
+
 </LinearLayout>

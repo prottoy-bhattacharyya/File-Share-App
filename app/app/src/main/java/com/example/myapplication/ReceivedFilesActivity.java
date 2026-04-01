@@ -1,18 +1,18 @@
 package com.example.myapplication;
 
 import android.content.ActivityNotFoundException;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Environment;
+import android.provider.Settings;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -22,11 +22,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class ReceivedFilesActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private FileAdapter adapter;
-    private List<SharedFile> fileListFull = new ArrayList<>(); // Original backup
+    private List<SharedFile> fileListFull = new ArrayList<>();
     private SearchView searchView;
 
     @Override
@@ -43,13 +45,21 @@ public class ReceivedFilesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_received_files);
 
         recyclerView = findViewById(R.id.recycler_view);
-        searchView = findViewById(R.id.search_view); // Ensure this ID exists in your XML
+        searchView = findViewById(R.id.search_view);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                intent.setData(uri);
+                startActivity(intent);
+            }
+        }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         loadFiles();
 
-        // Implement the search listener
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -68,52 +78,56 @@ public class ReceivedFilesActivity extends AppCompatActivity {
 
     private void loadFiles() {
         fileListFull = fetchFilesFromFolder();
-        // Pass a COPY of the list to the adapter
+
         adapter = new FileAdapter(this, new ArrayList<>(fileListFull));
         recyclerView.setAdapter(adapter);
 
         if (fileListFull.isEmpty()) {
-            Toast.makeText(this, "No files found", Toast.LENGTH_SHORT).show();
+            findViewById(R.id.empty_message).setVisibility(View.VISIBLE);
         }
     }
 
     private List<SharedFile> fetchFilesFromFolder() {
         List<SharedFile> list = new ArrayList<>();
-        Uri collection = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ?
-                MediaStore.Downloads.EXTERNAL_CONTENT_URI :
-                MediaStore.Files.getContentUri("external");
 
-        String[] projection = {
-                MediaStore.Downloads.DISPLAY_NAME,
-                MediaStore.Downloads.SIZE,
-                MediaStore.Downloads._ID,
-                MediaStore.Downloads.MIME_TYPE
-        };
+        File folder = new File(Environment.getExternalStorageDirectory() + "/" + Environment.DIRECTORY_DOWNLOADS + "/File Share App");
+        File directory = new File(folder.toURI());
 
-        String selection = MediaStore.Downloads.RELATIVE_PATH + " LIKE ?";
-        String[] selectionArgs = new String[]{"Download/File Share App/%"};
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
 
-        try (Cursor cursor = getContentResolver().query(collection, projection, selection, selectionArgs, MediaStore.Downloads.DATE_ADDED + " DESC")) {
-            if (cursor != null) {
-                int nameCol = cursor.getColumnIndexOrThrow(MediaStore.Downloads.DISPLAY_NAME);
-                int sizeCol = cursor.getColumnIndexOrThrow(MediaStore.Downloads.SIZE);
-                int idCol = cursor.getColumnIndexOrThrow(MediaStore.Downloads._ID);
-                int mimeCol = cursor.getColumnIndexOrThrow(MediaStore.Downloads.MIME_TYPE);
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
 
-                while (cursor.moveToNext()) {
-                    Uri contentUri = ContentUris.withAppendedId(collection, cursor.getLong(idCol));
-                    list.add(new SharedFile(
-                            cursor.getString(nameCol),
-                            cursor.getLong(sizeCol),
-                            contentUri,
-                            cursor.getString(mimeCol)
-                    ));
+                        Uri fileUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+
+                        String mimeType = getMimeType(file);
+
+                        list.add(new SharedFile(
+                                file.getName(),
+                                file.length(),
+                                fileUri,
+                                mimeType
+                        ));
+                    }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return list;
+    }
+
+    private String getMimeType(File file) {
+        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
+        String fileName = file.getName();
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i + 1);
+        }
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+        if (mimeType == null) mimeType = "*/*";
+        return mimeType;
     }
 
     public static class SharedFile {
@@ -134,10 +148,9 @@ public class ReceivedFilesActivity extends AppCompatActivity {
         public String getMimeType() { return mimeType; }
     }
 
-    // --- ADAPTER UPDATED WITH FILTERABLE ---
     private class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder> implements Filterable {
         private final Context context;
-        private List<SharedFile> filesDisplayed; // The filtered list
+        private List<SharedFile> filesDisplayed;
 
         public FileAdapter(Context context, List<SharedFile> files) {
             this.context = context;
@@ -152,7 +165,7 @@ public class ReceivedFilesActivity extends AppCompatActivity {
                     List<SharedFile> filteredList = new ArrayList<>();
 
                     if (constraint == null || constraint.length() == 0) {
-                        filteredList.addAll(fileListFull); // Show all if empty
+                        filteredList.addAll(fileListFull);
                     } else {
                         String filterPattern = constraint.toString().toLowerCase().trim();
                         for (SharedFile item : fileListFull) {
@@ -190,11 +203,16 @@ public class ReceivedFilesActivity extends AppCompatActivity {
             holder.nameTxt.setText(file.getName());
             holder.sizeTxt.setText(Formatter.formatShortFileSize(context, file.getSize()));
 
-            Glide.with(context)
-                    .load(file.getUri())
-                    .placeholder(R.drawable.ic_loading)
-                    .error(R.drawable.ic_docs)
-                    .into(holder.imgThumb);
+
+
+
+            int iconResId = getIconForFileType(file.getMimeType(), file.getName());
+
+            if (file.getMimeType().startsWith("image/")) {
+                Glide.with(context).load(file.getUri()).placeholder(R.drawable.ic_image).into(holder.imgThumb);
+            } else {
+                holder.imgThumb.setImageResource(iconResId);
+            }
 
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -221,6 +239,22 @@ public class ReceivedFilesActivity extends AppCompatActivity {
                 sizeTxt = itemView.findViewById(R.id.fileSize);
                 imgThumb = itemView.findViewById(R.id.thumbnail);
             }
+        }
+
+        private int getIconForFileType(String mimeType, String fileName) {
+            if (mimeType == null) mimeType = "*/*";
+
+
+            if (mimeType.startsWith("audio/")) return R.drawable.ic_audio;
+            if (mimeType.equals("application/pdf")) return R.drawable.ic_pdf;
+
+            String name = fileName.toLowerCase();
+            if (name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z")) return R.drawable.ic_docs;
+            if (name.endsWith(".doc") || name.endsWith(".docx")) return R.drawable.ic_docs;
+            if (name.endsWith(".xls") || name.endsWith(".xlsx")) return R.drawable.ic_docs;
+            if (name.endsWith(".txt")) return R.drawable.ic_docs;
+
+            return R.drawable.ic_docs;
         }
     }
 }
