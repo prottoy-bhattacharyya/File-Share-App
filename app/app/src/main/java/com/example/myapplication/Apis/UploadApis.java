@@ -1,10 +1,13 @@
 // UploadApis.java
 package com.example.myapplication;
 
+import com.example.myapplication.Responses.LoginResponse;
+import com.example.myapplication.Responses.UploadResponse;
+import com.example.myapplication.Responses.UserDataResponse;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.http.Body;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -14,7 +17,7 @@ public interface UploadApis {
     @Multipart
     @POST("login/")
     Call<LoginResponse> login(@Part("username") RequestBody username,
-                                @Part("password") RequestBody password
+                              @Part("password") RequestBody password
     );
 
     @Multipart

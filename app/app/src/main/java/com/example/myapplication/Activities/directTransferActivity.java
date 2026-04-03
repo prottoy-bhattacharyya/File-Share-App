@@ -49,9 +49,9 @@ import java.util.List;
 
 public class directTransferActivity extends AppCompatActivity {
 
-    private static final String TAG = "FileShareApp - DirectDownload";
+    private static String TAG = "FileShareApp - DirectDownload";
     private static final int PORT = 8888;
-    private final String SHARE_FOLDER = getResources().getString(R.string.download_folder);
+    private String SHARE_FOLDER;
 
     private WifiP2pManager manager;
     private WifiP2pManager.Channel channel;
@@ -108,6 +108,8 @@ public class directTransferActivity extends AppCompatActivity {
         receivedFilesListView = findViewById(R.id.received_files_list);
         btnDiscover = findViewById(R.id.btn_discover);
         btnPickFile = findViewById(R.id.btn_pick_file);
+
+        SHARE_FOLDER = getResources().getString(R.string.download_folder);
 
         receivedFilesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, receivedFileNames);
         receivedFilesListView.setAdapter(receivedFilesAdapter);
