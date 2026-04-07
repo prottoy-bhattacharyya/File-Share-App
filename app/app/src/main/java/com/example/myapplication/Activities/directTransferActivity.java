@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -32,6 +32,8 @@ import androidx.core.app.ActivityCompat;
 
 import androidx.core.content.FileProvider;
 import android.webkit.MimeTypeMap;
+
+import com.example.myapplication.R;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="32dp"
-        tools:context=".signupActivity">
+        tools:context=".Activities.signupActivity">
 
         <TextView
             android:id="@+id/text_title_signup"

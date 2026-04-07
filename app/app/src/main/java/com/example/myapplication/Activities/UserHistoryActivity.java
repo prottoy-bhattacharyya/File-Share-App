@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,11 +10,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.myapplication.Apis.NetworkClient;
+import com.example.myapplication.R;
+import com.example.myapplication.Apis.UploadApis;
+import com.example.myapplication.Responses.UserHistoryResponse;
+import com.example.myapplication.UserLocalStore;
+import com.example.myapplication.Apis.userInfo;
+import com.google.gson.Gson;
+
+import java.io.IOException;
 import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,7 +34,8 @@ import retrofit2.Retrofit;
 public class UserHistoryActivity extends AppCompatActivity {
 
     TableLayout file_transfer_table;
-    TextView empty_message;
+    SwipeRefreshLayout swipeRefreshLayout;
+    TextView message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,55 +43,82 @@ public class UserHistoryActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_user_history);
         file_transfer_table = findViewById(R.id.file_transfer_table);
-        empty_message = findViewById(R.id.empty_message);
+        message = findViewById(R.id.message);
 
+        fetchUserHistory();
+        exqListener();
+    }
+
+    private void exqListener(){
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            fetchUserHistory();
+        });
+    }
+
+
+
+
+    private void fetchUserHistory(){
         UserLocalStore userLocalStore = new UserLocalStore(this);
         String username = userLocalStore.getUsername();
-
         RequestBody usernameBody = RequestBody.create(MediaType.parse("text/plain"), username);
 
         Retrofit retrofit = NetworkClient.getRetrofit(this);
 
         UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        Call<UserDataResponse> call = uploadApis.user_info(usernameBody);
+        Call<UserHistoryResponse> call = uploadApis.user_history(usernameBody);
 
-        call.enqueue(new Callback<UserDataResponse>() {
+        call.enqueue(new Callback<UserHistoryResponse>() {
             @Override
-            public void onResponse(Call<UserDataResponse> call, Response<UserDataResponse> response) {
-                findViewById(R.id.fetching_history).setVisibility(View.GONE);
+            public void onResponse(Call<UserHistoryResponse> call, Response<UserHistoryResponse> response) {
+
+                swipeRefreshLayout.setRefreshing(false);
+
                 if (response.isSuccessful() && response.body() != null) {
-                    UserDataResponse userDataResponse = response.body();
-                    if ("success".equals(userDataResponse.getStatus()) && userDataResponse.getData() != null) {
-                        addUserDataRows(file_transfer_table, userDataResponse.getData());
+                    UserHistoryResponse userHistoryResponse = response.body();
+                    if ("success".equals(userHistoryResponse.getStatus()) &&
+                            userHistoryResponse.getData() != null) {
+                        addUserDataRows(file_transfer_table, userHistoryResponse.getData());
                     }
                     else {
-                        Toast.makeText(UserHistoryActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+                        message.setText("Request Unsuccessful: " + userHistoryResponse.getMessage());
                     }
                 }
                 else {
-                    Toast.makeText(UserHistoryActivity.this, "Server Error", Toast.LENGTH_SHORT).show();
+                    UserHistoryResponse errorData = null;
+                    try {
+                        errorData = new Gson().fromJson(
+                                response.errorBody().string(),
+                                UserHistoryResponse.class
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    message.setText("Request Unsuccessful: " + errorData.getMessage());
                 }
             }
 
             @Override
-            public void onFailure(Call<UserDataResponse> call, Throwable t) {
-                findViewById(R.id.fetching_history).setVisibility(View.GONE);
+            public void onFailure(Call<UserHistoryResponse> call, Throwable t) {
                 runOnUiThread(()->{
-                    Toast.makeText(UserHistoryActivity.this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                    message.setText("Failed to fetch data. Check your internet connection.");
+                    message.setTextColor(getResources().getColor(R.color.red));
                 });
-
             }
         });
-
     }
-
     public void addUserDataRows(TableLayout file_transfer_table, List<userInfo> dataList){
         if (dataList == null || dataList.isEmpty()) {
-            empty_message.setVisibility(View.VISIBLE);
+            message.setVisibility(View.VISIBLE);
+            message.setText("No Data Found");
             return;
         }
+        message.setVisibility(View.GONE);
         file_transfer_table.setVisibility(View.VISIBLE);
+        file_transfer_table.removeAllViews();
 
         for (int i = 0; i < dataList.size(); i++) {
             userInfo info = dataList.get(i);

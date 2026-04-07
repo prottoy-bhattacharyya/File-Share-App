@@ -32,35 +32,35 @@
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true" >
         <activity
-            android:name=".ReceivedFilesActivity"
+            android:name=".Activities.ReceivedFilesActivity"
             android:exported="false" />
         <activity
-            android:name=".UserProfileActivity"
+            android:name=".Activities.UserProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".directTransferActivity"
+            android:name=".Activities.directTransferActivity"
             android:exported="true" >
         </activity>
         <activity
-            android:name=".UserHistoryActivity"
+            android:name=".Activities.UserHistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".signupActivity"
+            android:name=".Activities.signupActivity"
             android:exported="false" />
         <activity
-            android:name=".loginActivity"
+            android:name=".Activities.loginActivity"
             android:exported="false" />
         <activity
-            android:name=".qrActivity"
+            android:name=".Activities.qrActivity"
             android:exported="false" />
         <activity
-            android:name=".receiveActivity"
+            android:name=".Activities.receiveActivity"
             android:exported="false" />
         <activity
-            android:name=".sendActivity"
+            android:name=".Activities.sendActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

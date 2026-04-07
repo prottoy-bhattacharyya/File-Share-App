@@ -1,8 +1,8 @@
-package com.example.myapplication;
+package com.example.myapplication.Apis;
 
 import android.content.Context;
 
-import java.util.concurrent.TimeUnit;
+import com.example.myapplication.R;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;

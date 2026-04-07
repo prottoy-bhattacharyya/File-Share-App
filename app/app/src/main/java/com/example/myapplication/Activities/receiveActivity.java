@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -17,6 +17,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
+import com.example.myapplication.Apis.NetworkClient;
+import com.example.myapplication.R;
+import com.example.myapplication.Apis.UploadApis;
+import com.example.myapplication.Responses.UploadResponse;
+import com.example.myapplication.UserLocalStore;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner;
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions;

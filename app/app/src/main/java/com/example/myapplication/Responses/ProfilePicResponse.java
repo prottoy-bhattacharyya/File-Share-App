@@ -2,18 +2,12 @@ package com.example.myapplication.Responses;
 
 import com.google.gson.annotations.SerializedName;
 
-public class UploadResponse {
+public class ProfilePicResponse {
     @SerializedName("status")
     private String status;
 
     @SerializedName("message")
     private String message;
-
-    public UploadResponse(String status, String message) {
-        this.status = status;
-        this.message = message;
-
-    }
 
     public String getStatus() {
         return status;

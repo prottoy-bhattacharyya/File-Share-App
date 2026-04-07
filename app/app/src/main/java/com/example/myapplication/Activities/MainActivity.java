@@ -1,18 +1,24 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import com.example.myapplication.R;
+import com.example.myapplication.UriWorks;
+import com.example.myapplication.UserLocalStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +27,10 @@ public class MainActivity extends AppCompatActivity {
     Button send_buton, receive_buton, direct_transfer_btn;
     ImageButton logout_btn;
     TextView username;
+    ImageView profile_image;
     LinearLayout user_profile_btn;
     UserLocalStore userLocalStore;
+    UriWorks uriWorks = new UriWorks();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void init_works() {
         username = findViewById(R.id.text_username);
+        profile_image = findViewById(R.id.profile_image);
         send_buton = findViewById(R.id.send_btn);
         direct_transfer_btn = findViewById(R.id.direct_transfer_btn);
         receive_buton = findViewById(R.id.receive_btn);
@@ -46,9 +55,17 @@ public class MainActivity extends AppCompatActivity {
         userLocalStore = new UserLocalStore(MainActivity.this);
 
         username.setText(userLocalStore.getFullname());
+        Uri profileImageUri = uriWorks.getProfileImageURI(getApplicationContext());
+        if(profileImageUri != null){
+            profile_image.setImageURI(profileImageUri);
+        }
 
         if(!userLocalStore.isLoggedIn()){
             username.setText(getResources().getString(R.string.guest));
+            send_buton.setEnabled(false);
+            receive_buton.setEnabled(false);
+            send_buton.setAlpha(0.5f);
+            receive_buton.setAlpha(0.5f);
         }
     }
 

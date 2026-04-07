@@ -8,7 +8,7 @@
     android:background="?attr/colorSurface"
     android:paddingStart="32dp"
     android:paddingEnd="32dp"
-    tools:context=".MainActivity">
+    tools:context=".Activities.MainActivity">
 
     <ImageButton
         android:id="@+id/button_logout"
@@ -44,7 +44,7 @@
             android:padding="16dp">
 
             <ImageView
-                android:id="@+id/icon_user"
+                android:id="@+id/profile_image"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:src="@drawable/ic_user"

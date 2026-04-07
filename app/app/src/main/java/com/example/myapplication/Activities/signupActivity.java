@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,6 +12,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.myapplication.Apis.NetworkClient;
+import com.example.myapplication.R;
+import com.example.myapplication.Apis.UploadApis;
+import com.example.myapplication.Responses.UploadResponse;
+import com.example.myapplication.UserLocalStore;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;

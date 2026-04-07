@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -20,6 +20,14 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+
+import com.example.myapplication.Apis.NetworkClient;
+import com.example.myapplication.R;
+import com.example.myapplication.SmallFunctions;
+import com.example.myapplication.Apis.UploadApis;
+import com.example.myapplication.Responses.UploadResponse;
+import com.example.myapplication.UriWorks;
+import com.example.myapplication.UserLocalStore;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,7 +93,7 @@ public class sendActivity extends AppCompatActivity {
             UserLocalStore userLocalStore = new UserLocalStore(getApplicationContext());
             String username = userLocalStore.getUsername();
             if(username == null){
-                Toast.makeText(getApplicationContext(), "Username not found", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Please Login First", Toast.LENGTH_SHORT).show();
                 return;
             }
             RequestBody username_body = RequestBody.create(MediaType.parse("text/plain"), username);

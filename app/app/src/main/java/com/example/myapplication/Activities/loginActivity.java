@@ -1,4 +1,4 @@
-package com.example.myapplication;
+package com.example.myapplication.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.myapplication.Responses.LoginResponse;
+import com.example.myapplication.Apis.NetworkClient;
+import com.example.myapplication.R;
+import com.example.myapplication.Apis.UploadApis;
+import com.example.myapplication.UserLocalStore;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -93,6 +99,8 @@ public class loginActivity extends AppCompatActivity {
 
                         userLocalStore.setUser(fullname, email, username, password);
                         runOnUiThread(()->{
+                            login.setEnabled(true);
+                            login.setAlpha(1.0f);
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                             launchMainActivity();
                         });

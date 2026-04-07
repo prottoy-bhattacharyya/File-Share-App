@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -47,5 +48,29 @@ public class UriWorks {
             Toast.makeText(context, "Error processing file: " + e.getMessage(), Toast.LENGTH_LONG).show();
             return null;
         }
+    }
+
+    public void saveProfileImage(Context context, Uri profileImageUri){
+
+        try(InputStream inputStream = context.getContentResolver().openInputStream(profileImageUri)) {
+            FileOutputStream fileOutputStream = new FileOutputStream(new File(context.getFilesDir(), "profile_image.jpg"));
+
+            byte[] buffer = new byte[4096];
+            int size;
+            while ((size = inputStream.read(buffer)) != -1){
+                fileOutputStream.write(buffer, 0, size);
+            }
+        }
+        catch (Exception e){
+            Log.d("Profile Activity", "Profile Image Save Failed");
+        }
+    }
+
+    public Uri getProfileImageURI(Context context){
+        File file = new File(context.getFilesDir(), "profile_image.jpg");
+        if(file.exists()){
+            return Uri.fromFile(file);
+        }
+        return null;
     }
 }

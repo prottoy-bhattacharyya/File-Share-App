@@ -19,11 +19,10 @@
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <TextView
-        android:id="@+id/fetching_history"
-        android:layout_width="164dp"
-        android:layout_height="31dp"
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Fetching history..."
         android:textAlignment="center"
         android:textColor="?attr/colorOnSurfaceVariant"
@@ -34,37 +33,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view_file_transfer" />
 
-    <TextView
-        android:id="@+id/empty_message"
-        android:visibility="invisible"
-        android:layout_width="164dp"
-        android:layout_height="31dp"
-        android:text="Your History is Empty"
-        android:textAlignment="center"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:textSize="16sp"
-        android:textStyle="bold"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_view_file_transfer" />
-
-    <TableLayout
-        android:id="@+id/file_transfer_table"
-        android:visibility="invisible"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:stretchColumns="*"
         app:layout_constraintTop_toBottomOf="@+id/text_view_file_transfer">
 
-        <TableRow
-            android:background="?attr/colorSurfaceVariant"
-            android:paddingVertical="8dp">
-            <TextView android:text="Sender" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
-            <TextView android:text="Code" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
-            <TextView android:text="Receiver" android:textStyle="bold" android:textColor="?attr/colorOnSurface" android:textAlignment="center"/>
-        </TableRow>
-    </TableLayout>
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TableLayout
+                android:id="@+id/file_transfer_table"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="*"
+                android:visibility="invisible">
+
+                <TableRow
+                    android:background="?attr/colorSurfaceVariant"
+                    android:paddingVertical="8dp">
+                    <TextView android:text="Sender" android:textAlignment="center" android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
+                    <TextView android:text="Code" android:textAlignment="center" android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
+                    <TextView android:text="Receiver" android:textAlignment="center" android:textColor="?attr/colorOnSurface" android:textStyle="bold" />
+                </TableRow>
+            </TableLayout>
+        </ScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

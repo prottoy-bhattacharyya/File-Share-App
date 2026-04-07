@@ -1,9 +1,10 @@
 // UploadApis.java
-package com.example.myapplication;
+package com.example.myapplication.Apis;
 
 import com.example.myapplication.Responses.LoginResponse;
+import com.example.myapplication.Responses.ProfilePicResponse;
 import com.example.myapplication.Responses.UploadResponse;
-import com.example.myapplication.Responses.UserDataResponse;
+import com.example.myapplication.Responses.UserHistoryResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -30,17 +31,25 @@ public interface UploadApis {
 
     @Multipart
     @POST("post_files/")
-    Call<UploadResponse> uploadFile(@Part MultipartBody.Part file, @Part("unique_text") RequestBody unique_text);
+    Call<UploadResponse> uploadFile(@Part MultipartBody.Part file,
+                                    @Part("unique_text") RequestBody unique_text);
 
     @Multipart
     @POST("save_sender/")
-    Call<UploadResponse> save_sender(@Part("unique_text") RequestBody unique_text, @Part("username") RequestBody username);
+    Call<UploadResponse> save_sender(@Part("unique_text") RequestBody unique_text,
+                                     @Part("username") RequestBody username);
 
     @Multipart
     @POST("save_receiver/")
-    Call<UploadResponse> save_receiver(@Part("unique_text") RequestBody unique_text, @Part("username") RequestBody username);
+    Call<UploadResponse> save_receiver(@Part("unique_text") RequestBody unique_text,
+                                       @Part("username") RequestBody username);
 
     @Multipart
-    @POST("user_info/")
-    Call<UserDataResponse> user_info(@Part("username") RequestBody username);
+    @POST("user_history/")
+    Call<UserHistoryResponse> user_history(@Part("username") RequestBody username);
+
+    @Multipart
+    @POST("setUserProfilePicture/")
+    Call<ProfilePicResponse> setUserProfilePicture(@Part MultipartBody.Part profilePicture,
+                                                   @Part("username") RequestBody username);
 }

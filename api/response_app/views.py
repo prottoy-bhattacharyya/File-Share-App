@@ -216,6 +216,95 @@ def signup(request):
 
     return JsonResponse(response)
 
+@csrf_exempt
+def setUserProfilePicture(request):
+    username = request.POST.get('username')
+    if request.method == "POST":
+        if 'profilePicture' in request.FILES:
+            profilePicture = request.FILES['profilePicture']
+        else:
+            response = {
+                'status': 'data error',
+                'message': 'Profile picture is required.'
+            }
+            return JsonResponse(response)
+
+    if not username or not profilePicture:
+        response = {
+            'status': 'data error',
+            'message': 'Username and profile picture are required.'
+        }
+        return JsonResponse(response)
+    
+    conn = get_connection()
+    if not conn:
+        response = {
+            'status': 'DB error',
+            'message': 'Database connection failed.'
+        }
+        return JsonResponse(response)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""UPDATE user_credentials
+                        SET profile_picture = %s WHERE username = %s""", 
+                        (profilePicture.read(), username)
+                    )
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        response = {
+            'status': 'DB error',
+            'message': 'Database saved failed.'
+        }
+        return JsonResponse(response)
+    
+    response = {
+        'status': 'success',
+        'message': 'Profile picture updated successfully.'
+    }
+
+    return JsonResponse(response)
+
+def getUserProfilePicture(request):
+    username = request.GET.get('username')
+    if not username:
+        response = {
+            'status': 'data error',
+            'message': 'Username is required.'
+        }
+        return JsonResponse(response, status=400)
+    
+    conn = get_connection()
+    if not conn:
+        response = {
+            'status': 'DB error',
+            'message': 'Database connection failed.'
+        }
+        return JsonResponse(response)
+    
+    cursor = conn.cursor()
+    cursor.execute("""SELECT profile_picture FROM user_credentials 
+                   WHERE username = %s""", (username,)
+                )
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if result:
+        profile_picture = result[0]
+        response = FileResponse(profile_picture, content_type='image/jpeg')
+        return response
+    
+    else:
+        response = {
+            'status': 'user error',
+            'message': 'User not found or no profile picture set.'
+        }
+        return JsonResponse(response, status=404)
+
 def download(request):
     unique_text = request.GET.get('unique_text')
     file_index = int(request.GET.get('file_index'))
@@ -353,7 +442,7 @@ def post_files(request):
         return JsonResponse(response, status=400)
     
 @csrf_exempt
-def user_info(request):
+def user_history(request):
     if request.method != 'POST':
         response = {
             'status': 'error',
@@ -392,5 +481,3 @@ def user_info(request):
         ]
     }
     return JsonResponse(response)
-
-
