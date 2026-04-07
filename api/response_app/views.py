@@ -1,3 +1,4 @@
+import io
 import re
 
 from django.http import FileResponse, HttpResponse, JsonResponse
@@ -33,6 +34,7 @@ def index(request):
                         fullname text,
                         username text,
                         email text,
+                        profile_picture mediumblob,
                         hashed_password text
                         );""")
         
@@ -257,7 +259,7 @@ def setUserProfilePicture(request):
     except Exception as e:
         response = {
             'status': 'DB error',
-            'message': 'Database saved failed.'
+            'message': 'Failed to update profile picture: ' + str(e)
         }
         return JsonResponse(response)
     
@@ -268,6 +270,7 @@ def setUserProfilePicture(request):
 
     return JsonResponse(response)
 
+
 def getUserProfilePicture(request):
     username = request.GET.get('username')
     if not username:
@@ -275,7 +278,7 @@ def getUserProfilePicture(request):
             'status': 'data error',
             'message': 'Username is required.'
         }
-        return JsonResponse(response, status=400)
+        return JsonResponse(response)
     
     conn = get_connection()
     if not conn:
@@ -294,16 +297,19 @@ def getUserProfilePicture(request):
     conn.close()
 
     if result:
-        profile_picture = result[0]
-        response = FileResponse(profile_picture, content_type='image/jpeg')
+        profile_picture_binary = result[0]
+        response = FileResponse(io.BytesIO(profile_picture_binary), 
+                                as_attachment=True, 
+                                content_type='image/jpeg'
+                            )
         return response
     
     else:
         response = {
             'status': 'user error',
-            'message': 'User not found or no profile picture set.'
+            'message': 'User not found or no profile picture set yet.'
         }
-        return JsonResponse(response, status=404)
+        return JsonResponse(response)
 
 def download(request):
     unique_text = request.GET.get('unique_text')
