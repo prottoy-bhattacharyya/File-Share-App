@@ -29,30 +29,31 @@ def index(request):
     cursor = conn.cursor()
     try:
 
-        cursor.execute("""create table if not exists user_credentials(
+        cursor.execute("""create table if not exists user_credentials (
                             id int primary key auto_increment, 
                             fullname text,
                             username text,
                             email text,
                             profile_picture mediumblob,
-                            hashed_password text
+                            hashed_password text,
+                            timestamp timestamp default current_timestamp
                         );""")
         
-        cursor.execute("""create table if not exists file_info(
+        cursor.execute("""create table if not exists file_info (
                             id int primary key auto_increment, 
                             sender text,
                             unique_text text,
-                            receiver text
+                            receiver text,
+                            timestamp timestamp default current_timestamp
                         );""")
         
-        cursor.execute("""create table if not exists file_blobs(
+        cursor.execute("""create table if not exists file_blobs (
                             id int primary key auto_increment, 
                             unique_text text,
                             file_name text,
-                            file_blob longblob
-                       );"""
-
-        )
+                            file_blob longblob,
+                            timestamp timestamp default current_timestamp
+                       );""")
         
         conn.commit()
 
@@ -319,6 +320,50 @@ def getUserProfilePicture(request):
             'message': 'User not found or no profile picture set yet.'
         }
         return JsonResponse(response)
+    
+@csrf_exempt
+def upload_file(request):
+    if request.method != 'POST':
+        response = {
+            'status': 'error',
+            'message': 'Invalid request method.'
+        }
+        return JsonResponse(response, status=400)
+    
+    if 'file' in request.FILES:
+        file = request.FILES['file']
+    
+    unique_text = request.POST.get('unique_text')
+    if not unique_text:
+        response = {
+            'status': 'error',
+            'message': 'No unique_text provided.'
+        }
+        return JsonResponse(response, status=400)
+    
+    conn = get_connection()
+    if not conn:
+        response = {
+            'status': 'DB error',
+            'message': 'Database connection failed.'
+        }
+        return JsonResponse(response, status=500)
+    
+    cursor = conn.cursor()
+    file_binary = file.read()
+    cursor.execute("""insert into file_blobs(unique_text, file_blob) 
+                        values (%s, %s)""", 
+                        (unique_text, file_binary)
+                    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    response = {
+        'status': 'success',
+        'message': 'File uploaded successfully.'
+    }
+    return JsonResponse(response)
 
 def download(request):
     unique_text = request.GET.get('unique_text')
@@ -455,50 +500,6 @@ def post_files(request):
             'message': 'Invalid request method.'
         }
         return JsonResponse(response, status=400)
-    
-
-@csrf_exempt
-def upload_file(request):
-    if request.method != 'POST':
-        response = {
-            'status': 'error',
-            'message': 'Invalid request method.'
-        }
-        return JsonResponse(response, status=400)
-    
-    if 'file' in request.FILES:
-        file = request.FILES['file']
-    
-    unique_text = request.POST.get('unique_text')
-    if not unique_text:
-        response = {
-            'status': 'error',
-            'message': 'No unique_text provided.'
-        }
-        return JsonResponse(response, status=400)
-    
-    conn = get_connection()
-    if not conn:
-        response = {
-            'status': 'DB error',
-            'message': 'Database connection failed.'
-        }
-        return JsonResponse(response, status=500)
-    
-    cursor = conn.cursor()
-    cursor.execute("""insert into file_blobs(unique_text, file) 
-                        values (%s, %s)""", 
-                        (unique_text, file.read())
-                    )
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    response = {
-        'status': 'success',
-        'message': 'File uploaded successfully.'
-    }
-    return JsonResponse(response)
 
 @csrf_exempt
 def user_history(request):
