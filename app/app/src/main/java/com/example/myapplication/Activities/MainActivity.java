@@ -3,7 +3,6 @@ package com.example.myapplication.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
@@ -16,12 +15,23 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.bumptech.glide.Glide;
+import com.example.myapplication.Apis.NetworkClient;
+import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.R;
-import com.example.myapplication.UriWorks;
 import com.example.myapplication.UserLocalStore;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     Button send_buton, receive_buton, direct_transfer_btn;
@@ -30,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView profile_image;
     LinearLayout user_profile_btn;
     UserLocalStore userLocalStore;
-    UriWorks uriWorks = new UriWorks();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,13 +64,13 @@ public class MainActivity extends AppCompatActivity {
 
         userLocalStore = new UserLocalStore(MainActivity.this);
 
-        username.setText(userLocalStore.getFullname());
-        Uri profileImageUri = uriWorks.getProfileImageURI(getApplicationContext());
-        if(profileImageUri != null){
-            profile_image.setImageURI(profileImageUri);
+        if (userLocalStore.isLoggedIn()) {
+            username.setText(userLocalStore.getFullname());
+            getProfileFromServer();
+            updateProfileUI();
         }
 
-        if(!userLocalStore.isLoggedIn()){
+        else {
             username.setText(getResources().getString(R.string.guest));
             send_buton.setEnabled(false);
             receive_buton.setEnabled(false);
@@ -127,5 +137,74 @@ public class MainActivity extends AppCompatActivity {
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), 100);
         }
+    }
+
+    private void updateProfileUI() {
+
+        File profile_pic = new File(getFilesDir(), "profile_image.jpg");
+        if (profile_pic.exists()){
+            Glide.with(this)
+                    .load(profile_pic)
+                    .signature(new com.bumptech.glide.signature.ObjectKey(profile_pic.lastModified()))
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_user)
+                    .error(R.drawable.ic_user)
+                    .into(profile_image);
+        }
+    }
+
+    private void getProfileFromServer() {
+
+        String username = userLocalStore.getUsername();
+        UploadApis api = NetworkClient.getRetrofit(this).create(UploadApis.class);
+
+        api.getUserProfilePicture(username).enqueue(new Callback<ResponseBody>() {
+
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    new Thread(() -> {
+                        try (InputStream inputStream = response.body().byteStream();
+                             FileOutputStream outputStream = new FileOutputStream(new File(getFilesDir(), "profile_image.jpg"))) {
+
+                            byte[] buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outputStream.write(buffer, 0, bytesRead);
+                            }
+                            outputStream.flush();
+
+                            runOnUiThread(()->{
+                                updateProfileUI();
+                            });
+                        } catch (IOException e) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(getApplicationContext(),
+                                                "Server error: " + e.getMessage(),
+                                                Toast.LENGTH_SHORT)
+                                                .show();
+                            });
+                        }
+                    }).start();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                runOnUiThread(()->{
+                    Toast.makeText(getApplicationContext(),
+                                    "Network failure: " + t.getMessage(),
+                                    Toast.LENGTH_SHORT)
+                                    .show();
+                });
+            }
+        });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateProfileUI();
     }
 }

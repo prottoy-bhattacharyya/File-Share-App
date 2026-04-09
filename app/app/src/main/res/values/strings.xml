@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">File Share</string>
 
-    <string name="title_item_detail">Item Detail</string>
-
     <string name="download_folder">File Share App</string>
     <string name="guest">Guest</string>
-    <string name="server_url">http://192.168.1.138:8000</string>
+    <string name="server_url">https://file-share-app-ten.vercel.app</string>
 </resources>

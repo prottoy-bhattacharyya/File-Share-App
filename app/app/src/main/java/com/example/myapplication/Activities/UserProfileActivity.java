@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.R;
@@ -64,10 +65,7 @@ public class UserProfileActivity extends AppCompatActivity {
         tv_username.setText(userLocalStore.getUsername());
         tv_email.setText(userLocalStore.getEmail());
 
-        Uri profileImageUri = uriWorks.getProfileImageURI(getApplicationContext());
-        if(profileImageUri != null){
-            profile_image.setImageURI(profileImageUri);
-        }
+        updateProfileUI();
     }
 
     void exqListener(){
@@ -94,29 +92,45 @@ public class UserProfileActivity extends AppCompatActivity {
 
         if (requestCode == 100 && resultCode == RESULT_OK && data != null){
             Uri profileImageUri = data.getData();
+
             Context context = getApplicationContext();
             uriWorks.saveProfileImage(context, profileImageUri);
+
             UpdateProfileToServer();
-            profile_image.setImageURI(profileImageUri);
+
+            updateProfileUI();
         }
+    }
+
+    private void updateProfileUI() {
+        File profile_pic = new File(getFilesDir(), "profile_image.jpg");
+        Glide.with(this)
+                .load(profile_pic)
+                .signature(new com.bumptech.glide.signature.ObjectKey(profile_pic.lastModified()))
+                .circleCrop()
+                .placeholder(R.drawable.ic_user)
+                .error(R.drawable.ic_account_circle)
+                .into(profile_image);
     }
 
     private void UpdateProfileToServer() {
         UserLocalStore userLocalStore = new UserLocalStore(getApplicationContext());
         String username = userLocalStore.getUsername();
 
-        // 1. Safety Check: Does the file actually exist?
         File profilePic = new File(getFilesDir(), "profile_image.jpg");
         if (!profilePic.exists()) {
             Toast.makeText(this, "No image found to upload", Toast.LENGTH_SHORT).show();
+            error_msg.setText("No image found to upload");
             return;
         }
 
         RequestBody username_body = RequestBody.create(MediaType.parse("text/plain"), username);
         RequestBody profileFileBody = RequestBody.create(MediaType.parse("image/jpeg"), profilePic);
 
-
-        MultipartBody.Part parts = MultipartBody.Part.createFormData("profilePicture", profilePic.getName(), profileFileBody);
+        MultipartBody.Part parts = MultipartBody.Part.createFormData("profilePicture",
+                                                                            profilePic.getName(),
+                                                                            profileFileBody
+                                                                    );
 
         Retrofit retrofit = NetworkClient.getRetrofit(getApplicationContext());
         UploadApis uploadApis = retrofit.create(UploadApis.class);
@@ -128,12 +142,20 @@ public class UserProfileActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     ProfilePicResponse serverResponse = response.body();
                     String message = serverResponse.getMessage();
-                    Log.d("ProfilePic", "Success: " + message);
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                    String status = serverResponse.getStatus();
+                    if (status.equals("success")) {
+                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        error_msg.setVisibility(View.VISIBLE);
+                        error_msg.setText("error: " + message);
+                        error_msg.setTextColor(getResources().getColor(R.color.red));
+                    }
                 } else {
                     Log.e("ProfilePic", "Server error code: " + response.code());
                     error_msg.setVisibility(View.VISIBLE);
                     error_msg.setText("Server error: " + response.code());
+                    error_msg.setTextColor(getResources().getColor(R.color.red));
                 }
             }
 
@@ -144,5 +166,11 @@ public class UserProfileActivity extends AppCompatActivity {
                 Log.e("ProfilePic", "Failure", t);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateProfileUI();
     }
 }
