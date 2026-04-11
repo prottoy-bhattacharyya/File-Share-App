@@ -602,7 +602,7 @@ def send_otp(request):
     expiry = timezone.now() + timedelta(minutes=5)
     print(f"Generated OTP for {user_email}: {otp} (expires at {expiry})")  # Debug log
     
-    # 1. Delete any existing OTPs for this email
+    
     cursor.execute("DELETE FROM otp_verifications WHERE email=%s", (user_email,))
     
     
@@ -610,7 +610,7 @@ def send_otp(request):
                    (user_email, otp, expiry))
     conn.commit()
     
-    # 3. Send email asynchronously
+    
     threading.Thread(target=send_otp_email, args=(user_email, otp)).start()
     
     return JsonResponse({
@@ -621,12 +621,12 @@ def send_otp(request):
 
 @csrf_exempt
 def verify_otp(request):
-    if request.method != 'POST':
+    if request.method != 'GET':
         print("Invalid request method for OTP verification")  # Debug log
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
     
-    otp_input = request.POST.get('otp').strip()
-    email = request.POST.get('email').strip()
+    otp_input = request.GET.get('otp').strip()
+    email = request.GET.get('email').strip()
     
     conn = get_connection()
     if not conn:
@@ -635,7 +635,7 @@ def verify_otp(request):
     
     cursor = conn.cursor()
     
-    # Check if valid, not used, and not expired
+
     cursor.execute("""SELECT id FROM otp_verifications 
                       WHERE email=%s AND otp_code=%s AND is_verified=FALSE AND expires_at > NOW()""", 
                    (email, otp_input))
@@ -651,7 +651,7 @@ def reset_password(request):
     email = request.GET.get('email').strip()
     password = request.GET.get('password').strip()
     
-    # Hash the new password for security
+    
     hashed_pwd = make_password(password)
     
     conn = get_connection()
@@ -660,10 +660,10 @@ def reset_password(request):
         return JsonResponse({'status': 'error', 'message': 'Database connection failed'})
     cursor = conn.cursor()
     
-    # 1. Update user password
+    
     cursor.execute("UPDATE user_credentials SET hashed_password=%s WHERE email=%s", (hashed_pwd, email))
     
-    # 2. Mark all OTPs for this email as verified so they can't be reused
+    
     cursor.execute("UPDATE otp_verifications SET is_verified=TRUE WHERE email=%s", (email,))
     
     conn.commit()

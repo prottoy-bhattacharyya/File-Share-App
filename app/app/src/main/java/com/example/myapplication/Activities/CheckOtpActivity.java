@@ -47,14 +47,14 @@ public class CheckOtpActivity extends AppCompatActivity {
             api.verifyOtp(otp, userEmail).enqueue(new Callback<VarifyOtpResponse>() {
                 @Override
                 public void onResponse(Call<VarifyOtpResponse> call, Response<VarifyOtpResponse> response) {
-                    if (response.isSuccessful()) {
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
                         // Pass both Email and OTP to the final step
                         Intent intent = new Intent(CheckOtpActivity.this, NewPasswordActivity.class);
                         intent.putExtra("user_email", userEmail);
                         intent.putExtra("otp_code", otp);
                         startActivity(intent);
                     } else {
-                        Toast.makeText(CheckOtpActivity.this, "Invalid OTP code", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CheckOtpActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
 

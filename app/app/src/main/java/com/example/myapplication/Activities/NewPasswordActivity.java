@@ -82,6 +82,9 @@ public class NewPasswordActivity extends AppCompatActivity {
         });
 
         btnReset.setOnClickListener(v -> {
+            btnReset.setAlpha(0.5f);
+            btnReset.setEnabled(false);
+
             String newPass = etNewPassword.getText().toString().trim();
 
             Retrofit retrofit = NetworkClient.getRetrofit(this);
@@ -92,7 +95,8 @@ public class NewPasswordActivity extends AppCompatActivity {
                 public void onResponse(Call<ResetPasswordResponse> call, Response<ResetPasswordResponse> response) {
                     if (response.isSuccessful()) {
                         Toast.makeText(NewPasswordActivity.this, "Success! Login with your new password.", Toast.LENGTH_LONG).show();
-
+                        btnReset.setAlpha(1f);
+                        btnReset.setEnabled(true);
                         // Clear backstack so they can't go "back" into recovery
                         Intent intent = new Intent(NewPasswordActivity.this, loginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -103,6 +107,8 @@ public class NewPasswordActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<ResetPasswordResponse> call, Throwable t) {
+                    btnReset.setAlpha(1f);
+                    btnReset.setEnabled(true);
                     Toast.makeText(NewPasswordActivity.this, "Update failed", Toast.LENGTH_SHORT).show();
                 }
             });
