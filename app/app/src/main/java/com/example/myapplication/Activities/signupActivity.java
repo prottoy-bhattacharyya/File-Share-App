@@ -92,7 +92,7 @@ public class signupActivity extends AppCompatActivity {
         });
 
     }
-    private ArrayList<String> isStrongPassword(String password) {
+    public ArrayList<String> isStrongPassword(String password) {
         String containsNumber = ".*[0-9].*";
         String containsSpecialChar = ".*[@#$%^&+=!].*";
         String containsUpperCase = ".*[A-Z].*";

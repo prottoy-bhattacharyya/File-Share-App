@@ -574,34 +574,38 @@ def user_history(request):
 def send_otp_email(email, otp):
     """Background task to send the email."""
     send_mail(
-        subject='Your Recovery Code',
+        subject='File Share App - Recovery Code',
         message=f'Your 6-digit OTP is: {otp}. It will expire in 5 minutes.',
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[email],
-        fail_silently=True,
+        fail_silently=False,
     )
 
 @csrf_exempt
 def send_otp(request):
-    # Retrofit @Query sends data in the URL (request.GET)
-    identifier = request.GET.get('identifier')
+    identifier = request.GET.get('identifier').strip()
     
     conn = get_connection()
+    if not conn:
+        print("Database connection failed during OTP sending")  # Debug log
+        return JsonResponse({'status': 'error', 'message': 'Database connection failed'})
     cursor = conn.cursor()
     
-    # 1. Find the user first
     cursor.execute("SELECT email FROM user_credentials WHERE username=%s OR email=%s", (identifier, identifier))
     user = cursor.fetchone()
     
     if not user:
-        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+        return JsonResponse({'status': 'error', 'message': 'User not found'})
     
     user_email = user[0]
     otp = str(random.randint(100000, 999999))
     expiry = timezone.now() + timedelta(minutes=5)
     print(f"Generated OTP for {user_email}: {otp} (expires at {expiry})")  # Debug log
     
-    # 2. Save OTP to your otp_verifications table
+    # 1. Delete any existing OTPs for this email
+    cursor.execute("DELETE FROM otp_verifications WHERE email=%s", (user_email,))
+    
+    
     cursor.execute("INSERT INTO otp_verifications (email, otp_code, expires_at) VALUES (%s, %s, %s)", 
                    (user_email, otp, expiry))
     conn.commit()
@@ -640,17 +644,20 @@ def verify_otp(request):
     if result:
         return JsonResponse({'status': 'success', 'message': 'OTP Verified'})
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid or expired OTP'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Invalid or expired OTP'})
 
 @csrf_exempt
 def reset_password(request):
-    email = request.GET.get('email')
-    password = request.GET.get('password')
+    email = request.GET.get('email').strip()
+    password = request.GET.get('password').strip()
     
     # Hash the new password for security
     hashed_pwd = make_password(password)
     
     conn = get_connection()
+    if not conn:
+        print("Database connection failed during password reset")  # Debug log
+        return JsonResponse({'status': 'error', 'message': 'Database connection failed'})
     cursor = conn.cursor()
     
     # 1. Update user password

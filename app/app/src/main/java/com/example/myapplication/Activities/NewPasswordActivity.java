@@ -1,9 +1,13 @@
 package com.example.myapplication.Activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +16,8 @@ import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.R;
 import com.example.myapplication.Responses.ResetPasswordResponse;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,11 +28,15 @@ public class NewPasswordActivity extends AppCompatActivity {
     EditText etNewPassword;
     Button btnReset;
     String userEmail, otpCode;
+    TextView text_Password_strength;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_password);
+
+        signupActivity signupActivity = new signupActivity();
 
         // Get everything passed from the previous steps
         userEmail = getIntent().getStringExtra("user_email");
@@ -34,6 +44,42 @@ public class NewPasswordActivity extends AppCompatActivity {
 
         etNewPassword = findViewById(R.id.et_final_password);
         btnReset = findViewById(R.id.btn_reset_final);
+        text_Password_strength = findViewById(R.id.text_password_strength);
+
+        etNewPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String newPass = s.toString();
+                text_Password_strength.setVisibility(TextView.VISIBLE);
+                text_Password_strength.setText("");
+                ArrayList<String> errors = signupActivity.isStrongPassword(newPass);
+                if (!errors.isEmpty()) {
+                    text_Password_strength.setTextColor(Color.RED);
+                    for (String error : errors) {
+                        text_Password_strength.append("• " + error + "\n");
+                    }
+
+                    btnReset.setAlpha(0.5f);
+                    btnReset.setEnabled(false);
+                }
+                else {
+                    btnReset.setAlpha(1f);
+                    btnReset.setEnabled(true);
+                    text_Password_strength.setText("Password is strong");
+                    text_Password_strength.setTextColor(Color.GREEN);
+                }
+            }
+        });
 
         btnReset.setOnClickListener(v -> {
             String newPass = etNewPassword.getText().toString().trim();
