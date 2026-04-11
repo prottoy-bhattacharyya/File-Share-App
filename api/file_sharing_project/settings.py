@@ -30,6 +30,15 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+password = 'ntdainpcdpusjzpw'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'prottoy379@gmail.com'
+EMAIL_HOST_PASSWORD = password
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'response_app.backends.email_backend.EmailBackend'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

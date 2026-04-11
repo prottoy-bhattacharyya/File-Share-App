@@ -22,11 +22,10 @@ import retrofit2.Retrofit;
 public class loginActivity extends AppCompatActivity {
 
     Button login, guest_btn;
-    TextView signup;
+    TextView signup, forgot_password;
     EditText input_username;
     EditText input_password;
     String url;
-
 
 
     @Override
@@ -40,6 +39,7 @@ public class loginActivity extends AppCompatActivity {
         signup = findViewById(R.id.text_signup);
         input_username = findViewById(R.id.input_username);
         input_password = findViewById(R.id.input_password);
+        forgot_password = findViewById(R.id.text_forgot_password);
         url = getResources().getString(R.string.server_url) + "/check_login/?username=";
 
         login.setOnClickListener(v -> {
@@ -56,6 +56,11 @@ public class loginActivity extends AppCompatActivity {
         guest_btn.setOnClickListener(v -> {
             Intent mainPage = new Intent(loginActivity.this, MainActivity.class);
             startActivity(mainPage);
+        });
+
+        forgot_password.setOnClickListener(v -> {
+            Intent findAccountPage = new Intent(loginActivity.this, FindAccountActivity.class);
+            startActivity(findAccountPage);
         });
     }
 

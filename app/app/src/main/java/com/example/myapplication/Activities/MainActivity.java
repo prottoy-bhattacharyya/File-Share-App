@@ -3,8 +3,10 @@ package com.example.myapplication.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -12,7 +14,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 
 import com.bumptech.glide.Glide;
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     ImageButton logout_btn;
     TextView username;
     ImageView profile_image;
-    LinearLayout user_profile_btn;
+    ConstraintLayout user_profile_btn;
     UserLocalStore userLocalStore;
 
 
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         direct_transfer_btn = findViewById(R.id.direct_transfer_btn);
         receive_buton = findViewById(R.id.receive_btn);
         logout_btn = findViewById(R.id.button_logout);
-        user_profile_btn = findViewById(R.id.user_info_btn);
+        user_profile_btn = findViewById(R.id.user_profile_btn);
 
         userLocalStore = new UserLocalStore(MainActivity.this);
 
@@ -76,6 +81,10 @@ public class MainActivity extends AppCompatActivity {
             receive_buton.setEnabled(false);
             send_buton.setAlpha(0.5f);
             receive_buton.setAlpha(0.5f);
+
+            removeProfileImage();
+            updateProfileUI();
+
         }
     }
 
@@ -93,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         logout_btn.setOnClickListener(view -> {
             userLocalStore.clearData();
+            removeProfileImage();
             Intent loginIntent = new Intent(MainActivity.this, loginActivity.class);
             startActivity(loginIntent);
             Toast.makeText(getApplicationContext(), "Logged Out", Toast.LENGTH_SHORT).show();
@@ -111,6 +121,31 @@ public class MainActivity extends AppCompatActivity {
         direct_transfer_btn.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, directTransferActivity.class);
             startActivity(intent);
+        });
+
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (userLocalStore.isLoggedIn()){
+                    androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(MainActivity.this)
+                            .setTitle("Exit the app ?")
+
+                            .setPositiveButton("Exit", (d, w) -> {
+                                setEnabled(false);
+                                finishAffinity();
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .create();
+
+                    dialog.show();
+
+                    dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                            .setTextColor(android.graphics.Color.RED);
+                }
+                else {
+                    finish();
+                }
+            }
         });
     }
 
@@ -153,6 +188,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void removeProfileImage() {
+        File profile_pic = new File(getFilesDir(), "profile_image.jpg");
+        profile_pic.delete();
+    }
+
     private void getProfileFromServer() {
 
         String username = userLocalStore.getUsername();
@@ -165,7 +205,8 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     new Thread(() -> {
                         try (InputStream inputStream = response.body().byteStream();
-                             FileOutputStream outputStream = new FileOutputStream(new File(getFilesDir(), "profile_image.jpg"))) {
+                             FileOutputStream outputStream = new FileOutputStream(new File(getFilesDir(),
+                                                                            "profile_image.jpg"))) {
 
                             byte[] buffer = new byte[4096];
                             int bytesRead;

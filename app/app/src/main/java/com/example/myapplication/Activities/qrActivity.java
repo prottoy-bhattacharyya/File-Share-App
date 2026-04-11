@@ -1,6 +1,7 @@
 package com.example.myapplication.Activities;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -23,6 +24,7 @@ import androidmads.library.qrgenearator.QRGEncoder;
 public class qrActivity extends AppCompatActivity {
     ImageView qrImage;
     TextView qrTextView;
+    TextView count_text;
     Button shareButton;
     String qrText;
     Bitmap combinedBitmap;
@@ -35,8 +37,25 @@ public class qrActivity extends AppCompatActivity {
 
         qrImage = findViewById(R.id.qr_image);
         qrTextView = findViewById(R.id.qrText);
+        count_text = findViewById(R.id.count_text);
         shareButton = findViewById(R.id.shareButton);
+
         qrText = getIntent().getStringExtra("unique_text");
+        int total_files_count = getIntent().getIntExtra("total_files_count", 0);
+        int successful_send_count = getIntent().getIntExtra("successful_send_count", 0);
+
+        if(total_files_count == successful_send_count) {
+            count_text.setText("All files upload successfull");
+        }
+        else if(successful_send_count == 0) {
+            count_text.setText("No files uploaded");
+            count_text.setTextColor(Color.RED);
+        }
+        else {
+            count_text.setText(total_files_count - successful_send_count + " files upload failed");
+            count_text.setTextColor(Color.RED);
+        }
+
 
         shareButton.setVisibility(View.INVISIBLE);
 
@@ -45,8 +64,7 @@ public class qrActivity extends AppCompatActivity {
 
         Runnable runnable = () -> {
             Bitmap qrBitmap = generateQR(qrText);
-            Bitmap logoBitmap = generateLogoBitmap();
-            combinedBitmap = addLogoToQR(qrBitmap, logoBitmap);
+            combinedBitmap = qrBitmap;
             handler.sendEmptyMessage(0);
         };
 
@@ -76,42 +94,25 @@ public class qrActivity extends AppCompatActivity {
 
 
 
-    private Bitmap generateQR(String qrText){
-        Bitmap bitmap;
-        QRGEncoder qrgEncoder = new QRGEncoder(qrText, null, QRGContents.Type.TEXT, 400);
-        qrgEncoder.setColorBlack(Color.BLACK);
-        qrgEncoder.setColorWhite(Color.WHITE);
-        try {
-            bitmap = qrgEncoder.getBitmap(0);
+    private Bitmap generateQR(String qrText) {
+        // 1. Get the Primary Color (The "ink" of the QR)
+        int foreground = com.google.android.material.color.MaterialColors.getColor(
+                this, com.google.android.material.R.attr.colorSecondary, Color.BLACK);
 
-        } catch (Exception e){
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+        // 2. Get the Surface Color (The "paper" background)
+        int background = com.google.android.material.color.MaterialColors.getColor(
+                this, com.google.android.material.R.attr.colorSurface, Color.WHITE);
+
+        QRGEncoder qrgEncoder = new QRGEncoder(qrText, null, QRGContents.Type.TEXT, 400);
+
+        // Set colors to match UI theme
+        qrgEncoder.setColorBlack(foreground);
+        qrgEncoder.setColorWhite(background);
+
+        try {
+            return qrgEncoder.getBitmap(0);
+        } catch (Exception e) {
             return null;
         }
-        return bitmap;
-    }
-
-    private Bitmap generateLogoBitmap(){
-        Bitmap logoBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo_8k_circle);
-        return logoBitmap;
-    }
-
-    private Bitmap addLogoToQR(Bitmap qrBitmap, Bitmap logoBitmap){
-        int qrWidth = qrBitmap.getWidth();
-        int qrHeight = qrBitmap.getHeight();
-
-        Bitmap combinedBitmap = Bitmap.createBitmap(qrWidth, qrHeight, qrBitmap.getConfig());
-        Canvas canvas = new Canvas(combinedBitmap);
-        canvas.drawBitmap(qrBitmap, 0, 0, null);
-
-        int logoSize = (int) (qrWidth * 0.2);
-        Bitmap scaledLogo = Bitmap.createScaledBitmap(logoBitmap, logoSize, logoSize, true);
-
-        float left = (qrWidth - scaledLogo.getWidth()) / 2f;
-        float top = (qrHeight - scaledLogo.getHeight()) / 2f;
-
-        canvas.drawBitmap(scaledLogo, left, top, null);
-        return combinedBitmap;
     }
 }

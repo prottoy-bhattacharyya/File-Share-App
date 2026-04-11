@@ -23,3 +23,14 @@ create table if not exists file_blobs (
 	file_blob longblob,
 	timestamp timestamp default current_timestamp
 );
+
+CREATE TABLE IF NOT EXISTS otp_verifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    otp_code VARCHAR(6) NOT NULL,
+    is_verified BOOLEAN DEFAULT FALSE,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX (email), -- For faster lookups
+    INDEX (expires_at) -- For cleanup scripts
+);

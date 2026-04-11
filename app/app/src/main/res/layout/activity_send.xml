@@ -10,8 +10,9 @@
         android:id="@+id/title_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
         android:text="Select Files"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="?attr/colorOnSurface"
         android:textSize="32sp"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -19,28 +20,59 @@
         android:id="@+id/file_count_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:alpha="0.7"
         android:text="No Files selected"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="16sp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
+        app:layout_constraintEnd_toStartOf="@+id/progress_percent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title_text" />
+
+    <TextView
+        android:id="@+id/progress_percent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="10%"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-medium"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/file_count_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/file_count_text" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/upload_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        app:indicatorColor="?attr/colorPrimary"
+        app:trackColor="?attr/colorPrimaryContainer"
+        app:trackCornerRadius="4dp"
+        app:trackThickness="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/file_count_text" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/file_list_card"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginVertical="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="24dp"
         app:cardBackgroundColor="?attr/colorSurfaceVariant"
-        app:cardCornerRadius="12dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toTopOf="@+id/select_files_button"
-        app:layout_constraintTop_toBottomOf="@+id/title_text">
+        app:layout_constraintTop_toBottomOf="@+id/upload_progress">
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp">
+            android:padding="12dp">
+
             <LinearLayout
                 android:id="@+id/file_list_container"
                 android:layout_width="match_parent"
@@ -51,21 +83,19 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/select_files_button"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_marginBottom="12dp"
         android:text="Add Files"
-        android:textColor="?attr/colorPrimary"
-        app:strokeColor="?attr/colorPrimary"
-        app:layout_constraintBottom_toTopOf="@+id/send_button"
-        android:layout_marginBottom="16dp"/>
+        app:layout_constraintBottom_toTopOf="@+id/send_button" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/send_button"
+        style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:text="Send"
-        android:backgroundTint="?attr/colorSecondary"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

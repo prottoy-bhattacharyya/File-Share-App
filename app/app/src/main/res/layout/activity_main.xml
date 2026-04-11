@@ -2,163 +2,128 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
-    android:paddingStart="32dp"
-    android:paddingEnd="32dp"
-    tools:context=".Activities.MainActivity">
+    android:paddingHorizontal="24dp">
 
-    <ImageButton
-        android:id="@+id/button_logout"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/circular_background"
-        android:contentDescription="Logout"
-        android:elevation="4dp"
-        android:src="@drawable/ic_logout"
-        app:layout_constraintBottom_toBottomOf="@+id/account_card"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tint="#1B1BD5" />
-
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/account_card"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        app:cardBackgroundColor="?attr/colorSurfaceVariant"
-        app:cardCornerRadius="16dp"
+        android:layout_marginTop="24dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+        app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:id="@+id/user_info_btn"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/user_profile_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="12dp">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/profile_image"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="2dp"
                 android:src="@drawable/ic_user"
-                android:contentDescription="User Icon" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:shapeAppearanceOverlay="@drawable/circular_background"
+                app:strokeWidth="1dp" />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/text_username"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
-                android:orientation="vertical">
+                android:fontFamily="sans-serif-medium"
+                android:text="Welcome, Guest"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_logout"
+                app:layout_constraintStart_toEndOf="@id/profile_image"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/text_username"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    tools:text="Guest"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:textColor="?attr/colorOnSurface" />
-            </LinearLayout>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+            <ImageButton
+                android:id="@+id/button_logout"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Logout"
+                android:src="@drawable/ic_logout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="?attr/colorError" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-medium"
+        android:layout_marginTop="48dp"
+        android:fontFamily="sans-serif-black"
         android:text="File Transfer"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="40sp"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="32sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/account_card" />
 
     <ImageView
-        android:id="@+id/qr_image"
-        android:layout_width="219dp"
-        android:layout_height="191dp"
+        android:id="@+id/main_logo"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:src="@drawable/logo_no_shadow_8k"
-        app:layout_constraintVertical_bias="0.4"
-        app:layout_constraintBottom_toTopOf="@+id/qr_image_shadow"
+        app:layout_constraintBottom_toTopOf="@+id/button_container"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title_text"/>
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        app:layout_constraintVertical_bias="0.4" />
 
-    <ImageView
-        android:id="@+id/qr_image_shadow"
-        android:layout_width="293dp"
-        android:layout_height="53dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:alpha="0.5"
-        android:src="@drawable/shadow"
-        app:layout_constraintBottom_toTopOf="@+id/send_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/send_btn"
-        android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#4CAF50"
-        android:fontFamily="sans-serif-medium"
-        android:text="Upload to Cloud"
-        android:textAllCaps="false"
-        android:textSize="18sp"
-        app:cornerRadius="12dp"
-        app:icon="@drawable/ic_send"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/direct_transfer_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/send_btn"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:text="Upload to Cloud"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_send" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/direct_transfer_btn"
-        android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#687CED"
-        android:fontFamily="sans-serif-medium"
-        android:text="Direct Transfer (Local)"
-        android:textAllCaps="false"
-        android:textSize="18sp"
-        app:cornerRadius="12dp"
-        app:icon="@drawable/ic_logout"
-        app:iconGravity="textStart"
-        app:iconPadding="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/receive_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/direct_transfer_btn"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_marginBottom="12dp"
+            android:text="Direct Local Transfer"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_logout" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/receive_btn"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="32dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Receive Files"
-        android:textAllCaps="false"
-        android:textColor="?attr/colorPrimary"
-        android:textSize="18sp"
-        app:cornerRadius="12dp"
-        app:icon="@drawable/ic_download"
-        app:iconGravity="textStart"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="?attr/colorPrimary"
-        app:strokeWidth="2dp" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/receive_btn"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="Receive Files"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_download" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

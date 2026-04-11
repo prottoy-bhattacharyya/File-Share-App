@@ -80,6 +80,7 @@ public class UserHistoryActivity extends AppCompatActivity {
                     UserHistoryResponse userHistoryResponse = response.body();
                     if ("success".equals(userHistoryResponse.getStatus()) &&
                             userHistoryResponse.getData() != null) {
+
                         addUserDataRows(file_transfer_table, userHistoryResponse.getData());
                     }
                     else {
@@ -119,6 +120,16 @@ public class UserHistoryActivity extends AppCompatActivity {
         message.setVisibility(View.GONE);
         file_transfer_table.setVisibility(View.VISIBLE);
         file_transfer_table.removeAllViews();
+
+        TableRow headerRow = new TableRow(this);
+        headerRow.setBackgroundColor(Color.parseColor("#E1F5FE"));
+        headerRow.setPadding(0, 15, 0, 15);
+
+        headerRow.addView(createTransferTextView("Sender"));
+        headerRow.addView(createTransferTextView("Unique Text"));
+        headerRow.addView(createTransferTextView("Receiver"));
+
+        file_transfer_table.addView(headerRow);
 
         for (int i = 0; i < dataList.size(); i++) {
             userInfo info = dataList.get(i);

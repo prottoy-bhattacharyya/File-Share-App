@@ -1,23 +1,33 @@
 package com.example.myapplication.Activities;
 
+import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.OpenableColumns;
+import android.text.TextUtils;
+import android.util.Log;
 import android.util.Size;
+import android.view.DragAndDropPermissions;
+import android.view.DragEvent;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -28,10 +38,12 @@ import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.Responses.UploadResponse;
 import com.example.myapplication.UriWorks;
 import com.example.myapplication.UserLocalStore;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -46,13 +58,18 @@ import retrofit2.Retrofit;
 
 public class sendActivity extends AppCompatActivity {
     Button select_files_button, send_button;
-    TextView file_count_text;
+    TextView file_count_text, progress_percent;
     LinearLayout fileListContainer;
     CardView file_list_card;
     String unique_text;
     Iterator it;
     int unique_text_length = 6;
     boolean isUserNameSent = false;
+
+    int total_selected_files = 0;
+    int successful_upload_files;
+    LinearProgressIndicator upload_progress;
+    UserLocalStore userLocalStore;
     private final Set<Uri> selectedFileUris = new HashSet<>();
 
     @Override
@@ -65,17 +82,33 @@ public class sendActivity extends AppCompatActivity {
         send_button = findViewById(R.id.send_button);
         file_list_card = findViewById(R.id.file_list_card);
         file_count_text = findViewById(R.id.file_count_text);
+        progress_percent = findViewById(R.id.progress_percent);
         fileListContainer = findViewById(R.id.file_list_container);
+        upload_progress = findViewById(R.id.upload_progress);
+
+        userLocalStore = new UserLocalStore(this);
 
         select_files_button.setOnClickListener(view -> selectFiles());
 
         send_button.setOnClickListener(view -> {
+            if (!userLocalStore.isLoggedIn()) {
+                Toast.makeText(getApplicationContext(), "Please Login First", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if(selectedFileUris.isEmpty()){
                 Toast.makeText(getApplicationContext(), "Please select files", Toast.LENGTH_SHORT).show();
             }
             else{
+                total_selected_files = selectedFileUris.size();
+                successful_upload_files = 0;
+
                 Toast toast = Toast.makeText(getApplicationContext(), "Sending files", Toast.LENGTH_SHORT);
                 toast.show();
+
+                send_button.setEnabled(false);
+                send_button.setAlpha(0.5f);
+                progress_percent.setVisibility(View.VISIBLE);
 
                 unique_text = SmallFunctions.generateUniqueText(unique_text_length);
                 it = selectedFileUris.iterator();
@@ -84,9 +117,97 @@ public class sendActivity extends AppCompatActivity {
 
             }
         });
+
+        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (total_selected_files == successful_upload_files){
+                    finish();
+                }
+
+                else if (total_selected_files > 0) {
+                    androidx.appcompat.app.AlertDialog dialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(sendActivity.this)
+                            .setTitle("Cancel Upload ?")
+                            .setMessage("If you go back, the files upload will be canceled.")
+                            .setPositiveButton("Cancel Upload", (d, w) -> {
+                                setEnabled(false);
+                                finish();
+                            })
+                            .setNegativeButton("Stay", null)
+                            .create();
+
+                    dialog.show();
+
+                    dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+                            .setTextColor(android.graphics.Color.RED);
+                }
+                else {
+                    finish();
+                }
+            }
+        });
+
+        file_list_card.setOnDragListener((v, event) -> {
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    // Return true if it's a file/URI list, otherwise Android won't send the DROP event
+                    return event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_URILIST)
+                            || event.getClipDescription().hasMimeType("text/uri-list");
+
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    v.setBackgroundColor(Color.parseColor("#E0E0E0")); // Visual hint
+                    return true;
+
+                case DragEvent.ACTION_DRAG_EXITED:
+                case DragEvent.ACTION_DRAG_ENDED:
+                    v.setBackgroundColor(Color.TRANSPARENT);
+                    return true;
+
+                case DragEvent.ACTION_DROP:
+                    v.setBackgroundColor(Color.TRANSPARENT);
+
+                    // 1. Request permissions (Required for Android 7.0+)
+                    DragAndDropPermissions permissions = null;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        permissions = requestDragAndDropPermissions(event);
+                    }
+
+                    // 2. Extract the data
+                    ClipData clipData = event.getClipData();
+                    if (clipData != null) {
+                        boolean itemsAdded = false;
+                        for (int i = 0; i < clipData.getItemCount(); i++) {
+                            Uri uri = clipData.getItemAt(i).getUri();
+                            if (uri != null) {
+                                // Add to your set and update UI
+                                if (selectedFileUris.add(uri)) {
+                                    itemsAdded = true;
+                                    loadAndShowFile(uri);
+                                }
+                            }
+                        }
+
+                        if (itemsAdded) {
+                            file_list_card.setVisibility(View.VISIBLE);
+                            updateFileCount();
+                        }
+
+                        return true;
+                    }
+
+                    return false;
+
+                default:
+                    return false;
+            }
+        });
+
+        handleIncomingIntent();
     }
 
     private void sendFiles(Uri uri, String unique_text) {
+        upload_progress.setVisibility(View.VISIBLE);
+        upload_progress.setMax(total_selected_files);
 
         if(!isUserNameSent){
             RequestBody unique_text_body = RequestBody.create(MediaType.parse("text/plain"), unique_text);
@@ -131,6 +252,7 @@ public class sendActivity extends AppCompatActivity {
         try {
             RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), file);
             MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file_name, requestBody);
+
             RequestBody unique_text_body = RequestBody.create(MediaType.parse("text/plain"), unique_text);
 
 
@@ -142,11 +264,23 @@ public class sendActivity extends AppCompatActivity {
             call.enqueue(new Callback<UploadResponse>() {
                 @Override
                 public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+
+                    successful_upload_files++;
                     file.delete();
+
+                    runOnUiThread(() -> {
+                        upload_progress.setProgress(successful_upload_files);
+                        progress_percent.setText(successful_upload_files * 100 / total_selected_files + "%");
+                        file_count_text.setText(successful_upload_files + " files uploaded");
+                    });
+
 
                     if(it.hasNext()){
                         Uri uri = (Uri) it.next();
                         sendFiles(uri, unique_text);
+                    }
+                    else {
+                        launchQrActivity();
                     }
                 }
 
@@ -155,12 +289,15 @@ public class sendActivity extends AppCompatActivity {
                     file.delete();
 
                     runOnUiThread(() -> {
-                        Toast.makeText(getApplicationContext(), "failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "upload failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     });
 
                     if(it.hasNext()){
                         Uri uri = (Uri) it.next();
                         sendFiles(uri, unique_text);
+                    }
+                    else {
+                        launchQrActivity();
                     }
                 }
             });
@@ -170,16 +307,13 @@ public class sendActivity extends AppCompatActivity {
             SmallFunctions dialogueBox = new SmallFunctions("catch: " + e.getMessage());
             dialogueBox.show(getSupportFragmentManager(), "dialog");
         }
-
-        if(!it.hasNext()){
-            Toast.makeText(this, "All Files sent", Toast.LENGTH_SHORT).show();
-            launchQrActivity();
-        }
     }
 
     private void launchQrActivity() {
         Intent intent = new Intent(sendActivity.this, qrActivity.class);
         intent.putExtra("unique_text", unique_text);
+        intent.putExtra("total_files_count", total_selected_files);
+        intent.putExtra("successful_send_count", successful_upload_files);
         startActivity(intent);
     }
 
@@ -256,16 +390,14 @@ public class sendActivity extends AppCompatActivity {
                             Size thumbnailSize = new Size(150, 150);
                             thumbnailBitmap = getContentResolver().loadThumbnail(uri, thumbnailSize, null);
                         } catch (IOException e) {
-                            handler.post(() -> {
-                                Toast.makeText(this, "Error loading thumbnail: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
+                            Log.d("send activity", "loadAndShowFile: " + e.getMessage());
                         }
                     }
 
                     final Bitmap finalThumbnailBitmap = thumbnailBitmap;
 
                     handler.post(() ->
-                            showFileInUi(fileName, fileSize, finalThumbnailBitmap)
+                            showFileInUi(uri, fileName, fileSize, finalThumbnailBitmap)
                     );
                 }
                 cursor.close();
@@ -275,54 +407,132 @@ public class sendActivity extends AppCompatActivity {
         thread.start();
     }
 
-    private void showFileInUi(String fileName, long fileSize, Bitmap thumbnailBitmap) {
+    private void showFileInUi(Uri fileUri, String fileName, long fileSize, Bitmap thumbnailBitmap) {
         DecimalFormat df = new DecimalFormat("0.00");
 
+        // Container for the row
+        LinearLayout itemLayout = new LinearLayout(this);
+        itemLayout.setOrientation(LinearLayout.HORIZONTAL);
+        itemLayout.setPadding(16, 16, 16, 16);
+        itemLayout.setGravity(Gravity.CENTER_VERTICAL);
+
+        // 1. Thumbnail
         ImageView imageView = new ImageView(this);
-        imageView.setPadding(8, 8, 8, 8);
-        LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(200, 200);
+        LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(140, 140); // Slightly smaller for better fit
         imageView.setLayoutParams(imageParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         if (thumbnailBitmap != null) {
             imageView.setImageBitmap(thumbnailBitmap);
         } else {
+            // Simple extension check
+            int resId = R.drawable.ic_docs; // Default
+            if (fileName.endsWith(".pdf")) resId = R.drawable.ic_pdf;
+            else if (fileName.contains(".mp3") || fileName.contains(".wav")) resId = R.drawable.ic_audio;
+            imageView.setImageResource(resId);
+        }
 
-            if (fileName.endsWith(".pdf")) {
-                imageView.setImageResource(R.drawable.ic_pdf);
-            } else if (fileName.endsWith(".doc") || fileName.endsWith(".docx") || fileName.endsWith(".txt")) {
-                imageView.setImageResource(R.drawable.ic_docs);
-            } else if (fileName.endsWith(".mp3") || fileName.endsWith(".wav") || fileName.endsWith(".flac")) {
-                imageView.setImageResource(R.drawable.ic_audio);
-            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                 imageView.setImageResource(R.drawable.ic_launcher_foreground);
+        // 2. Text Info Container
+        LinearLayout textContainer = new LinearLayout(this);
+        textContainer.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams textContainerParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        textContainer.setLayoutParams(textContainerParams);
+        textContainer.setPadding(24, 0, 8, 0);
+
+        TextView nameText = new TextView(this);
+        nameText.setText(fileName);
+        nameText.setTextSize(15);
+        nameText.setTypeface(null, Typeface.BOLD);
+        nameText.setEllipsize(TextUtils.TruncateAt.END);
+        nameText.setSingleLine(true);
+
+        TextView sizeText = new TextView(this);
+        String formattedSize = (fileSize < 1024 * 1024) ? df.format(fileSize / 1024.0) + " KB" : df.format(fileSize / (1024.0 * 1024.0)) + " MB";
+        sizeText.setText(formattedSize);
+        sizeText.setTextSize(13);
+        sizeText.setAlpha(0.6f);
+
+        textContainer.addView(nameText);
+        textContainer.addView(sizeText);
+
+        // 3. Modern Delete Button
+        ImageButton deleteBtn = new ImageButton(this);
+        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(100, 100);
+        deleteBtn.setLayoutParams(btnParams);
+        deleteBtn.setImageResource(R.drawable.ic_close); // Use a 'close' or 'delete' icon
+        deleteBtn.setBackgroundResource(android.R.color.transparent);
+        deleteBtn.setColorFilter(Color.RED); // Subtle red tint
+
+        // THE LOGIC: Remove from UI and from your data list
+        deleteBtn.setOnClickListener(v -> {
+            // Remove the view from the UI
+            fileListContainer.removeView(itemLayout);
+
+            // Remove from your upload list (assuming you have a list named selectedFileUris)
+            if (selectedFileUris != null) {
+                selectedFileUris.remove(fileUri);
+            }
+
+            // Update the file count text
+            updateFileCount();
+        });
+
+        // Assemble
+        itemLayout.addView(imageView);
+        itemLayout.addView(textContainer);
+        itemLayout.addView(deleteBtn);
+
+        fileListContainer.addView(itemLayout);
+    }
+
+    private void handleIncomingIntent() {
+        Intent intent = getIntent();
+        if (intent == null || intent.getAction() == null) return;
+
+        String action = intent.getAction();
+        String type = intent.getType();
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            Uri uri;
+            // API 33+ safe way to get the file
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                uri = intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri.class);
             } else {
-                imageView.setImageResource(android.R.drawable.ic_menu_help);
+                uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            }
+
+            if (uri != null && selectedFileUris.add(uri)) {
+                loadAndShowFile(uri);
+            }
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null) {
+            ArrayList<Uri> uris;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM, Uri.class);
+            } else {
+                uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+            }
+
+            if (uris != null) {
+                for (Uri u : uris) {
+                    if (u != null && selectedFileUris.add(u)) {
+                        loadAndShowFile(u);
+                    }
+                }
             }
         }
 
-        TextView fileInfoText = new TextView(this);
-        String formattedSize;
+        if (!selectedFileUris.isEmpty()) {
+            file_list_card.setVisibility(View.VISIBLE);
+            updateFileCount();
+            // Crucial: Clear the action so the files don't reload on screen rotation
+            getIntent().setAction(null);
+        }
+    }
 
-        if (fileSize < 1024) formattedSize = df.format(fileSize) + " B";
-        else if (fileSize < 1024 * 1024) formattedSize = df.format(fileSize / 1024.0) + " KB";
-        else formattedSize = df.format(fileSize / (1024.0 * 1024.0)) + " MB";
-
-        fileInfoText.setText(fileName + "\n" + formattedSize);
-        fileInfoText.setTextColor(Color.BLACK);
-
-        LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        fileInfoText.setLayoutParams(textParams);
-        fileInfoText.setGravity(android.view.Gravity.CENTER_VERTICAL);
-
-        LinearLayout itemLayout = new LinearLayout(this);
-        itemLayout.setOrientation(LinearLayout.HORIZONTAL);
-        itemLayout.setPadding(16, 16, 16, 16);
-
-        itemLayout.addView(imageView);
-        itemLayout.addView(fileInfoText);
-
-        fileListContainer.addView(itemLayout);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent); // IMPORTANT: Updates the activity's intent
+        handleIncomingIntent();
     }
 }

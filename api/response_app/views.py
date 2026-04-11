@@ -1,11 +1,15 @@
 import io
 import re
+import threading
+import os
 
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
-import os
+from django.core.mail import send_mail
+
+from file_sharing_project import settings
 from . import dbconfig
 import mysql.connector
 
@@ -54,6 +58,17 @@ def index(request):
                             file_blob longblob,
                             timestamp timestamp default current_timestamp
                        );""")
+        
+        cursor.execute("""CREATE TABLE IF NOT EXISTS otp_verifications (
+                            id INT PRIMARY KEY AUTO_INCREMENT,
+                            email VARCHAR(255) NOT NULL,
+                            otp_code VARCHAR(6) NOT NULL,
+                            is_verified BOOLEAN DEFAULT FALSE,
+                            expires_at TIMESTAMP NOT NULL,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            INDEX (email), -- For faster lookups
+                            INDEX (expires_at) -- For cleanup scripts
+                        );""")
         
         conn.commit()
 
@@ -167,9 +182,20 @@ def login(request):
         cursor.close()
     if conn:
         conn.close()
+
+    email_thread = threading.Thread(target=send_login_mail, args=(fullname,))
+    email_thread.start()
     
     return JsonResponse(response)
 
+def send_login_mail(fullname):
+    send_mail (
+        subject='Login Attempt Notification',
+        message=f'Hello {fullname},\n\nThis is a notification of a login attempt to your account. If this was you, you can safely ignore this email. If you did not attempt to log in, please secure your account immediately.',
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=["prottoyvhattacharyya@gmail.com"],
+        fail_silently=False,
+    )
 
 @csrf_exempt
 def signup(request):

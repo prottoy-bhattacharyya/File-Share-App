@@ -1,6 +1,7 @@
 // UploadApis.java
 package com.example.myapplication.Apis;
 
+import com.example.myapplication.Responses.FindAccoundResponse;
 import com.example.myapplication.Responses.LoginResponse;
 import com.example.myapplication.Responses.ProfilePicResponse;
 import com.example.myapplication.Responses.UploadResponse;
@@ -33,7 +34,7 @@ public interface UploadApis {
     );
 
     @Multipart
-    @POST("post_files/")
+    @POST("upload_file/")
     Call<UploadResponse> uploadFile(@Part MultipartBody.Part file,
                                     @Part("unique_text") RequestBody unique_text);
 
@@ -58,4 +59,13 @@ public interface UploadApis {
 
     @GET("getUserProfilePicture/")
     Call<ResponseBody> getUserProfilePicture(@Query("username") String username);
+
+    @POST("sendOtp/")
+    Call<FindAccoundResponse> findAccoundAndSendOtp(@Query("identifier") String identifier);
+
+    @POST("verifyOtp/")
+    Call<VarifyOtpResponse> verifyOtp(@Query("otp") String otp, @Query("email") String email);
+
+    @POST("resetPassword/")
+    Call<ResetPasswordResponse> resetPassword(@Query("email") String email, @Query("password") String password);
 }
