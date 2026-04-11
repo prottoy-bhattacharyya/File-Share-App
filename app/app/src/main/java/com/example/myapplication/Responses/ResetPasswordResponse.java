@@ -2,15 +2,12 @@ package com.example.myapplication.Responses;
 
 import com.google.gson.annotations.SerializedName;
 
-public class FindAccoundResponse {
+public class ResetPasswordResponse {
     @SerializedName("status")
     private String status;
 
     @SerializedName("message")
     private String message;
-
-    @SerializedName("email")
-    private String email;
 
     public String getStatus() {
         return status;
@@ -18,9 +15,5 @@ public class FindAccoundResponse {
 
     public String getMessage() {
         return message;
-    }
-
-    public String getEmail() {
-        return email;
     }
 }

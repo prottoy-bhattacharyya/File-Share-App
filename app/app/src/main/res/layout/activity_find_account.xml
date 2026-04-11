@@ -5,6 +5,13 @@
     android:padding="24dp"
     android:gravity="center_vertical">
 
+    <ProgressBar
+        android:id="@+id/recovery_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
+
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

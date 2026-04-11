@@ -4,8 +4,10 @@ package com.example.myapplication.Apis;
 import com.example.myapplication.Responses.FindAccoundResponse;
 import com.example.myapplication.Responses.LoginResponse;
 import com.example.myapplication.Responses.ProfilePicResponse;
+import com.example.myapplication.Responses.ResetPasswordResponse;
 import com.example.myapplication.Responses.UploadResponse;
 import com.example.myapplication.Responses.UserHistoryResponse;
+import com.example.myapplication.Responses.VarifyOtpResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -60,12 +62,12 @@ public interface UploadApis {
     @GET("getUserProfilePicture/")
     Call<ResponseBody> getUserProfilePicture(@Query("username") String username);
 
-    @POST("sendOtp/")
+    @GET("sendOtp/")
     Call<FindAccoundResponse> findAccoundAndSendOtp(@Query("identifier") String identifier);
 
-    @POST("verifyOtp/")
+    @GET("verifyOtp/")
     Call<VarifyOtpResponse> verifyOtp(@Query("otp") String otp, @Query("email") String email);
 
-    @POST("resetPassword/")
+    @GET("resetPassword/")
     Call<ResetPasswordResponse> resetPassword(@Query("email") String email, @Query("password") String password);
 }

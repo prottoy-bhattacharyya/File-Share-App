@@ -32,7 +32,7 @@
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".Activities.ChangePasswordActivity"
+            android:name=".Activities.NewPasswordActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.CheckOtpActivity"

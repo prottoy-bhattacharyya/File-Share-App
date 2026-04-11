@@ -16,7 +16,11 @@ urlpatterns = [
     path('save_receiver/', views.save_receiver, name='save_receiver'),
     
     path('user_history/', views.user_history, name='user_history'),
+
+    path('sendOtp/', views.send_otp, name='send_otp'),
+    path('verifyOtp/', views.verify_otp, name='verify_otp'),
+    path('resetPassword/', views.reset_password, name='reset_password'),
     
-    path('admin_view/', views.admin_view, name='amin_view'),
+    path('admin_view/', views.admin_view, name='admin_view'),
     path('', views.index, name='index'),
 ]

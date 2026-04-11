@@ -2,7 +2,10 @@ import io
 import re
 import threading
 import os
+import random
+from datetime import timedelta
 
+from django.utils import timezone
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
@@ -567,3 +570,94 @@ def user_history(request):
         ]
     }
     return JsonResponse(response)
+
+def send_otp_email(email, otp):
+    """Background task to send the email."""
+    send_mail(
+        subject='Your Recovery Code',
+        message=f'Your 6-digit OTP is: {otp}. It will expire in 5 minutes.',
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[email],
+        fail_silently=True,
+    )
+
+@csrf_exempt
+def send_otp(request):
+    # Retrofit @Query sends data in the URL (request.GET)
+    identifier = request.GET.get('identifier')
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # 1. Find the user first
+    cursor.execute("SELECT email FROM user_credentials WHERE username=%s OR email=%s", (identifier, identifier))
+    user = cursor.fetchone()
+    
+    if not user:
+        return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
+    
+    user_email = user[0]
+    otp = str(random.randint(100000, 999999))
+    expiry = timezone.now() + timedelta(minutes=5)
+    print(f"Generated OTP for {user_email}: {otp} (expires at {expiry})")  # Debug log
+    
+    # 2. Save OTP to your otp_verifications table
+    cursor.execute("INSERT INTO otp_verifications (email, otp_code, expires_at) VALUES (%s, %s, %s)", 
+                   (user_email, otp, expiry))
+    conn.commit()
+    
+    # 3. Send email asynchronously
+    threading.Thread(target=send_otp_email, args=(user_email, otp)).start()
+    
+    return JsonResponse({
+        'status': 'success', 
+        'email': user_email, 
+        'message': 'OTP sent successfully'
+    })
+
+@csrf_exempt
+def verify_otp(request):
+    if request.method != 'POST':
+        print("Invalid request method for OTP verification")  # Debug log
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+    
+    otp_input = request.POST.get('otp').strip()
+    email = request.POST.get('email').strip()
+    
+    conn = get_connection()
+    if not conn:
+        print("Database connection failed during OTP verification")  # Debug log
+        return JsonResponse({'status': 'error', 'message': 'Database connection failed'})
+    
+    cursor = conn.cursor()
+    
+    # Check if valid, not used, and not expired
+    cursor.execute("""SELECT id FROM otp_verifications 
+                      WHERE email=%s AND otp_code=%s AND is_verified=FALSE AND expires_at > NOW()""", 
+                   (email, otp_input))
+    result = cursor.fetchone()
+    
+    if result:
+        return JsonResponse({'status': 'success', 'message': 'OTP Verified'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid or expired OTP'}, status=400)
+
+@csrf_exempt
+def reset_password(request):
+    email = request.GET.get('email')
+    password = request.GET.get('password')
+    
+    # Hash the new password for security
+    hashed_pwd = make_password(password)
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # 1. Update user password
+    cursor.execute("UPDATE user_credentials SET hashed_password=%s WHERE email=%s", (hashed_pwd, email))
+    
+    # 2. Mark all OTPs for this email as verified so they can't be reused
+    cursor.execute("UPDATE otp_verifications SET is_verified=TRUE WHERE email=%s", (email,))
+    
+    conn.commit()
+    return JsonResponse({'status': 'success', 'message': 'Password reset successful'})

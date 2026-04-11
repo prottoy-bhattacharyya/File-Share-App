@@ -4,9 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,55 +24,51 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class FindAccountActivity extends AppCompatActivity {
-
-    TextInputEditText input_identifier;
-    Button btn_send_otp;
+    EditText etIdentifier;
+    Button btnSendOtp;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_find_account);
 
-        initWorks();
-        exqListener();
-    }
+        etIdentifier = findViewById(R.id.et_find_identifier);
+        btnSendOtp = findViewById(R.id.btn_send_otp);
+        progressBar = findViewById(R.id.recovery_progress);
 
-    private void initWorks() {
-        input_identifier = findViewById(R.id.et_find_identifier);
-        btn_send_otp = findViewById(R.id.btn_send_otp);
-    }
+        btnSendOtp.setOnClickListener(v -> {
+            String identifier = etIdentifier.getText().toString().trim();
+            if (identifier.isEmpty()) return;
 
-    private void exqListener() {
-        btn_send_otp.setOnClickListener(v -> {
-            sendOtp();
-        });
-    }
+            progressBar.setVisibility(View.VISIBLE);
 
+            Retrofit retrofit = NetworkClient.getRetrofit(this);
+            UploadApis api = retrofit.create(UploadApis.class);
 
-    private void sendOtp(){
-        String identifier = input_identifier.getText().toString();
-        UploadApis api = NetworkClient.getRetrofit(this).create(UploadApis.class);
-        api.findAccoundAndSendOtp(identifier).enqueue(new Callback<FindAccoundResponse>() {
-            @Override
-            public void onResponse(Call<FindAccoundResponse> call, Response<FindAccoundResponse> response) {
-                if (response.isSuccessful() && response.body() != null){
-                    FindAccoundResponse ServerResponse = response.body();
-                    if (ServerResponse.getStatus().equals("success")){
-                        Intent intent = new Intent(FindAccountActivity.this, otpActivity.class);
-                        intent.putExtra("identifier", identifier);
+            api.findAccoundAndSendOtp(identifier).enqueue(new Callback<FindAccoundResponse>() {
+                @Override
+                public void onResponse(Call<FindAccoundResponse> call, Response<FindAccoundResponse> response) {
+                    progressBar.setVisibility(View.GONE);
+                    if (response.isSuccessful() && response.body() != null) {
+                        // Pass the email returned by the server to the next page
+                        Intent intent = new Intent(FindAccountActivity.this, CheckOtpActivity.class);
+                        intent.putExtra("user_email", response.body().getEmail());
                         startActivity(intent);
+                    } else {
+                        Toast.makeText(FindAccountActivity.this, "User not found", Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<FindAccoundResponse> call, Throwable t) {
-
-            }
+                @Override
+                public void onFailure(Call<FindAccoundResponse> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(FindAccountActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         });
-
     }
 }
