@@ -17,14 +17,12 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.R;
-import com.example.myapplication.Responses.ProfilePicResponse;
+import com.example.myapplication.Responses.ProfilePicUploadResponse;
 import com.example.myapplication.UriWorks;
 import com.example.myapplication.UserLocalStore;
 import com.google.android.material.button.MaterialButton;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -135,12 +133,12 @@ public class UserProfileActivity extends AppCompatActivity {
         Retrofit retrofit = NetworkClient.getRetrofit(getApplicationContext());
         UploadApis uploadApis = retrofit.create(UploadApis.class);
 
-        Call<ProfilePicResponse> call = uploadApis.setUserProfilePicture(parts, username_body);
-        call.enqueue(new Callback<ProfilePicResponse>() {
+        Call<ProfilePicUploadResponse> call = uploadApis.setUserProfilePicture(parts, username_body);
+        call.enqueue(new Callback<ProfilePicUploadResponse>() {
             @Override
-            public void onResponse(Call<ProfilePicResponse> call, Response<ProfilePicResponse> response) {
+            public void onResponse(Call<ProfilePicUploadResponse> call, Response<ProfilePicUploadResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    ProfilePicResponse serverResponse = response.body();
+                    ProfilePicUploadResponse serverResponse = response.body();
                     String message = serverResponse.getMessage();
                     String status = serverResponse.getStatus();
                     if (status.equals("success")) {
@@ -160,7 +158,7 @@ public class UserProfileActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ProfilePicResponse> call, Throwable t) {
+            public void onFailure(Call<ProfilePicUploadResponse> call, Throwable t) {
                 error_msg.setVisibility(View.VISIBLE);
                 error_msg.setText("Network failure: " + t.getMessage());
                 Log.e("ProfilePic", "Failure", t);

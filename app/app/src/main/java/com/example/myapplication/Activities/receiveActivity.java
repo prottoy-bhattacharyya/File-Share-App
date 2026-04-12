@@ -8,8 +8,10 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +23,9 @@ import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.R;
 import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.Responses.UploadResponse;
+import com.example.myapplication.Responses.getFileCountResponse;
 import com.example.myapplication.UserLocalStore;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner;
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions;
@@ -42,6 +46,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 
 public class receiveActivity extends AppCompatActivity {
@@ -54,6 +59,11 @@ public class receiveActivity extends AppCompatActivity {
 
     EditText type_text;
     String unique_text_value = "";
+
+    LinearLayout download_progress_container;
+
+    TextView download_status_text, download_percent;
+    LinearProgressIndicator downloadProgress;
 
 
     @Override
@@ -74,6 +84,13 @@ public class receiveActivity extends AppCompatActivity {
         go_button = findViewById(R.id.go_button);
         title_text = findViewById(R.id.title_text);
         type_text = findViewById(R.id.type_text);
+
+
+        download_progress_container = findViewById(R.id.download_progress_container);
+        download_status_text = findViewById(R.id.download_status_text);
+        download_percent = findViewById(R.id.download_percent);
+        downloadProgress = findViewById(R.id.download_progress);
+
 
         DOWNLOAD_LINK_BASE = getResources().getString(R.string.server_url)+ "/download?unique_text=";
         FILE_COUNT_LINK_BASE =getResources().getString(R.string.server_url)+ "/get_file_count?unique_text=";
@@ -132,49 +149,87 @@ public class receiveActivity extends AppCompatActivity {
             }
         }
 
-        String file_count_url = FILE_COUNT_LINK_BASE + unique_text_value;
-        //http://<address>/get_file_count?unique_text=<unique_text>
+        download_progress_container.setVisibility(View.VISIBLE);
+        title_text.setVisibility(View.GONE);
 
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(file_count_url)
-                .build();
 
-        client.newCall(request).enqueue(new Callback() {
+
+//        String file_count_url = FILE_COUNT_LINK_BASE + unique_text_value;
+//        //http://<address>/get_file_count?unique_text=<unique_text>
+//
+//        OkHttpClient client = new OkHttpClient();
+//        Request request = new Request.Builder()
+//                .url(file_count_url)
+//                .build();
+//
+//        client.newCall(request).enqueue(new Callback() {
+//            @Override
+//            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+//                runOnUiThread(() -> {
+//                    Toast.makeText(getApplicationContext(), "Failed to get file count: " + e.getMessage(), Toast.LENGTH_LONG).show();
+//                });
+//            }
+//
+//            @Override
+//            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+//                String responseBody = response.body().string();
+//                int count = 0;
+//                try {
+//                    JSONObject jsonObject = new JSONObject(responseBody);
+//                    count = jsonObject.getInt("file_count");
+//
+//                    downloadProgress.setProgress(0);
+//                    downloadProgress.setMax(count);
+//                }
+//
+//                catch (JSONException e) {
+//                    runOnUiThread(() -> {
+//                        Toast.makeText(getApplicationContext(), "Failed to parse file count JSON.", Toast.LENGTH_LONG).show();
+//                    });
+//
+//                }
+//
+//                save_receiver();
+//
+//                final int finalCount = count;
+//                runOnUiThread(()->{
+//                    Toast.makeText(getApplicationContext(), "Downloading " + finalCount + " files", Toast.LENGTH_SHORT).show();
+//                    next_download_process(finalCount);
+//                });
+//
+//            }
+//        });
+        save_receiver();
+        get_file_count();
+    }
+
+    private int get_file_count(){
+        Retrofit retrofit = NetworkClient.getRetrofit(receiveActivity.this);
+
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
+
+        uploadApis.get_file_count(unique_text_value).enqueue(new retrofit2.Callback<getFileCountResponse>() {
             @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), "Failed to get file count: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
+            public void onResponse(retrofit2.Call<getFileCountResponse> call, retrofit2.Response<getFileCountResponse> response) {
+                if (response.isSuccessful() && response.body().getStatus().equals("success")){
+                    save_receiver();
+                    next_download_process(response.body().getFileCount());
+
+                }
+                else {
+                    Toast.makeText(getApplicationContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                String responseBody = response.body().string();
-                int count = 0;
-                try {
-                    JSONObject jsonObject = new JSONObject(responseBody);
-                    count = jsonObject.getInt("file_count");
-                }
-
-                catch (JSONException e) {
-                    runOnUiThread(() -> {
-                        Toast.makeText(getApplicationContext(), "Failed to parse file count JSON.", Toast.LENGTH_LONG).show();
-                    });
-
-                }
-
-                save_receiver();
-
-                final int finalCount = count;
-                runOnUiThread(()->{
-                    Toast.makeText(getApplicationContext(), "Downloading " + finalCount + " files", Toast.LENGTH_SHORT).show();
-                    next_download_process(finalCount);
-                });
-
+            public void onFailure(retrofit2.Call<getFileCountResponse> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Failed to get file count: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+
+        return 0;
     }
+
 
     public void save_receiver() {
         UserLocalStore userLocalStore = new UserLocalStore(getApplicationContext());
@@ -230,6 +285,10 @@ public class receiveActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+                runOnUiThread(()->{
+                    //TODO: update download progress
+                });
 
                 String contentDisposition = response.header("Content-Disposition");
 

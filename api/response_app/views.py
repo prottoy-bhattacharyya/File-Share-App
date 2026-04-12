@@ -363,6 +363,8 @@ def upload_file(request):
         file = request.FILES['file']
     
     unique_text = request.POST.get('unique_text')
+    file_name = file.name
+
     if not unique_text:
         response = {
             'status': 'error',
@@ -380,9 +382,9 @@ def upload_file(request):
     
     cursor = conn.cursor()
     file_binary = file.read()
-    cursor.execute("""insert into file_blobs(unique_text, file_blob) 
-                        values (%s, %s)""", 
-                        (unique_text, file_binary)
+    cursor.execute("""insert into file_blobs(unique_text, file_name, file_blob) 
+                        values (%s, %s, %s)""", 
+                        (unique_text, file_name, file_binary)
                     )
     conn.commit()
     cursor.close()
@@ -396,38 +398,70 @@ def upload_file(request):
 
 def download(request):
     unique_text = request.GET.get('unique_text')
-    file_index = int(request.GET.get('file_index'))
-
-    try:
-        folder_path = os.path.join('media', unique_text)
-        files = os.listdir(folder_path)
-        
-        filename = files[file_index]
-        file_path = os.path.join(folder_path, filename)
-
-    except Exception as e:
-        response ={
-            'status': 'error',
-            'message': 'File not found.' + str(e)
+    
+    conn = get_connection()
+    if not conn:
+        response = {
+            'status': 'DB error',
+            'message': 'Database connection failed.'
         }
-        return JsonResponse(response, status=404)
+        return JsonResponse(response, status=500)
     
-    return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+    cursor = conn.cursor()
+    cursor.execute("""SELECT file_blob FROM file_blobs
+                     WHERE unique_text = %s""", (unique_text,))
+    result = cursor.fetchall()
 
+    cursor.close()
+    conn.close()
 
-def get_file_count(request):
-    unique_text = request.GET.get('unique_text')
-    folder_path = os.path.join('media', unique_text)
-    
-    if not os.path.exists(folder_path):
-        response ={
+    if not result:
+        response = {
             'status': 'error',
             'message': 'File not found.'
         }
         return JsonResponse(response, status=404)
+    file_blob = result[0][0]
     
-    files = os.listdir(folder_path)
-    file_count = len(files)
+    response = FileResponse(io.BytesIO(file_blob), 
+                            as_attachment=True, 
+                            content_type='application/octet-stream'
+                        )
+    return response
+
+
+def get_file_count(request):
+    unique_text = request.GET.get('unique_text')
+    # folder_path = os.path.join('media', unique_text)
+    
+    # if not os.path.exists(folder_path):
+    #     response ={
+    #         'status': 'error',
+    #         'message': 'File not found.'
+    #     }
+    #     return JsonResponse(response, status=404)
+    
+    # files = os.listdir(folder_path)
+    # file_count = len(files)
+
+    conn = get_connection()
+    if not conn:
+        response = {
+            'status': 'DB error',
+            'message': 'Database connection failed.'
+        }
+        return JsonResponse(response, status=500)
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM file_blobs WHERE unique_text = %s", (unique_text,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if result:
+        file_count = result[0]
+    else:
+        file_count = 0
 
     response = {
         'status': 'success',

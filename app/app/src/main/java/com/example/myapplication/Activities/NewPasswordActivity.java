@@ -82,6 +82,11 @@ public class NewPasswordActivity extends AppCompatActivity {
         });
 
         btnReset.setOnClickListener(v -> {
+            if (etNewPassword.getText().toString().trim().isEmpty()) {
+                Toast.makeText(this, "Please enter a new password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             btnReset.setAlpha(0.5f);
             btnReset.setEnabled(false);
 

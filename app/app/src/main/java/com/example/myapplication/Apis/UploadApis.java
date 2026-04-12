@@ -3,11 +3,12 @@ package com.example.myapplication.Apis;
 
 import com.example.myapplication.Responses.FindAccoundResponse;
 import com.example.myapplication.Responses.LoginResponse;
-import com.example.myapplication.Responses.ProfilePicResponse;
+import com.example.myapplication.Responses.ProfilePicUploadResponse;
 import com.example.myapplication.Responses.ResetPasswordResponse;
 import com.example.myapplication.Responses.UploadResponse;
 import com.example.myapplication.Responses.UserHistoryResponse;
 import com.example.myapplication.Responses.VarifyOtpResponse;
+import com.example.myapplication.Responses.getFileCountResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -38,7 +39,11 @@ public interface UploadApis {
     @Multipart
     @POST("upload_file/")
     Call<UploadResponse> uploadFile(@Part MultipartBody.Part file,
-                                    @Part("unique_text") RequestBody unique_text);
+                                    @Part("unique_text") RequestBody unique_text,
+                                    @Part("username") RequestBody file_name);
+
+    @GET("get_file_count/")
+    Call<getFileCountResponse> get_file_count(@Query("unique_text") String unique_text);
 
     @Multipart
     @POST("save_sender/")
@@ -56,8 +61,8 @@ public interface UploadApis {
 
     @Multipart
     @POST("setUserProfilePicture/")
-    Call<ProfilePicResponse> setUserProfilePicture(@Part MultipartBody.Part profilePicture,
-                                                   @Part("username") RequestBody username);
+    Call<ProfilePicUploadResponse> setUserProfilePicture(@Part MultipartBody.Part profilePicture,
+                                                         @Part("username") RequestBody username);
 
     @GET("getUserProfilePicture/")
     Call<ResponseBody> getUserProfilePicture(@Query("username") String username);

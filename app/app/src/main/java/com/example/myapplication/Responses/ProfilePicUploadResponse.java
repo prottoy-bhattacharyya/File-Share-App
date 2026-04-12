@@ -2,7 +2,7 @@ package com.example.myapplication.Responses;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ProfilePicResponse {
+public class ProfilePicUploadResponse {
     @SerializedName("status")
     private String status;
 
