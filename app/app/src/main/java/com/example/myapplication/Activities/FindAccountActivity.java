@@ -53,13 +53,13 @@ public class FindAccountActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<FindAccoundResponse> call, Response<FindAccoundResponse> response) {
                     progressBar.setVisibility(View.GONE);
-                    if (response.isSuccessful() && response.body() != null) {
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
                         // Pass the email returned by the server to the next page
                         Intent intent = new Intent(FindAccountActivity.this, CheckOtpActivity.class);
                         intent.putExtra("user_email", response.body().getEmail());
                         startActivity(intent);
                     } else {
-                        Toast.makeText(FindAccountActivity.this, "User not found", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FindAccountActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
 

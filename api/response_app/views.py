@@ -611,7 +611,8 @@ def send_otp(request):
     conn.commit()
     
     
-    threading.Thread(target=send_otp_email, args=(user_email, otp)).start()
+    # threading.Thread(target=send_otp_email, args=(user_email, otp)).start()
+    send_otp_email(user_email, otp)
     
     return JsonResponse({
         'status': 'success', 

@@ -5,6 +5,11 @@
     android:padding="24dp"
     android:gravity="center_vertical">
 
+    <ProgressBar
+        android:id="@+id/recovery_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,5 +47,13 @@
         android:layout_height="55dp"
         android:layout_marginTop="20dp"
         android:text="Verify OTP" />
+
+    <Button
+        android:id="@+id/btn_resend_otp"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp"
+        android:text="Resend OTP"
+        android:backgroundTint="?attr/colorSecondary"/>
 
 </LinearLayout>

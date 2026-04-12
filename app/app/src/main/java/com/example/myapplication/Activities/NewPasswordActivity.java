@@ -93,15 +93,21 @@ public class NewPasswordActivity extends AppCompatActivity {
             api.resetPassword(userEmail, newPass).enqueue(new Callback<ResetPasswordResponse>() {
                 @Override
                 public void onResponse(Call<ResetPasswordResponse> call, Response<ResetPasswordResponse> response) {
-                    if (response.isSuccessful()) {
+
+                    btnReset.setAlpha(1f);
+                    btnReset.setEnabled(true);
+
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
                         Toast.makeText(NewPasswordActivity.this, "Success! Login with your new password.", Toast.LENGTH_LONG).show();
-                        btnReset.setAlpha(1f);
-                        btnReset.setEnabled(true);
+
                         // Clear backstack so they can't go "back" into recovery
                         Intent intent = new Intent(NewPasswordActivity.this, loginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();
+                    }
+                    else{
+                        Toast.makeText(NewPasswordActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
