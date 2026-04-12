@@ -1,6 +1,7 @@
 // UploadApis.java
 package com.example.myapplication.Apis;
 
+import com.example.myapplication.Responses.FileListResponse;
 import com.example.myapplication.Responses.FindAccoundResponse;
 import com.example.myapplication.Responses.LoginResponse;
 import com.example.myapplication.Responses.ProfilePicUploadResponse;
@@ -19,6 +20,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.Query;
+import retrofit2.http.Streaming;
 
 public interface UploadApis {
 
@@ -42,8 +44,14 @@ public interface UploadApis {
                                     @Part("unique_text") RequestBody unique_text,
                                     @Part("username") RequestBody file_name);
 
-    @GET("get_file_count/")
-    Call<getFileCountResponse> get_file_count(@Query("unique_text") String unique_text);
+    // 1. Get the list of files first
+    @GET("get_file_list/")
+    Call<FileListResponse> getFileList(@Query("unique_text") String uniqueText);
+
+    // 2. Download a specific file by ID
+    @Streaming
+    @GET("download_single_file/")
+    Call<ResponseBody> downloadFile(@Query("file_id") int fileId);
 
     @Multipart
     @POST("save_sender/")

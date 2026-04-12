@@ -8,8 +8,10 @@ urlpatterns = [
     path('setUserProfilePicture/', views.setUserProfilePicture, name='set_user_profile_picture'),
     path('getUserProfilePicture/', views.getUserProfilePicture, name='get_user_profile_picture'),
     
-    path('get_file_count/', views.get_file_count, name='get_file_number'),
-    path('download/', views.download, name='download'),
+    path('get_file_list/', views.get_file_list, name='get_file_number'),
+    path('download_single_file/', views.download_single_file, name='download'),
+
+    
     path('upload_file/', views.upload_file, name='upload_file'),
     
     path('save_sender/', views.save_sender, name='save_sender'),

@@ -396,79 +396,42 @@ def upload_file(request):
     }
     return JsonResponse(response)
 
-def download(request):
+@csrf_exempt
+def get_file_list(request):
     unique_text = request.GET.get('unique_text')
-    
     conn = get_connection()
-    if not conn:
-        response = {
-            'status': 'DB error',
-            'message': 'Database connection failed.'
-        }
-        return JsonResponse(response, status=500)
-    
     cursor = conn.cursor()
-    cursor.execute("""SELECT file_blob FROM file_blobs
-                     WHERE unique_text = %s""", (unique_text,))
-    result = cursor.fetchall()
-
-    cursor.close()
-    conn.close()
-
-    if not result:
-        response = {
-            'status': 'error',
-            'message': 'File not found.'
-        }
-        return JsonResponse(response, status=404)
-    file_blob = result[0][0]
     
-    response = FileResponse(io.BytesIO(file_blob), 
-                            as_attachment=True, 
-                            content_type='application/octet-stream'
-                        )
-    return response
-
-
-def get_file_count(request):
-    unique_text = request.GET.get('unique_text')
-    # folder_path = os.path.join('media', unique_text)
+    # Get ID and Name for all files with this unique_text
+    cursor.execute("SELECT id, file_name FROM file_blobs WHERE unique_text=%s", (unique_text,))
+    rows = cursor.fetchall()
     
-    # if not os.path.exists(folder_path):
-    #     response ={
-    #         'status': 'error',
-    #         'message': 'File not found.'
-    #     }
-    #     return JsonResponse(response, status=404)
-    
-    # files = os.listdir(folder_path)
-    # file_count = len(files)
+    file_list = [
+        {
+            "id": row[0], 
+            "name": row[1]
+        } 
+        for row in rows
+        ]
+    return JsonResponse({'status': 'success', 'files': file_list})
 
+@csrf_exempt
+def download_single_file(request):
+    file_id = request.GET.get('file_id')
     conn = get_connection()
-    if not conn:
-        response = {
-            'status': 'DB error',
-            'message': 'Database connection failed.'
-        }
-        return JsonResponse(response, status=500)
-    
     cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM file_blobs WHERE unique_text = %s", (unique_text,))
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    if result:
-        file_count = result[0]
-    else:
-        file_count = 0
-
-    response = {
-        'status': 'success',
-        'file_count': file_count,
-    }
     
-    return JsonResponse(response)
+    cursor.execute("SELECT file_name, file_blob FROM file_blobs WHERE id=%s", (file_id,))
+    row = cursor.fetchone()
+    
+    if row:
+        file_name, blob_data = row
+        response = HttpResponse(blob_data, content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+        return response
+    return HttpResponse(status=404)
+
+
 
 @csrf_exempt
 def save_sender(request):
