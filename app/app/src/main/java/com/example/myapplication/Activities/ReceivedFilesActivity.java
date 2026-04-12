@@ -12,6 +12,8 @@ import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.webkit.MimeTypeMap;
 import android.widget.Filter;
 import android.widget.Filterable;
@@ -58,6 +60,11 @@ public class ReceivedFilesActivity extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // Add this after setting the LayoutManager
+
+        // Load and apply the animation
+        LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down);
+        recyclerView.setLayoutAnimation(animation);
 
         loadFiles();
 

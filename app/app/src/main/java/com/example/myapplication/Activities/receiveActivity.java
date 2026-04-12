@@ -2,6 +2,7 @@ package com.example.myapplication.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import com.example.myapplication.R;
 import com.example.myapplication.Responses.FileListResponse;
 import com.example.myapplication.Responses.UploadResponse;
 import com.example.myapplication.UserLocalStore;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanner;
@@ -42,12 +44,11 @@ import retrofit2.Retrofit;
 
 public class receiveActivity extends AppCompatActivity {
 
-    Button scan_button, go_button;
-    TextView title_text;
+    Button scan_button, go_button, browse_files_button;
     EditText type_text;
     String unique_text_value = "";
 
-    LinearLayout download_progress_container;
+    MaterialCardView download_progress_container;
     TextView download_status_text, download_percent;
     LinearProgressIndicator downloadProgress;
 
@@ -59,12 +60,14 @@ public class receiveActivity extends AppCompatActivity {
         // Initialize UI
         scan_button = findViewById(R.id.scan_button);
         go_button = findViewById(R.id.go_button);
-        title_text = findViewById(R.id.title_text);
+
         type_text = findViewById(R.id.type_text);
         download_progress_container = findViewById(R.id.download_progress_container);
         download_status_text = findViewById(R.id.download_status_text);
         download_percent = findViewById(R.id.download_percent);
         downloadProgress = findViewById(R.id.download_progress);
+        browse_files_button = findViewById(R.id.btn_browse_files);
+
 
         scan_button.setOnClickListener(view -> qr_scanner());
 
@@ -75,6 +78,11 @@ public class receiveActivity extends AppCompatActivity {
                 return;
             }
             start_download_process();
+        });
+
+        browse_files_button.setOnClickListener(view -> {
+            Intent intent = new Intent(receiveActivity.this, ReceivedFilesActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -96,7 +104,8 @@ public class receiveActivity extends AppCompatActivity {
 
     void start_download_process() {
         download_progress_container.setVisibility(View.VISIBLE);
-        title_text.setVisibility(View.GONE);
+        browse_files_button.setAlpha(0.5f);
+        browse_files_button.setEnabled(false);
 
         // Optional: Update server that this user is receiving files
         save_receiver();
@@ -142,6 +151,11 @@ public class receiveActivity extends AppCompatActivity {
         if (index >= list.size()) {
             download_status_text.setText("All files downloaded!");
             download_percent.setText("100%");
+            downloadProgress.setProgress(list.size());
+
+            browse_files_button.setEnabled(true);
+            browse_files_button.setAlpha(1f);
+
             Toast.makeText(this, "Download finished!", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -150,7 +164,7 @@ public class receiveActivity extends AppCompatActivity {
 
         // Update UI Progress
         int displayIndex = index + 1;
-        download_status_text.setText("Downloading: " + currentFile.getName() + " (" + displayIndex + "/" + list.size() + ")");
+        download_status_text.setText("Downloading: \n" +  currentFile.getName() + " (" + displayIndex + "/" + list.size() + ")");
         int percent = (int) (((float) index / list.size()) * 100);
         download_percent.setText(percent + "%");
         downloadProgress.setProgress(index);
@@ -180,11 +194,17 @@ public class receiveActivity extends AppCompatActivity {
 
     private void saveFileToDisk(ResponseBody body, String fileName) {
         try {
-            // Save to /Android/data/package_name/files/Downloads
-            File path = new File(getExternalFilesDir(null), "Downloads");
-            if (!path.exists()) path.mkdirs();
+            // Target: /storage/emulated/0/Download/File Share App
+            File downloadsRoot = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File customFolder = new File(downloadsRoot, "File Share App");
 
-            File file = new File(path, fileName);
+            // Create the "File Share App" folder if it doesn't exist
+            if (!customFolder.exists()) {
+                customFolder.mkdirs();
+            }
+
+            File file = new File(customFolder, fileName);
+
             try (InputStream is = body.byteStream();
                  FileOutputStream fos = new FileOutputStream(file)) {
                 byte[] buffer = new byte[8192];
