@@ -404,7 +404,7 @@ def get_file_list(request):
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Get ID and Name for all files with this unique_text
+    
     cursor.execute("SELECT id, file_name FROM file_blobs WHERE unique_text=%s", (unique_text,))
     rows = cursor.fetchall()
     
@@ -478,56 +478,6 @@ def save_receiver(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
-@csrf_exempt
-def post_files(request):
-    if request.method == 'POST':
-        if 'file' in request.FILES:
-            file = request.FILES['file']
-        else:
-            response = {
-                'status': 'error',
-                'message': 'No file provided.'
-            }
-            return JsonResponse(response, status=400)
-        
-        unique_text = request.POST.get('unique_text')
-        if not unique_text:
-            response = {
-                'status': 'error',
-                'message': 'No unique_text provided.'
-            }
-            return JsonResponse(response, status=400)
-
-        folder_path = os.path.join('media', unique_text)
-        os.makedirs(folder_path, exist_ok=True)
-
-        
-        file_path = os.path.join(folder_path, file.name)
-        with open(file_path, 'wb+') as destination:
-            for chunk in file.chunks():
-                destination.write(chunk)
-
-
-        conn = get_connection()
-        if not conn:
-            response = {
-                'status': 'DB error',
-                'message': 'Database connection failed.'
-            }
-            return JsonResponse(response, status=500)
-        cursor = conn.cursor()
-
-        response = {
-            'status': 'success',
-            'message': 'File uploaded successfully.'
-        }
-        return JsonResponse(response)
-    else:
-        response = {
-            'status': 'error',
-            'message': 'Invalid request method.'
-        }
-        return JsonResponse(response, status=400)
 
 @csrf_exempt
 def user_history(request):
@@ -619,7 +569,6 @@ def send_otp(request):
         'message': 'OTP sent successfully'
     })
 
-from django.utils import timezone
 
 @csrf_exempt
 def verify_otp(request):
@@ -646,6 +595,7 @@ def verify_otp(request):
     
 
     print(f"OTP verification result for {email} with OTP {otp_input}: {'success' if result else 'failure'}")  # Debug log
+    
     if result:
         cursor.execute("UPDATE otp_verifications SET is_verified=TRUE WHERE id=%s", (result[0],))
         cursor.execute("UPDATE user_credentials SET is_verified=TRUE WHERE email=%s", (email,))

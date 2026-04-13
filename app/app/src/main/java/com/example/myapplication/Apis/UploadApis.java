@@ -10,7 +10,6 @@ import com.example.myapplication.Responses.UploadResponse;
 import com.example.myapplication.Responses.UserHistoryResponse;
 import com.example.myapplication.Responses.VarifyOtpResponse;
 import com.example.myapplication.Responses.VerifyEmailResponse;
-import com.example.myapplication.Responses.getFileCountResponse;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -45,11 +44,11 @@ public interface UploadApis {
                                     @Part("unique_text") RequestBody unique_text,
                                     @Part("username") RequestBody file_name);
 
-    // 1. Get the list of files first
+
     @GET("get_file_list/")
     Call<FileListResponse> getFileList(@Query("unique_text") String uniqueText);
 
-    // 2. Download a specific file by ID
+
     @Streaming
     @GET("download_single_file/")
     Call<ResponseBody> downloadFile(@Query("file_id") int fileId);
