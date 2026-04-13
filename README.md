@@ -3,15 +3,12 @@
 A file-sharing Android application that enables users to upload and share files through QR code scanning, built with Java and powered by Django REST API.
 
 ##  Features
-
-- **Multi-File Upload**: Upload single or multiple files simultaneously to the server
+- **User Authentication**: User can create account and login
+- **Multiple file Upload and Download**: Upload files to database (4.5 MB max size for each file because of free vercel account)
 - **QR Code Sharing**: Generate QR codes for file sharing - receivers can download files by simply scanning
-- **User Authentication**: Secure login and signup functionality
+- **Account Recovery and Verification**: User can reset or verify the account via OTP sent to email
 - **Transfer History**: Automatically saves and displays user's send and receive history
-- **Local Storage**: Efficiently stores user information locally after authentication
 
-##  Future Works
-- **⚡ Fast & Reliable**: Quick file transfers with real-time progress tracking
 
 ##  Tech Stack
 
@@ -27,17 +24,12 @@ Before running this project, ensure you have:
 - JDK 8 or higher
 - Python 3.8+
 - MySQL Server
-- Android device or emulator (API level 21+)
 
 ##  Installation
 
 ### Backend Setup
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/file-share-android.git
-cd file-share-android
-```
+1. Open `api` folder in your IDE:
 
 2. Configure MySQL database in `dbconfig.py`:
 ```python
@@ -51,15 +43,21 @@ DATABASES = {
     }
 }
 ```
+3. Goto `goggle apppassword` and get your password
+Configure Email in `settings.py`
+```python
+    EMAIL_HOST_USER = "your gmail"
+    EMAIL_HOST_PASSWORD = "your password"
+```
 
-3. Start the Django server:
+4. Start the Django server:
 ```bash
 python -m uv run manage.py runserver 0.0.0.0:8000
 ```
 
 ### Android App Setup
 
-1. Open the `android` folder in Android Studio
+1. Open the `app` folder in Android Studio
 
 2. Update the API base URL in the app configuration:
 ```java
@@ -85,9 +83,7 @@ python -m uv run manage.py runserver 0.0.0.0:8000
 3. **View History**: Check your receive history anytime
 
 ##  Screenshots
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/59cdc9fa-bd03-446f-8bce-5f3813ba9cde" />
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/b0c8773f-45ed-4e29-bfa2-8254efe7d85e" />
-<img width="300" alt="image" src="https://github.com/user-attachments/assets/9ff4f6d3-895d-49b7-b7c7-5654825ba379" />
+
 
 
 ##  API Endpoints
