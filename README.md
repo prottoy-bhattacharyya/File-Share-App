@@ -83,6 +83,11 @@ python -m uv run manage.py runserver 0.0.0.0:8000
 3. **View History**: Check your receive history anytime
 
 ##  Screenshots
+<img src="Screenshots/main.png" alt="Home Page" width="150"> <img src="Screenshots/profile.png" alt="Project Logo" width="150"> <img src="Screenshots/received files.png" alt="Project Logo" width="150">
+
+<img src="Screenshots/upload files.png" alt="Project Logo" width="150"> <img src="Screenshots/qr scan.png" alt="Project Logo" width="150"> <img src="Screenshots/receiving files.png" alt="Project Logo" width="150">
+
+
 
 
 
