@@ -64,10 +64,19 @@ python -m uv run manage.py runserver 0.0.0.0:8000
 // In res/values/strings.xml file
 <string name="server_url">your_server_ip:8000</string>
 ```
+3. If you are using `http` url, then add it here.
+```java
+    // In res/xml/network_security_config.xml file
+    <?xml version="1.0" encoding="utf-8"?>
+    <network-security-config>
+        <domain-config cleartextTrafficPermitted="true">
+            <domain includeSubdomains="true">192.168.1.215</domain> 
+        </domain-config>
+    </network-security-config>
+```
+4. Sync Gradle files and build the project
 
-3. Sync Gradle files and build the project
-
-4. Run the app on your device or emulator
+5. Run the app on your device or emulator
 
 ##  Usage
 
