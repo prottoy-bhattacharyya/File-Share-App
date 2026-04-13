@@ -214,7 +214,7 @@ def signup(request):
             'status': 'data error',
             'message': 'All fields are required.'
         }
-        return JsonResponse(response, status=400)
+        return JsonResponse(response)
     
     conn = get_connection()
     if not conn:
@@ -222,7 +222,7 @@ def signup(request):
             'status': 'DB conn error',
             'message': 'Database connection failed.'
         }
-        return JsonResponse(response, status=500)
+        return JsonResponse(response)
     
     hashed_password = make_password(password)
 
@@ -235,7 +235,7 @@ def signup(request):
         }
         cursor.close()
         conn.close()
-        return JsonResponse(response, status=400)
+        return JsonResponse(response)
     
     cursor.execute("""SELECT email FROM user_credentials WHERE email = %s""", (email,))
     if cursor.fetchone():
@@ -245,7 +245,7 @@ def signup(request):
         }
         cursor.close()
         conn.close()
-        return JsonResponse(response, status=400)
+        return JsonResponse(response)
     
     cursor.execute("INSERT INTO user_credentials (fullname, email, username, hashed_password) VALUES (%s, %s, %s, %s)", (fullname, email, username, hashed_password))
     conn.commit()
