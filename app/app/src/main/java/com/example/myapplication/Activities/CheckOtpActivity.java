@@ -18,6 +18,7 @@ import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.R;
 import com.example.myapplication.Responses.FindAccoundResponse;
 import com.example.myapplication.Responses.VarifyOtpResponse;
+import com.example.myapplication.UserLocalStore;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,7 +29,7 @@ public class CheckOtpActivity extends AppCompatActivity {
     EditText etOtp;
     TextView tvEmail;
     Button btnVerify, resendOtp;
-    String userEmail;
+    String userEmail, type;
     ProgressBar recoveryProgress;
     private CountDownTimer countDownTimer;
 
@@ -39,6 +40,8 @@ public class CheckOtpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_check_otp);
 
         userEmail = getIntent().getStringExtra("user_email");
+        type = getIntent().getStringExtra("type");
+
         etOtp = findViewById(R.id.et_otp_code);
         btnVerify = findViewById(R.id.btn_verify_otp);
         tvEmail = findViewById(R.id.tv_email);
@@ -62,6 +65,8 @@ public class CheckOtpActivity extends AppCompatActivity {
 
         btnVerify.setOnClickListener(v -> {
             String otp = etOtp.getText().toString().trim();
+            if (otp.isEmpty()) return; // Don't send empty OTP
+
             recoveryProgress.setVisibility(ProgressBar.VISIBLE);
 
             Retrofit retrofit = NetworkClient.getRetrofit(this);
@@ -70,24 +75,37 @@ public class CheckOtpActivity extends AppCompatActivity {
             api.verifyOtp(otp, userEmail).enqueue(new Callback<VarifyOtpResponse>() {
                 @Override
                 public void onResponse(Call<VarifyOtpResponse> call, Response<VarifyOtpResponse> response) {
-
                     recoveryProgress.setVisibility(ProgressBar.GONE);
 
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
-                        // Pass both Email and OTP to the final step
-                        Intent intent = new Intent(CheckOtpActivity.this, NewPasswordActivity.class);
-                        intent.putExtra("user_email", userEmail);
-                        intent.putExtra("otp_code", otp);
-                        startActivity(intent);
+                    if (response.isSuccessful() && response.body() != null) {
+                        if (response.body().getStatus().equals("success")) {
+
+                            if ("email_verify".equals(type)) {
+
+                                UserLocalStore userLocalStore = new UserLocalStore(CheckOtpActivity.this);
+                                userLocalStore.setIsVerified(true);
+
+                                Intent intent = new Intent(CheckOtpActivity.this, UserProfileActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Intent intent = new Intent(CheckOtpActivity.this, NewPasswordActivity.class);
+                                intent.putExtra("user_email", userEmail);
+                                startActivity(intent);
+                            }
+                        } else {
+                            Toast.makeText(CheckOtpActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(CheckOtpActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CheckOtpActivity.this, "Server error: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<VarifyOtpResponse> call, Throwable t) {
                     recoveryProgress.setVisibility(ProgressBar.GONE);
-                    Toast.makeText(CheckOtpActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CheckOtpActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         });

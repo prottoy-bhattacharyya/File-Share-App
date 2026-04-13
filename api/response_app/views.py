@@ -4,6 +4,7 @@ import threading
 import os
 import random
 from datetime import timedelta
+from urllib import response
 
 from django.utils import timezone
 from django.http import FileResponse, HttpResponse, JsonResponse
@@ -41,6 +42,7 @@ def index(request):
                             fullname text,
                             username text,
                             email text,
+                            is_verified BOOLEAN DEFAULT FALSE,
                             profile_picture mediumblob,
                             hashed_password text,
                             timestamp timestamp default current_timestamp
@@ -617,6 +619,8 @@ def send_otp(request):
         'message': 'OTP sent successfully'
     })
 
+from django.utils import timezone
+
 @csrf_exempt
 def verify_otp(request):
     if request.method != 'GET':
@@ -635,14 +639,31 @@ def verify_otp(request):
     
 
     cursor.execute("""SELECT id FROM otp_verifications 
-                      WHERE email=%s AND otp_code=%s AND is_verified=FALSE AND expires_at > NOW()""", 
+                      WHERE email=%s AND otp_code=%s AND is_verified=FALSE""", 
                    (email, otp_input))
+    
     result = cursor.fetchone()
     
+
+    print(f"OTP verification result for {email} with OTP {otp_input}: {'success' if result else 'failure'}")  # Debug log
     if result:
-        return JsonResponse({'status': 'success', 'message': 'OTP Verified'})
+        cursor.execute("UPDATE otp_verifications SET is_verified=TRUE WHERE id=%s", (result[0],))
+        cursor.execute("UPDATE user_credentials SET is_verified=TRUE WHERE email=%s", (email,))
+        conn.commit()
+
+        response = {
+            'status': 'success', 
+            'message': 'OTP Verified'
+        }
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid or expired OTP'})
+        response = {
+            'status': 'error', 
+            'message': 'Invalid or expired OTP'
+        }
+    
+    cursor.close()
+    conn.close()
+    return JsonResponse(response)
 
 @csrf_exempt
 def reset_password(request):
@@ -666,3 +687,22 @@ def reset_password(request):
     
     conn.commit()
     return JsonResponse({'status': 'success', 'message': 'Password reset successful'})
+
+
+@csrf_exempt
+def check_email_verification(request):
+    email = request.GET.get('email').strip()
+    
+    conn = get_connection()
+    if not conn:
+        print("Database connection failed during verification check")  # Debug log
+        return JsonResponse({'status': 'error', 'message': 'Database connection failed'})
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT is_verified FROM user_credentials WHERE email=%s", (email,))
+    result = cursor.fetchone()
+    
+    if result and result[0]:
+        return JsonResponse({'status': 'success', 'message': 'User is verified'})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'User is not verified'})

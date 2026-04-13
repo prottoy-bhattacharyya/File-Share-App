@@ -3,9 +3,10 @@ create table if not exists user_credentials (
 	fullname text,
 	username text,
 	email text,
+	is_verified BOOLEAN DEFAULT FALSE,
 	profile_picture mediumblob,
 	hashed_password text,
-    timestamp timestamp default current_timestamp
+	timestamp timestamp default current_timestamp
 );
 
 create table if not exists file_info (

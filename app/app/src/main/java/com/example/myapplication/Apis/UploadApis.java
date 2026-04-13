@@ -9,6 +9,7 @@ import com.example.myapplication.Responses.ResetPasswordResponse;
 import com.example.myapplication.Responses.UploadResponse;
 import com.example.myapplication.Responses.UserHistoryResponse;
 import com.example.myapplication.Responses.VarifyOtpResponse;
+import com.example.myapplication.Responses.VerifyEmailResponse;
 import com.example.myapplication.Responses.getFileCountResponse;
 
 import okhttp3.MultipartBody;
@@ -83,4 +84,8 @@ public interface UploadApis {
 
     @GET("resetPassword/")
     Call<ResetPasswordResponse> resetPassword(@Query("email") String email, @Query("password") String password);
+
+    @GET("check_email_verification/")
+    Call<VerifyEmailResponse> checkEmailVerification(@Query("email") String email);
+
 }

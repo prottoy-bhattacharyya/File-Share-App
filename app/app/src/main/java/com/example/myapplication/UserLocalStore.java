@@ -19,6 +19,7 @@ public class UserLocalStore {
             editor.putString("username", username);
             editor.putString("password", password);
             editor.putBoolean("checkLoggedIn",true);
+            editor.putBoolean("isVerified", false);
             editor.apply();
         }
         catch (Exception e) {
@@ -38,6 +39,15 @@ public class UserLocalStore {
     }
     public String getPassword() {
         return sharedPreferences.getString("password", null);
+    }
+
+    public boolean getIsVerified() {
+        return sharedPreferences.getBoolean("isVerified", false);
+    }
+    public void setIsVerified(boolean b){
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isVerified", b);
+        editor.apply();
     }
 
     public boolean isLoggedIn() {

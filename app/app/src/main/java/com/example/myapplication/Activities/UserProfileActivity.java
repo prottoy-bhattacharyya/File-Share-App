@@ -2,6 +2,7 @@ package com.example.myapplication.Activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,25 +18,29 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.R;
+import com.example.myapplication.Responses.FindAccoundResponse;
 import com.example.myapplication.Responses.ProfilePicUploadResponse;
+import com.example.myapplication.Responses.VerifyEmailResponse;
 import com.example.myapplication.UriWorks;
 import com.example.myapplication.UserLocalStore;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 import java.io.File;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class UserProfileActivity extends AppCompatActivity {
-    TextView tv_fullname, tv_username, tv_email, error_msg;
+    TextView tv_fullname, tv_username, tv_email;
     ImageView profile_image;
-    MaterialButton btn_user_history, btn_received_files;
+    MaterialButton btn_user_history, btn_received_files, btn_verify_email;
     UserLocalStore userLocalStore;
     UriWorks uriWorks = new UriWorks();
 
@@ -56,14 +61,19 @@ public class UserProfileActivity extends AppCompatActivity {
         btn_user_history = findViewById(R.id.btn_user_history);
         btn_received_files = findViewById(R.id.btn_received_files);
         profile_image  = findViewById(R.id.profile_image);
-        error_msg = findViewById(R.id.error_msg);
+        btn_verify_email = findViewById(R.id.btn_verify_email);
 
         userLocalStore = new UserLocalStore(UserProfileActivity.this);
         tv_fullname.setText(userLocalStore.getFullname());
         tv_username.setText(userLocalStore.getUsername());
         tv_email.setText(userLocalStore.getEmail());
 
+        btn_verify_email.setEnabled(true);
+        btn_verify_email.setAlpha(1f);
+
         updateProfileUI();
+
+        updateEmailVarification();
     }
 
     void exqListener(){
@@ -81,6 +91,44 @@ public class UserProfileActivity extends AppCompatActivity {
             intent.setType("image/*");
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             startActivityForResult(intent, 100);
+        });
+
+        btn_verify_email.setOnClickListener(view -> {
+            btn_verify_email.setEnabled(false);
+            btn_verify_email.setAlpha(0.5f);
+            sendVerificationEmail();
+
+        });
+    }
+
+    private void sendVerificationEmail() {
+        Retrofit retrofit = NetworkClient.getRetrofit(getApplicationContext());
+        UploadApis uploadApis = retrofit.create(UploadApis.class);
+
+        uploadApis.findAccoundAndSendOtp(userLocalStore.getEmail()).enqueue(new Callback<FindAccoundResponse>() {
+            @Override
+            public void onResponse(Call<FindAccoundResponse> call, Response<FindAccoundResponse> response) {
+                try {
+                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                        Intent intent = new Intent(UserProfileActivity.this, CheckOtpActivity.class);
+                        intent.putExtra("user_email", userLocalStore.getEmail());
+                        intent.putExtra("type", "email_verify");
+                        startActivity(intent);
+                    }
+                    else {
+                        showError(response.body().getMessage());
+                    }
+                }
+                catch (Exception e){
+                    showError(e.getMessage());
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<FindAccoundResponse> call, Throwable t) {
+                showError(t.getMessage());
+            }
         });
     }
 
@@ -117,8 +165,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
         File profilePic = new File(getFilesDir(), "profile_image.jpg");
         if (!profilePic.exists()) {
-            Toast.makeText(this, "No image found to upload", Toast.LENGTH_SHORT).show();
-            error_msg.setText("No image found to upload");
+            showError("No profile picture found");
             return;
         }
 
@@ -145,30 +192,90 @@ public class UserProfileActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        error_msg.setVisibility(View.VISIBLE);
-                        error_msg.setText("error: " + message);
-                        error_msg.setTextColor(getResources().getColor(R.color.red));
+                        showError(response.body().getMessage());
                     }
                 } else {
                     Log.e("ProfilePic", "Server error code: " + response.code());
-                    error_msg.setVisibility(View.VISIBLE);
-                    error_msg.setText("Server error: " + response.code());
-                    error_msg.setTextColor(getResources().getColor(R.color.red));
+                    showError("Server error code: " + response.code() + "\n" + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ProfilePicUploadResponse> call, Throwable t) {
-                error_msg.setVisibility(View.VISIBLE);
-                error_msg.setText("Network failure: " + t.getMessage());
+                showError(t.getMessage());
                 Log.e("ProfilePic", "Failure", t);
             }
         });
+    }
+
+    private void updateEmailVarification() {
+        if (userLocalStore.getIsVerified()) {
+            btn_verify_email.setText("Verified");
+            btn_verify_email.setIcon(getDrawable(R.drawable.ic_check));
+            btn_verify_email.setBackgroundColor(Color.GREEN);
+            btn_verify_email.setEnabled(false);
+
+            return;
+        }
+
+        UploadApis uploadApis = NetworkClient.getRetrofit(this).create(UploadApis.class);
+        uploadApis.checkEmailVerification(userLocalStore.getEmail()).enqueue(new Callback<VerifyEmailResponse>() {
+            @Override
+            public void onResponse(Call<VerifyEmailResponse> call, Response<VerifyEmailResponse> response) {
+                // SAFE CHECK
+                if (response.isSuccessful() && response.body() != null) {
+                    if ("success".equals(response.body().getStatus())) {
+                        userLocalStore.setIsVerified(true);
+                    } else {
+                        userLocalStore.setIsVerified(false);
+
+                    }
+                } else {
+                    userLocalStore.setIsVerified(false);
+                    showError("Verification check failed: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VerifyEmailResponse> call, Throwable t) {
+                userLocalStore.setIsVerified(false);
+                showError("Verification check failed: " + t.getMessage());
+            }
+        });
+    }
+
+    private void showError(String message) {
+        MaterialCardView errorCard = findViewById(R.id.error_card);
+        TextView errorText = findViewById(R.id.error_msg);
+
+        errorText.setText(message);
+
+        // Smooth Slide Down Animation
+        errorCard.setVisibility(View.VISIBLE);
+        errorCard.setAlpha(0f);
+        errorCard.setTranslationY(-100f);
+
+        errorCard.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(400)
+                .start();
+
+        // Auto-hide after 3 seconds
+        new android.os.Handler().postDelayed(() -> {
+            errorCard.animate()
+                    .alpha(0f)
+                    .translationY(-100f)
+                    .setDuration(400)
+                    .withEndAction(() -> errorCard.setVisibility(View.GONE))
+                    .start();
+        }, 3000);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         updateProfileUI();
+        updateEmailVarification();
     }
 }

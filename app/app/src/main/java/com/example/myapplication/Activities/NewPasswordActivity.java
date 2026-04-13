@@ -27,7 +27,7 @@ import retrofit2.Retrofit;
 public class NewPasswordActivity extends AppCompatActivity {
     EditText etNewPassword;
     Button btnReset;
-    String userEmail, otpCode;
+    String userEmail;
     TextView text_Password_strength;
 
 
@@ -38,9 +38,9 @@ public class NewPasswordActivity extends AppCompatActivity {
 
         signupActivity signupActivity = new signupActivity();
 
-        // Get everything passed from the previous steps
+
         userEmail = getIntent().getStringExtra("user_email");
-        otpCode = getIntent().getStringExtra("otp_code");
+
 
         etNewPassword = findViewById(R.id.et_final_password);
         btnReset = findViewById(R.id.btn_reset_final);
