@@ -33,26 +33,25 @@ Before running this project, ensure you have:
 
 2. Configure MySQL database in `dbconfig.py`:
 ```python
-DATABASES = {
-    'default': {
-        'USER': 'root',
-        'PASSWORD': '1234',
-        'HOST': 'localhost',
-        'PORT': '3306',
-        'database'; 'file_share_app'
+    config = {
+        'host': 'localhost',
+        'user': 'root',
+        'password': '',
+        'port': '3306',
+        'database': 'file_share_db'
     }
-}
 ```
-3. Goto `goggle apppassword` and get your password
+3. Web Search `goggle apppassword` and get your password
 Configure Email in `settings.py`
 ```python
     EMAIL_HOST_USER = "your gmail"
     EMAIL_HOST_PASSWORD = "your password"
 ```
 
-4. Start the Django server:
+4. Start the Django server inside `api` folder:
 ```bash
-python -m uv run manage.py runserver 0.0.0.0:8000
+    pip install uv
+    python -m uv run manage.py runserver 0.0.0.0:8000
 ```
 
 ### Android App Setup
@@ -78,18 +77,6 @@ python -m uv run manage.py runserver 0.0.0.0:8000
 
 5. Run the app on your device or emulator
 
-##  Usage
-
-### For Sender:
-1. **Sign Up/Login**: Create an account or log in to existing one
-2. **Upload Files**: Select single or multiple files from your device
-3. **Generate QR Code**: After upload, a unique QR code is generated
-4. **Share**: Show the QR code to the receiver
-
-### For Receiver:
-1. **Scan QR Code**: Open the app and use the QR scanner
-2. **Download Files**: Files are automatically downloaded to your device
-3. **View History**: Check your receive history anytime
 
 ##  Screenshots
 <img src="Screenshots/main.png" alt="Home Page" width="150"> <img src="Screenshots/profile.png" alt="Project Logo" width="150"> <img src="Screenshots/received files.png" alt="Project Logo" width="150">
@@ -105,9 +92,7 @@ python -m uv run manage.py runserver 0.0.0.0:8000
 
 ## Known Issues
 
-- Large files download may failed
-
-
+- Can't Upload or download greater than 4.5 MB file
 
 
  If you found this project helpful, please give it a star!
