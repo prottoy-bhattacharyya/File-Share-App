@@ -179,7 +179,7 @@ public class signupActivity extends AppCompatActivity {
                         UserLocalStore userLocalStore = new UserLocalStore(getApplicationContext());
                         userLocalStore.setUser(fullname, email, username, password);
                         runOnUiThread(() -> {
-                            Toast.makeText(getApplicationContext(), "Account Created Successfully", Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(), "Account Created but not verified yet.", Toast.LENGTH_LONG).show();
                             launchMainActivity();
                         });
 

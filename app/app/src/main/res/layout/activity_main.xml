@@ -88,6 +88,18 @@
         app:layout_constraintTop_toBottomOf="@id/title_text"
         app:layout_constraintVertical_bias="0.4" />
 
+    <TextView
+        android:id="@+id/text_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Varify to unlock all features"
+        android:textColor="@color/red"
+        app:layout_constraintBottom_toTopOf="@+id/button_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_logo"
+        android:visibility="invisible"/>
+
     <LinearLayout
         android:id="@+id/button_container"
         android:layout_width="match_parent"

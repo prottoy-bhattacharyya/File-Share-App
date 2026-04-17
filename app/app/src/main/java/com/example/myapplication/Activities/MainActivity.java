@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -37,7 +38,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     Button send_buton, receive_buton, direct_transfer_btn;
     ImageButton logout_btn;
-    TextView username;
+    TextView username, text_error;
     ImageView profile_image;
     ConstraintLayout user_profile_btn;
     UserLocalStore userLocalStore;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void init_works() {
         username = findViewById(R.id.text_username);
+        text_error = findViewById(R.id.text_error);
         profile_image = findViewById(R.id.profile_image);
         send_buton = findViewById(R.id.send_btn);
         direct_transfer_btn = findViewById(R.id.direct_transfer_btn);
@@ -69,19 +71,40 @@ public class MainActivity extends AppCompatActivity {
             username.setText(userLocalStore.getFullname());
             getProfileFromServer();
             updateProfileUI();
+
+            if (!userLocalStore.getIsVerified()) {
+                disableButtons();
+                text_error.setVisibility(View.VISIBLE);
+            }
+            else {
+                enableButtons();
+                text_error.setVisibility(View.GONE);
+            }
+
         }
 
         else {
             username.setText(getResources().getString(R.string.guest));
-            send_buton.setEnabled(false);
-            receive_buton.setEnabled(false);
-            send_buton.setAlpha(0.5f);
-            receive_buton.setAlpha(0.5f);
+            disableButtons();
 
             removeProfileImage();
             updateProfileUI();
 
         }
+    }
+
+    private void enableButtons() {
+        send_buton.setEnabled(true);
+        receive_buton.setEnabled(true);
+        send_buton.setAlpha(1f);
+        receive_buton.setAlpha(1f);
+    }
+
+    private void disableButtons() {
+        send_buton.setEnabled(false);
+        receive_buton.setEnabled(false);
+        send_buton.setAlpha(0.5f);
+        receive_buton.setAlpha(0.5f);
     }
 
     public void exqListener() {
@@ -242,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        init_works();
         updateProfileUI();
     }
 }
