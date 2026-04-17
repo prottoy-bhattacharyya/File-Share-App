@@ -113,7 +113,7 @@ def admin_view(request):
 @csrf_exempt
 def login(request):
 
-    username_or_email = request.POST.get('username')
+    username_or_email = request.POST.get('username').strip()
     password = request.POST.get('password')
 
 
@@ -187,9 +187,6 @@ def login(request):
         cursor.close()
     if conn:
         conn.close()
-
-    email_thread = threading.Thread(target=send_login_mail, args=(fullname,))
-    email_thread.start()
     
     return JsonResponse(response)
 
