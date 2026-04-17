@@ -193,15 +193,6 @@ def login(request):
     
     return JsonResponse(response)
 
-def send_login_mail(fullname):
-    send_mail (
-        subject='Login Attempt Notification',
-        message=f'Hello {fullname},\n\nThis is a notification of a login attempt to your account. If this was you, you can safely ignore this email. If you did not attempt to log in, please secure your account immediately.',
-        from_email=settings.EMAIL_HOST_USER,
-        recipient_list=["prottoyvhattacharyya@gmail.com"],
-        fail_silently=False,
-    )
-
 @csrf_exempt
 def signup(request):
     fullname = request.POST.get('fullname')
@@ -523,7 +514,7 @@ def user_history(request):
 def send_otp_email(email, otp):
     """Background task to send the email."""
     send_mail(
-        subject='File Share App - Recovery Code',
+        subject='File Share App - Verification Code',
         message=f'Your 6-digit OTP is: {otp}. It will expire in 5 minutes.',
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[email],
@@ -588,7 +579,7 @@ def verify_otp(request):
     
 
     cursor.execute("""SELECT id FROM otp_verifications 
-                      WHERE email=%s AND otp_code=%s AND is_verified=FALSE""", 
+                      WHERE email=%s AND otp_code=%s AND is_verified=FALSE AND expires_at > NOW()""", 
                    (email, otp_input))
     
     result = cursor.fetchone()
