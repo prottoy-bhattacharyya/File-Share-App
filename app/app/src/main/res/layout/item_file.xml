@@ -60,16 +60,15 @@
                 android:alpha="0.6"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/fileUniqueText"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="8dp"
-            android:alpha="0.4"
-            android:src="@drawable/ic_logout"
-            android:rotation="90"
-            app:tint="?attr/colorOnSurface" />
+
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

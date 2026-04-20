@@ -47,6 +47,7 @@ public class ReceivedFilesActivity extends AppCompatActivity {
     private List<SharedFile> fileListFull = new ArrayList<>();
     private SearchView searchView;
     String uniqueText;
+    TextView tv_unique_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +56,15 @@ public class ReceivedFilesActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycler_view);
         searchView = findViewById(R.id.search_view);
+        tv_unique_text = findViewById(R.id.tv_unique_text_value);
 
          uniqueText = getIntent().getStringExtra("unique_text");
          if (uniqueText == null) {
              uniqueText = "";
+             tv_unique_text.setVisibility(View.GONE);
+         }
+         else {
+             tv_unique_text.append(uniqueText);
          }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

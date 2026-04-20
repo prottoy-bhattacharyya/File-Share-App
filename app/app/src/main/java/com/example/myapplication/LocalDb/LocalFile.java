@@ -10,6 +10,6 @@ public class LocalFile {
 
     public String fileName;
     public String filePath;
-    public String uniqueText; // e.g., "abcd"
+    public String uniqueText;
     public long uploadTimestamp;
 }

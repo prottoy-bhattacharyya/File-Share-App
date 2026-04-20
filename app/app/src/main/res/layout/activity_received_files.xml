@@ -56,10 +56,12 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         <TextView
-            android:id="@+id/unique_text_value"
+            android:id="@+id/tv_unique_text_value"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="unique text : xxxx"/>
+            android:text="unique text : "
+            android:padding="16dp"
+            android:textSize="16dp"/>
 
 
     </com.google.android.material.appbar.AppBarLayout>

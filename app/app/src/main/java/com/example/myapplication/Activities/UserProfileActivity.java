@@ -39,7 +39,9 @@ import retrofit2.Retrofit;
 public class UserProfileActivity extends AppCompatActivity {
     TextView tv_fullname, tv_username, tv_email;
     ImageView profile_image;
-    MaterialButton btn_user_history, btn_received_files, btn_verify_email;
+    MaterialButton btn_user_history;
+    MaterialButton btn_received_files;
+    static MaterialButton btn_verify_email;
     UserLocalStore userLocalStore;
     UriWorks uriWorks = new UriWorks();
 
@@ -207,7 +209,7 @@ public class UserProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void updateEmailVarification() {
+    public void updateEmailVarification() {
         if (userLocalStore.getIsVerified()) {
             btn_verify_email.setText("Verified");
             btn_verify_email.setIcon(getDrawable(R.drawable.ic_check));
