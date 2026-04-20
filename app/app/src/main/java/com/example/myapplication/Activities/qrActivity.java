@@ -42,30 +42,26 @@ public class qrActivity extends AppCompatActivity {
 
         if(total_files_count == successful_send_count) {
             count_text.setText("All files upload successfull");
+            qr_thread();
         }
         else if(successful_send_count == 0) {
             count_text.setText("No files uploaded");
             count_text.setTextColor(Color.RED);
+            disable_button();
+            qrImage.setVisibility(View.GONE);
+            qrTextView.setVisibility(View.GONE);
+
         }
         else {
             count_text.setText(total_files_count - successful_send_count + " files upload failed");
             count_text.setTextColor(Color.RED);
+            qr_thread();
         }
-
-
-        shareButton.setVisibility(View.INVISIBLE);
 
         shareButton.setOnClickListener(view -> shareCode());
 
 
-        Runnable runnable = () -> {
-            Bitmap qrBitmap = generateQR(qrText);
-            combinedBitmap = qrBitmap;
-            handler.sendEmptyMessage(0);
-        };
 
-        Thread thread = new Thread(runnable);
-        thread.start();
     }
 
     private void shareCode() {
@@ -79,6 +75,11 @@ public class qrActivity extends AppCompatActivity {
 
     }
 
+    private void disable_button(){
+        shareButton.setEnabled(false);
+        shareButton.setAlpha(0.5f);
+    }
+
     Handler handler = new Handler() {
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -89,19 +90,26 @@ public class qrActivity extends AppCompatActivity {
     };
 
 
+    private void qr_thread(){
+        Runnable runnable = () -> {
+            Bitmap qrBitmap = generateQR(qrText);
+            combinedBitmap = qrBitmap;
+            handler.sendEmptyMessage(0);
+        };
 
+        Thread thread = new Thread(runnable);
+        thread.start();
+    }
     private Bitmap generateQR(String qrText) {
-        // 1. Get the Primary Color (The "ink" of the QR)
+
         int foreground = com.google.android.material.color.MaterialColors.getColor(
                 this, com.google.android.material.R.attr.colorSecondary, Color.BLACK);
 
-        // 2. Get the Surface Color (The "paper" background)
         int background = com.google.android.material.color.MaterialColors.getColor(
                 this, com.google.android.material.R.attr.colorSurface, Color.WHITE);
 
         QRGEncoder qrgEncoder = new QRGEncoder(qrText, null, QRGContents.Type.TEXT, 400);
 
-        // Set colors to match UI theme
         qrgEncoder.setColorBlack(foreground);
         qrgEncoder.setColorWhite(background);
 

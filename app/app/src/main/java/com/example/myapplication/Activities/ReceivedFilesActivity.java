@@ -29,11 +29,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.myapplication.LocalDb.AppDatabase;
+import com.example.myapplication.LocalDb.LocalFile;
 import com.example.myapplication.R;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
 
 public class ReceivedFilesActivity extends AppCompatActivity {
 
@@ -41,6 +46,7 @@ public class ReceivedFilesActivity extends AppCompatActivity {
     private FileAdapter adapter;
     private List<SharedFile> fileListFull = new ArrayList<>();
     private SearchView searchView;
+    String uniqueText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,11 @@ public class ReceivedFilesActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recycler_view);
         searchView = findViewById(R.id.search_view);
+
+         uniqueText = getIntent().getStringExtra("unique_text");
+         if (uniqueText == null) {
+             uniqueText = "";
+         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -85,31 +96,66 @@ public class ReceivedFilesActivity extends AppCompatActivity {
     }
 
     private void loadFiles() {
-        fileListFull = fetchFilesFromFolder();
+//        fileListFull = fetchFilesFromFolder();
+//
+//        adapter = new FileAdapter(this, new ArrayList<>(fileListFull));
+//        recyclerView.setAdapter(adapter);
+//
+//        if (fileListFull.isEmpty()) {
+//            findViewById(R.id.empty_message).setVisibility(View.VISIBLE);
+//        }
 
-        adapter = new FileAdapter(this, new ArrayList<>(fileListFull));
-        recyclerView.setAdapter(adapter);
+        // Since DB operations are blocking, run them in a background thread
+        Executors.newSingleThreadExecutor().execute(() -> {
 
-        if (fileListFull.isEmpty()) {
-            findViewById(R.id.empty_message).setVisibility(View.VISIBLE);
-        }
+            // 3. Get allowed filenames from Local DB
+            AppDatabase db = AppDatabase.getInstance(this);
+            List<LocalFile> dbFiles = db.fileDao().getFilesByCode(uniqueText);
+
+            // Use a Set for faster lookup (O(1) vs O(n))
+            Set<String> allowedFileNames = new HashSet<>();
+            for (LocalFile f : dbFiles) {
+                allowedFileNames.add(f.fileName);
+            }
+
+            // 4. Fetch physical files that match the DB names
+            fileListFull = fetchFilesFromFolder(allowedFileNames);
+
+            // 5. Update UI on the main thread
+            runOnUiThread(() -> {
+                adapter = new FileAdapter(this, new ArrayList<>(fileListFull));
+                recyclerView.setAdapter(adapter);
+
+                if (fileListFull.isEmpty()) {
+                    findViewById(R.id.empty_message).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.empty_message).setVisibility(View.GONE);
+                    recyclerView.scheduleLayoutAnimation();
+                }
+            });
+        });
     }
 
-    private List<SharedFile> fetchFilesFromFolder() {
+    private List<SharedFile> fetchFilesFromFolder(Set<String> allowedNames) {
         List<SharedFile> list = new ArrayList<>();
 
-        File folder = new File(Environment.getExternalStorageDirectory() + "/" + Environment.DIRECTORY_DOWNLOADS + "/File Share App");
-        File directory = new File(folder.toURI());
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "File Share App");
 
-        if (directory.exists() && directory.isDirectory()) {
-            File[] files = directory.listFiles();
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
+
+            if (allowedNames.isEmpty()) {
+                for (File file : files) {
+                    allowedNames.add(file.getName());
+                }
+            }
 
             if (files != null) {
                 for (File file : files) {
-                    if (file.isFile()) {
+                    // 6. Only add the file if its name exists in our DB set
+                    if (file.isFile() && allowedNames.contains(file.getName())) {
 
                         Uri fileUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
-
                         String mimeType = getMimeType(file);
 
                         list.add(new SharedFile(
@@ -262,7 +308,7 @@ public class ReceivedFilesActivity extends AppCompatActivity {
             if (name.endsWith(".xls") || name.endsWith(".xlsx")) return R.drawable.ic_docs;
             if (name.endsWith(".txt")) return R.drawable.ic_docs;
 
-            return R.drawable.ic_docs;
+            return R.drawable.ic_unknown;
         }
     }
 }

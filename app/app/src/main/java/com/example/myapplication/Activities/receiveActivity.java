@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.Apis.UploadApis;
+import com.example.myapplication.LocalDb.AppDatabase;
+import com.example.myapplication.LocalDb.LocalFile;
 import com.example.myapplication.Responses.FileMetadata;
 import com.example.myapplication.R;
 import com.example.myapplication.Responses.FileListResponse;
@@ -46,8 +48,10 @@ public class receiveActivity extends AppCompatActivity {
     String unique_text_value = "";
 
     MaterialCardView download_progress_container;
-    TextView download_status_text, download_percent;
+    TextView download_status_text, download_percent, error_text;
     LinearProgressIndicator downloadProgress;
+
+    int failed_downloads = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +68,7 @@ public class receiveActivity extends AppCompatActivity {
         download_percent = findViewById(R.id.download_percent);
         downloadProgress = findViewById(R.id.download_progress);
         browse_files_button = findViewById(R.id.btn_browse_files);
+        error_text = findViewById(R.id.error_text);
 
 
         scan_button.setOnClickListener(view -> qr_scanner());
@@ -79,6 +84,7 @@ public class receiveActivity extends AppCompatActivity {
 
         browse_files_button.setOnClickListener(view -> {
             Intent intent = new Intent(receiveActivity.this, ReceivedFilesActivity.class);
+            intent.putExtra("unique_text", unique_text_value);
             startActivity(intent);
         });
     }
@@ -99,15 +105,38 @@ public class receiveActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Scan failed", Toast.LENGTH_SHORT).show());
     }
 
+    private void enable_buttons() {
+        scan_button.setEnabled(true);
+        scan_button.setAlpha(1f);
+
+        go_button.setEnabled(true);
+        go_button.setAlpha(1f);
+
+        browse_files_button.setEnabled(true);
+        browse_files_button.setAlpha(1f);
+
+    }
+
+    private void disable_buttons() {
+        scan_button.setEnabled(false);
+        scan_button.setAlpha(0.5f);
+
+        go_button.setEnabled(false);
+        go_button.setAlpha(0.5f);
+
+        browse_files_button.setEnabled(false);
+        browse_files_button.setAlpha(0.5f);
+    }
+
     void start_download_process() {
         download_progress_container.setVisibility(View.VISIBLE);
-        browse_files_button.setAlpha(0.5f);
-        browse_files_button.setEnabled(false);
+        error_text.setVisibility(View.GONE);
+        downloadProgress.setProgress(0, true);
 
-        // Optional: Update server that this user is receiving files
+        disable_buttons();
+
         save_receiver();
 
-        // Step 1: Get the list of files for this identifier
         fetchFileList(unique_text_value);
     }
 
@@ -126,11 +155,10 @@ public class receiveActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Setup progress bar
-                    downloadProgress.setMax(files.size());
-                    downloadProgress.setProgress(0);
 
-                    // Step 2: Start sequential download
+                    downloadProgress.setMax(files.size());
+                    downloadProgress.setProgress(0, true);
+
                     downloadFilesSequentially(files, 0);
                 } else {
                     Toast.makeText(receiveActivity.this, "Error: " + response.message(), Toast.LENGTH_SHORT).show();
@@ -148,10 +176,20 @@ public class receiveActivity extends AppCompatActivity {
         if (index >= list.size()) {
             download_status_text.setText("All files downloaded!");
             download_percent.setText("100%");
-            downloadProgress.setProgress(list.size());
+            downloadProgress.setProgress(list.size(), true);
 
-            browse_files_button.setEnabled(true);
-            browse_files_button.setAlpha(1f);
+            enable_buttons();
+
+            if (failed_downloads > 0) {
+                error_text.setVisibility(View.VISIBLE);
+                if (failed_downloads == 1 ){
+                    error_text.setText(failed_downloads + " file download failed");
+                } else if (failed_downloads == list.size()) {
+                    error_text.setText("All files download failed");
+                } else {
+                    error_text.setText(failed_downloads + " files download failed");
+                }
+            }
 
             Toast.makeText(this, "Download finished!", Toast.LENGTH_SHORT).show();
             return;
@@ -164,7 +202,7 @@ public class receiveActivity extends AppCompatActivity {
         download_status_text.setText("Downloading: \n" +  currentFile.getName() + " (" + displayIndex + "/" + list.size() + ")");
         int percent = (int) (((float) index / list.size()) * 100);
         download_percent.setText(percent + "%");
-        downloadProgress.setProgress(index);
+        downloadProgress.setProgress(index, true);
 
         UploadApis api = NetworkClient.getRetrofit(this).create(UploadApis.class);
         api.downloadFile(currentFile.getId()).enqueue(new Callback<ResponseBody>() {
@@ -173,17 +211,19 @@ public class receiveActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     new Thread(() -> {
                         saveFileToDisk(response.body(), currentFile.getName());
-                        // Trigger next download on Main Thread
+
                         runOnUiThread(() -> downloadFilesSequentially(list, index + 1));
                     }).start();
                 } else {
-                    // Log error and try next file
+
+                    failed_downloads++;
                     runOnUiThread(() -> downloadFilesSequentially(list, index + 1));
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
+                failed_downloads++;
                 runOnUiThread(() -> downloadFilesSequentially(list, index + 1));
             }
         });
@@ -195,7 +235,7 @@ public class receiveActivity extends AppCompatActivity {
             File downloadsRoot = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
             File customFolder = new File(downloadsRoot, "File Share App");
 
-            // Create the "File Share App" folder if it doesn't exist
+
             if (!customFolder.exists()) {
                 customFolder.mkdirs();
             }
@@ -215,6 +255,22 @@ public class receiveActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e("SAVE_FILE", "Error: " + e.getMessage());
         }
+
+        saveMetadataToDb(fileName);
+
+    }
+    
+    private void saveMetadataToDb(String filename){
+        // Saving metadata after a successful upload
+        LocalFile newFile = new LocalFile();
+        newFile.fileName = filename;
+        newFile.uniqueText = unique_text_value;
+        newFile.uploadTimestamp = System.currentTimeMillis();
+
+        AppDatabase db = AppDatabase.getInstance(this);
+        new Thread(() -> {
+            db.fileDao().insertFile(newFile);
+        }).start();
     }
 
     public void save_receiver() {
@@ -228,7 +284,7 @@ public class receiveActivity extends AppCompatActivity {
         uploadApis.save_receiver(unique_text_body, username_body).enqueue(new Callback<UploadResponse>() {
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
-                // Background update, no toast needed unless it fails critical logic
+                Log.d("RECEIVER_SAVE", "Saved: " + response.message());
             }
 
             @Override

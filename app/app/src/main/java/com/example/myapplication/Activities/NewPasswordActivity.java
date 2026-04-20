@@ -25,7 +25,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class NewPasswordActivity extends AppCompatActivity {
-    EditText etNewPassword;
+    EditText etNewPassword, etConfirmPassword;
     Button btnReset;
     String userEmail;
     TextView text_Password_strength;
@@ -43,6 +43,7 @@ public class NewPasswordActivity extends AppCompatActivity {
 
 
         etNewPassword = findViewById(R.id.et_final_password);
+        etConfirmPassword = findViewById(R.id.et_confirm_password);
         btnReset = findViewById(R.id.btn_reset_final);
         text_Password_strength = findViewById(R.id.text_password_strength);
 
@@ -84,6 +85,16 @@ public class NewPasswordActivity extends AppCompatActivity {
         btnReset.setOnClickListener(v -> {
             if (etNewPassword.getText().toString().trim().isEmpty()) {
                 Toast.makeText(this, "Please enter a new password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (etConfirmPassword.getText().toString().trim().isEmpty()) {
+                Toast.makeText(this, "Please confirm your new password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!etNewPassword.getText().toString().trim().equals(etConfirmPassword.getText().toString().trim())) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                 return;
             }
 

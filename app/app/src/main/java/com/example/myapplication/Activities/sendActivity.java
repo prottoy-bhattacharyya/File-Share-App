@@ -271,7 +271,7 @@ public class sendActivity extends AppCompatActivity {
                     file.delete();
 
                     runOnUiThread(() -> {
-                        upload_progress.setProgress(successful_upload_files);
+                        upload_progress.setProgress(successful_upload_files, true);
                         progress_percent.setText(successful_upload_files * 100 / total_selected_files + "%");
                         file_count_text.setText(successful_upload_files + " files uploaded");
                     });
@@ -427,10 +427,11 @@ public class sendActivity extends AppCompatActivity {
         if (thumbnailBitmap != null) {
             imageView.setImageBitmap(thumbnailBitmap);
         } else {
-            // Simple extension check
-            int resId = R.drawable.ic_docs; // Default
+            int resId = R.drawable.ic_unknown; // Default
             if (fileName.endsWith(".pdf")) resId = R.drawable.ic_pdf;
-            else if (fileName.contains(".mp3") || fileName.contains(".wav")) resId = R.drawable.ic_audio;
+            else if (fileName.endsWith(".doc") || fileName.endsWith(".docx") || fileName.endsWith(".txt") ) {
+                resId = R.drawable.ic_docs;
+            } else if (fileName.contains(".mp3") || fileName.contains(".wav")) resId = R.drawable.ic_audio;
             imageView.setImageResource(resId);
         }
 
@@ -461,21 +462,20 @@ public class sendActivity extends AppCompatActivity {
         ImageButton deleteBtn = new ImageButton(this);
         LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(100, 100);
         deleteBtn.setLayoutParams(btnParams);
-        deleteBtn.setImageResource(R.drawable.ic_close); // Use a 'close' or 'delete' icon
+        deleteBtn.setImageResource(R.drawable.ic_close);
         deleteBtn.setBackgroundResource(android.R.color.transparent);
-        deleteBtn.setColorFilter(Color.RED); // Subtle red tint
+        deleteBtn.setColorFilter(Color.RED);
 
-        // THE LOGIC: Remove from UI and from your data list
+
         deleteBtn.setOnClickListener(v -> {
             // Remove the view from the UI
             fileListContainer.removeView(itemLayout);
 
-            // Remove from your upload list (assuming you have a list named selectedFileUris)
+
             if (selectedFileUris != null) {
                 selectedFileUris.remove(fileUri);
             }
 
-            // Update the file count text
             updateFileCount();
         });
 
