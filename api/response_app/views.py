@@ -353,6 +353,7 @@ def upload_file(request):
         file = request.FILES['file']
     
     unique_text = request.POST.get('unique_text')
+    sender = request.POST.get('username')
     file_name = file.name
 
     if not unique_text:
@@ -457,9 +458,22 @@ def save_receiver(request):
                 'message': 'Database connection failed.'
             }
             return JsonResponse(response, status=500)
+        
         cursor = conn.cursor()
-        cursor.execute("""UPDATE file_info SET receiver = %s WHERE unique_text = %s""", (receiver, unique_text))
+        cursor.execute("""SELECT sender FROM file_info 
+                       WHERE unique_text = %s""", 
+                       (unique_text,)
+                    )
+        
+        result = cursor.fetchone()
+        sender = result[0]
+        
+        cursor.execute("""INSERT INTO file_info (sender, receiver, unique_text)
+                       VALUES (%s, %s, %s)""",
+                       (sender, receiver, unique_text)
+                    )
         conn.commit()
+
         cursor.close()
         conn.close()
         return JsonResponse({'status': 'success', 'message': 'Receiver saved successfully.'})

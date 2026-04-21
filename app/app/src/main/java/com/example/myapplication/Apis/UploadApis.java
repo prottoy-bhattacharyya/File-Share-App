@@ -42,7 +42,7 @@ public interface UploadApis {
     @POST("upload_file/")
     Call<UploadResponse> uploadFile(@Part MultipartBody.Part file,
                                     @Part("unique_text") RequestBody unique_text,
-                                    @Part("username") RequestBody file_name);
+                                    @Part("username") RequestBody username);
 
 
     @GET("get_file_list/")

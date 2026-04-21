@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -79,6 +80,8 @@ public class directTransferActivity extends AppCompatActivity {
     private MaterialCardView progressCard;
     private LinearLayout peersContainer, emptyPeers, filesContainer, emptyFiles;
     private MaterialButton btnDiscover, btnPickFile;
+    private Button btnShowFiles;
+    private ImageView statusIcon;
 
     // Thread management
     private final ExecutorService executor = Executors.newCachedThreadPool();
@@ -138,6 +141,11 @@ public class directTransferActivity extends AppCompatActivity {
             intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
             filePickerLauncher.launch(intent);
         });
+
+        btnShowFiles.setOnClickListener(v -> {
+            Intent intent = new Intent(directTransferActivity.this, ReceivedFilesActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override
@@ -171,6 +179,7 @@ public class directTransferActivity extends AppCompatActivity {
 
     private void bindViews() {
         statusText     = findViewById(R.id.status_text);
+        statusIcon     = findViewById(R.id.iv_status_icon);
         statusSubtitle = findViewById(R.id.status_subtitle);
         statusSpinner  = findViewById(R.id.status_spinner);
         progressCard   = findViewById(R.id.progress_card);
@@ -183,6 +192,7 @@ public class directTransferActivity extends AppCompatActivity {
 //        emptyFiles     = findViewById(R.id.empty_files);
         btnDiscover    = findViewById(R.id.btn_discover);
         btnPickFile    = findViewById(R.id.btn_pick_file);
+        btnShowFiles   = findViewById(R.id.btn_show_received_files);
     }
 
     // ══════════════════════════════════════════════════════════════════════════
@@ -235,6 +245,10 @@ public class directTransferActivity extends AppCompatActivity {
         manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
             @Override public void onSuccess() {
                 setStatus("Discovering…", "Scanning for nearby devices");
+                runOnUiThread(()->{
+                    setSpinner(true);
+                });
+
             }
             @Override public void onFailure(int reason) {
                 setSpinner(false);
