@@ -500,7 +500,7 @@ def user_history(request):
         return JsonResponse(response, status=500)
     
     cursor = conn.cursor()
-    cursor.execute("""SELECT sender, receiver, unique_text 
+    cursor.execute("""SELECT sender, receiver, unique_text, t
                    FROM file_info 
                    WHERE sender = %s OR receiver = %s""", 
                    (username, username)
@@ -515,7 +515,8 @@ def user_history(request):
         'data': [
             {'sender': row[0], 
              'receiver': row[1], 
-             'unique_text': row[2]
+             'unique_text': row[2],
+             'timestamp': row[3].isoformat() if len(row) > 3 and row[3] else None
             } 
              for row in results
         ]

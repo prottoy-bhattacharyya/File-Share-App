@@ -39,7 +39,7 @@ import retrofit2.Retrofit;
 public class UserProfileActivity extends AppCompatActivity {
     TextView tv_fullname, tv_username, tv_email;
     ImageView profile_image;
-    MaterialButton btn_user_history;
+    MaterialButton btn_user_sent_history, btn_user_receive_history;
     MaterialButton btn_received_files;
     static MaterialButton btn_verify_email;
     UserLocalStore userLocalStore;
@@ -59,7 +59,8 @@ public class UserProfileActivity extends AppCompatActivity {
         tv_fullname = findViewById(R.id.tv_fullname);
         tv_username = findViewById(R.id.tv_username);
         tv_email = findViewById(R.id.tv_email);
-        btn_user_history = findViewById(R.id.btn_user_history);
+        btn_user_sent_history = findViewById(R.id.btn_user_history);
+        btn_user_receive_history = findViewById(R.id.btn_receive_history);
         btn_received_files = findViewById(R.id.btn_received_files);
         profile_image  = findViewById(R.id.profile_image);
         btn_verify_email = findViewById(R.id.btn_verify_email);
@@ -78,8 +79,13 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     void exqListener(){
-        btn_user_history.setOnClickListener(view -> {
-            Intent intent = new Intent(UserProfileActivity.this, UserHistoryActivity.class);
+        btn_user_sent_history.setOnClickListener(view -> {
+            Intent intent = new Intent(UserProfileActivity.this, UserSentHistoryActivity.class);
+            startActivity(intent);
+        });
+
+        btn_user_receive_history.setOnClickListener(view ->{
+            Intent intent = new Intent(UserProfileActivity.this, ReceivedHistoryActivity.class);
             startActivity(intent);
         });
         btn_received_files.setOnClickListener(view -> {

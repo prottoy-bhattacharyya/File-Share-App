@@ -31,7 +31,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="true">
-
+        <activity
+            android:name=".Activities.ReceivedHistoryActivity"
+            android:exported="false" />
         <activity
             android:name=".Activities.NewPasswordActivity"
             android:exported="false" />
@@ -51,7 +53,7 @@
             android:name=".Activities.directTransferActivity"
             android:exported="true" />
         <activity
-            android:name=".Activities.UserHistoryActivity"
+            android:name=".Activities.UserSentHistoryActivity"
             android:exported="false" />
         <activity
             android:name=".Activities.signupActivity"

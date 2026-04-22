@@ -17,6 +17,7 @@ roomCommonJvm = "2.8.4"
 roomRuntimeJvm = "2.8.4"
 roomRuntime = "2.8.4"
 roomCompiler = "2.8.4"
+activityKtx = "1.8.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -36,6 +37,7 @@ room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.r
 room-runtime-jvm = { group = "androidx.room", name = "room-runtime-jvm", version.ref = "roomRuntimeJvm" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

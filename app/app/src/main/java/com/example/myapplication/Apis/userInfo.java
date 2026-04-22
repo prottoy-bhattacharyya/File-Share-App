@@ -11,8 +11,11 @@ public class userInfo {
 
     @SerializedName("unique_text")
     private String uniqueText;
+    @SerializedName("timestamp")
+    private String timestamp;
 
     public String getSender() { return sender; }
     public String getReceiver() { return receiver; }
     public String getUniqueText() { return uniqueText; }
+    public String getTimestamp() { return  timestamp; }
 }
