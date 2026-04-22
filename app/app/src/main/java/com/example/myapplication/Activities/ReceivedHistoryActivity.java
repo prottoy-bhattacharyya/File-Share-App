@@ -66,9 +66,6 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(this::fetchReceiveHistory);
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // Network fetch — reuses the same user_history endpoint; we filter client-side
-    // ══════════════════════════════════════════════════════════════════════════
 
     private void fetchReceiveHistory() {
         showLoading();
@@ -86,14 +83,20 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
                 swipeRefreshLayout.setRefreshing(false);
 
                 if (response.isSuccessful() && response.body() != null) {
-                    UserHistoryResponse body = response.body();
-                    if ("success".equals(body.getStatus())
-                            && body.getData() != null
-                            && !body.getData().isEmpty()) {
-                        buildAndDisplayCards(body.getData(), username);
-                    } else {
-                        showEmpty("You haven't received any files yet");
+
+                    try {
+                        UserHistoryResponse body = response.body();
+                        if ("success".equals(body.getStatus())
+                                && body.getData() != null
+                                && !body.getData().isEmpty()) {
+                            buildAndDisplayCards(body.getData(), username);
+                        } else {
+                            showEmpty("You haven't received any files yet");
+                        }
+                    } catch (Exception e) {
+                        showError(e.getMessage());
                     }
+
                 } else {
                     String msg = "Request failed";
                     try {
@@ -122,7 +125,7 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
     //   - Keep only rows where receiver == currentUsername
     //   - Group by unique_text (one card per code)
     //   - Each card shows: sender name + file names from the sender's local DB
-    //     entries stored under that unique_text
+    //   - entries stored under that unique_text
     // ══════════════════════════════════════════════════════════════════════════
 
     private void buildAndDisplayCards(List<userInfo> serverRows, String currentUsername) {
@@ -138,17 +141,16 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
                 String sender   = row.getSender();
                 if (code == null || code.isEmpty()) continue;
 
-                // Only rows where the current user is the receiver
+
                 if (currentUsername == null || !currentUsername.equals(receiver)) continue;
 
-                // One group per unique_text — take the first sender seen for that code
+
                 if (!grouped.containsKey(code)) {
                     grouped.put(code, new ReceivedGroup(code, sender != null ? sender : "Unknown"));
                 }
             }
 
             // Look up file names from the local DB for each code.
-            // These are files the sender uploaded (saved in local_files with that uniqueText).
             for (ReceivedGroup group : grouped.values()) {
                 List<LocalFile> localFiles = db.fileDao().getFilesByCode(group.uniqueText);
                 for (LocalFile lf : localFiles) {
@@ -171,9 +173,6 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
         });
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // Data model
-    // ══════════════════════════════════════════════════════════════════════════
 
     static class ReceivedGroup {
         final String uniqueText;
@@ -186,9 +185,6 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // RecyclerView Adapter
-    // ══════════════════════════════════════════════════════════════════════════
 
     private class ReceiveHistoryAdapter extends RecyclerView.Adapter<ReceiveHistoryAdapter.VH> {
         private final List<ReceivedGroup> items;
@@ -209,14 +205,12 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull VH h, int position) {
             ReceivedGroup g = items.get(position);
 
-            // Unique code
+
             h.tvUniqueCode.setText(g.uniqueText);
 
-            // Sender name
+
             h.tvSenderName.setText(g.senderName);
 
-            // File names — look up from local DB (files saved by the receiver's app
-            // under this unique_text when they downloaded them via receiveActivity)
             if (g.fileNames.isEmpty()) {
                 h.tvFilesReceived.setText("Files not found locally");
             } else {
@@ -244,9 +238,6 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // UI state helpers
-    // ══════════════════════════════════════════════════════════════════════════
 
     private void showLoading() {
         stateContainer.setVisibility(View.VISIBLE);

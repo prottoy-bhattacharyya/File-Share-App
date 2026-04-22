@@ -32,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.example.myapplication.Apis.NetworkClient;
+import com.example.myapplication.FileSignatureChecker;
 import com.example.myapplication.R;
 import com.example.myapplication.SmallFunctions;
 import com.example.myapplication.Apis.UploadApis;
@@ -254,8 +255,7 @@ public class sendActivity extends AppCompatActivity {
             MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file_name, requestBody);
 
             RequestBody unique_text_body = RequestBody.create(MediaType.parse("text/plain"), unique_text);
-
-            RequestBody username_body = RequestBody.create(MediaType.parse("text/plain"), userLocalStore.getUsername());
+            RequestBody file_name_body = RequestBody.create(MediaType.parse("text/plain"), file_name);
 
 
 
@@ -263,7 +263,7 @@ public class sendActivity extends AppCompatActivity {
             UploadApis uploadApis = retrofit.create(UploadApis.class);
 
 
-            Call<UploadResponse> call = uploadApis.uploadFile(parts, unique_text_body, username_body);
+            Call<UploadResponse> call = uploadApis.uploadFile(parts, unique_text_body, file_name_body);
             call.enqueue(new Callback<UploadResponse>() {
                 @Override
                 public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
@@ -386,6 +386,37 @@ public class sendActivity extends AppCompatActivity {
                 if (nameColumnIndex >= 0 && sizeColumnIndex >= 0) {
                     String fileName = cursor.getString(nameColumnIndex);
                     long fileSize = cursor.getLong(sizeColumnIndex);
+
+                    // ── File signature analysis ───────────────────────────────
+                    // Read the first bytes of the file to verify its true type,
+                    // regardless of what the file name or extension says.
+                    FileSignatureChecker.Result sigResult =
+                            FileSignatureChecker.check(contentResolver, uri);
+
+                    if (sigResult.status == FileSignatureChecker.CheckResult.BLOCKED) {
+                        selectedFileUris.remove(uri);
+                        handler.post(() -> {
+                            showRejectedFileInUi(fileName, sigResult.detectedType,
+                                    sigResult.warningDetail, false);
+                            updateFileCount();
+                        });
+                        cursor.close();
+                        return;
+                    }
+
+                    if (sigResult.status == FileSignatureChecker.CheckResult.UNKNOWN) {
+
+                        selectedFileUris.remove(uri);
+                        handler.post(() -> {
+                            showRejectedFileInUi(fileName, "Unknown type",
+                                    sigResult.warningDetail, true);
+                            updateFileCount();
+                        });
+                        cursor.close();
+                        return;
+                    }
+                    // ── SAFE — continue as before ─────────────────────────────
+
                     Bitmap thumbnailBitmap = null;
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -486,6 +517,106 @@ public class sendActivity extends AppCompatActivity {
         itemLayout.addView(deleteBtn);
 
         fileListContainer.addView(itemLayout);
+    }
+
+    /**
+     * Shows a warning row for a file that failed signature analysis.
+     * The file has already been removed from selectedFileUris before this is called.
+     *
+     * @param isUnknown true  → amber "unrecognised" warning
+     *                  false → red "blocked" warning
+     */
+    private void showRejectedFileInUi(String fileName, String detectedType,
+                                      String detail, boolean isUnknown) {
+        int accentColor = isUnknown
+                ? 0xFFFF8F00   // amber for unknown
+                : 0xFFD32F2F;  // red for blocked
+
+        // Outer row
+        LinearLayout itemLayout = new LinearLayout(this);
+        itemLayout.setOrientation(LinearLayout.HORIZONTAL);
+        itemLayout.setPadding(16, 20, 16, 20);
+        itemLayout.setGravity(Gravity.CENTER_VERTICAL);
+        itemLayout.setBackgroundColor(isUnknown ? 0x18FF8F00 : 0x18D32F2F); // tinted bg
+
+        // Warning icon
+        ImageView icon = new ImageView(this);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(100, 100);
+        icon.setLayoutParams(iconParams);
+        icon.setImageResource(R.drawable.ic_close);
+        icon.setColorFilter(accentColor);
+        icon.setPadding(8, 8, 8, 8);
+
+        // Text container
+        LinearLayout textContainer = new LinearLayout(this);
+        textContainer.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams textParams =
+                new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        textContainer.setLayoutParams(textParams);
+        textContainer.setPadding(20, 0, 8, 0);
+
+        // File name (struck through)
+        TextView nameText = new TextView(this);
+        nameText.setText(fileName);
+        nameText.setTextSize(14);
+        nameText.setTypeface(null, Typeface.BOLD);
+        nameText.setTextColor(accentColor);
+        nameText.setEllipsize(TextUtils.TruncateAt.END);
+        nameText.setSingleLine(true);
+        nameText.setPaintFlags(nameText.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+
+        // Warning label
+        TextView labelText = new TextView(this);
+        String label = isUnknown ? "⚠ Unrecognised file type" : "✕ Blocked — " + detectedType;
+        labelText.setText(label);
+        labelText.setTextSize(12);
+        labelText.setTextColor(accentColor);
+
+        // Detail text (why it was blocked)
+        TextView detailText = new TextView(this);
+        detailText.setText(detail);
+        detailText.setTextSize(11);
+        detailText.setAlpha(0.7f);
+        detailText.setTextColor(accentColor);
+
+        textContainer.addView(nameText);
+        textContainer.addView(labelText);
+        textContainer.addView(detailText);
+
+        // Dismiss button
+        ImageButton dismissBtn = new ImageButton(this);
+        LinearLayout.LayoutParams btnParams = new LinearLayout.LayoutParams(80, 80);
+        dismissBtn.setLayoutParams(btnParams);
+        dismissBtn.setImageResource(R.drawable.ic_close);
+        dismissBtn.setBackgroundResource(android.R.color.transparent);
+        dismissBtn.setColorFilter(accentColor);
+        dismissBtn.setAlpha(0.5f);
+        dismissBtn.setOnClickListener(v -> fileListContainer.removeView(itemLayout));
+
+        itemLayout.addView(icon);
+        itemLayout.addView(textContainer);
+        itemLayout.addView(dismissBtn);
+
+        // Add a thin coloured top border by wrapping in a parent
+        LinearLayout wrapper = new LinearLayout(this);
+        wrapper.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams wrapperParams =
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+        wrapperParams.setMargins(0, 4, 0, 0);
+        wrapper.setLayoutParams(wrapperParams);
+
+        View borderLine = new View(this);
+        LinearLayout.LayoutParams borderParams =
+                new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 4);
+        borderLine.setLayoutParams(borderParams);
+        borderLine.setBackgroundColor(accentColor);
+
+        wrapper.addView(borderLine);
+        wrapper.addView(itemLayout);
+
+        file_list_card.setVisibility(View.VISIBLE);
+        fileListContainer.addView(wrapper);
     }
 
     private void handleIncomingIntent() {
