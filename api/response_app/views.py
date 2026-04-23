@@ -475,7 +475,7 @@ def save_receiver(request):
                 
                 return JsonResponse({'status': 'success', 'message': 'Receiver saved successfully.'})
             else:
-                return JsonResponse({'status': 'error', 'message': 'Invalid unique text.'}, status=404)
+                return JsonResponse({'status': 'error', 'message': 'Invalid unique text.'})
 
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

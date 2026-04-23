@@ -147,7 +147,7 @@ public class receiveActivity extends AppCompatActivity {
         api.getFileList(uniqueText).enqueue(new Callback<FileListResponse>() {
             @Override
             public void onResponse(Call<FileListResponse> call, Response<FileListResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().getFiles() != null) {
+                if (response.isSuccessful() && "success".equals(response.body().getStatus()) && response.body().getFiles() != null) {
                     List<FileMetadata> files = response.body().getFiles();
                     if (files.isEmpty()) {
                         Toast.makeText(receiveActivity.this, "No files found for this code", Toast.LENGTH_SHORT).show();
@@ -161,12 +161,20 @@ public class receiveActivity extends AppCompatActivity {
 
                     downloadFilesSequentially(files, 0);
                 } else {
+                    error_text.setVisibility(View.VISIBLE);
+                    error_text.setText(response.message());
+                    enable_buttons();
+                    download_progress_container.setVisibility(View.INVISIBLE);
                     Toast.makeText(receiveActivity.this, "Error: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<FileListResponse> call, Throwable t) {
+                error_text.setVisibility(View.VISIBLE);
+                error_text.setText(t.getMessage());
+                enable_buttons();
+                download_progress_container.setVisibility(View.INVISIBLE);
                 Toast.makeText(receiveActivity.this, "Failed to connect to server", Toast.LENGTH_SHORT).show();
             }
         });
