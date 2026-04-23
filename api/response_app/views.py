@@ -500,7 +500,7 @@ def user_history(request):
         return JsonResponse(response, status=500)
     
     cursor = conn.cursor()
-    cursor.execute("""SELECT sender, receiver, unique_text, t
+    cursor.execute("""SELECT sender, receiver, unique_text, timestamp
                    FROM file_info 
                    WHERE sender = %s OR receiver = %s""", 
                    (username, username)
