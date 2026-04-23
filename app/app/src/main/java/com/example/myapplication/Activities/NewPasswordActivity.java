@@ -113,10 +113,9 @@ public class NewPasswordActivity extends AppCompatActivity {
                     btnReset.setAlpha(1f);
                     btnReset.setEnabled(true);
 
-                    if (response.isSuccessful() && response.body().getStatus().equals("success")) {
+                    if (response.isSuccessful() && "success".equals(response.body().getStatus())) {
                         Toast.makeText(NewPasswordActivity.this, "Success! Login with your new password.", Toast.LENGTH_LONG).show();
 
-                        // Clear backstack so they can't go "back" into recovery
                         Intent intent = new Intent(NewPasswordActivity.this, loginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);

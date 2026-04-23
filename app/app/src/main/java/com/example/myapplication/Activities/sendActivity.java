@@ -255,15 +255,14 @@ public class sendActivity extends AppCompatActivity {
             MultipartBody.Part parts = MultipartBody.Part.createFormData("file", file_name, requestBody);
 
             RequestBody unique_text_body = RequestBody.create(MediaType.parse("text/plain"), unique_text);
-            RequestBody file_name_body = RequestBody.create(MediaType.parse("text/plain"), file_name);
-
+            RequestBody username_body = RequestBody.create(MediaType.parse("text/plain"), userLocalStore.getUsername());
 
 
             Retrofit retrofit = NetworkClient.getRetrofit(getApplicationContext());
             UploadApis uploadApis = retrofit.create(UploadApis.class);
 
 
-            Call<UploadResponse> call = uploadApis.uploadFile(parts, unique_text_body, file_name_body);
+            Call<UploadResponse> call = uploadApis.uploadFile(parts, unique_text_body, username_body);
             call.enqueue(new Callback<UploadResponse>() {
                 @Override
                 public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
