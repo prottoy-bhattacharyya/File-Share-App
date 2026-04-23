@@ -229,7 +229,7 @@ public class UserProfileActivity extends AppCompatActivity {
         uploadApis.checkEmailVerification(userLocalStore.getEmail()).enqueue(new Callback<VerifyEmailResponse>() {
             @Override
             public void onResponse(Call<VerifyEmailResponse> call, Response<VerifyEmailResponse> response) {
-                // SAFE CHECK
+
                 if (response.isSuccessful() && response.body() != null) {
                     if ("success".equals(response.body().getStatus())) {
                         userLocalStore.setIsVerified(true);

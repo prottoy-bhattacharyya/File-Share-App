@@ -453,32 +453,37 @@ def save_receiver(request):
 
         conn = get_connection()
         if not conn:
-            response = {
-                'status': 'DB error',
-                'message': 'Database connection failed.'
-            }
-            return JsonResponse(response, status=500)
+            return JsonResponse({'status': 'DB error', 'message': 'Database connection failed.'}, status=500)
         
-        cursor = conn.cursor()
-        cursor.execute("""SELECT sender FROM file_info 
-                       WHERE unique_text = %s""", 
-                       (unique_text,)
-                    )
-        
-        result = cursor.fetchone()
-        sender = result[0]
-        
-        cursor.execute("""INSERT INTO file_info (sender, receiver, unique_text)
-                       VALUES (%s, %s, %s)""",
-                       (sender, receiver, unique_text)
-                    )
-        conn.commit()
+        try:
+            cursor = conn.cursor(buffered=True)
+            
+            cursor.execute("""SELECT sender FROM file_info 
+                           WHERE unique_text = %s LIMIT 1""", 
+                           (unique_text,))
+            
+            result = cursor.fetchone()
+            
+            
+            if result:
+                sender = result[0]
+                
+                cursor.execute("""INSERT INTO file_info (sender, receiver, unique_text)
+                               VALUES (%s, %s, %s)""",
+                               (sender, receiver, unique_text))
+                conn.commit()
+                
+                return JsonResponse({'status': 'success', 'message': 'Receiver saved successfully.'})
+            else:
+                return JsonResponse({'status': 'error', 'message': 'Invalid unique text.'}, status=404)
 
-        cursor.close()
-        conn.close()
-        return JsonResponse({'status': 'success', 'message': 'Receiver saved successfully.'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        finally:
+            cursor.close()
+            conn.close()
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
 
 
 @csrf_exempt
