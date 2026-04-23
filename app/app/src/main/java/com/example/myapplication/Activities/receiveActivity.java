@@ -150,7 +150,10 @@ public class receiveActivity extends AppCompatActivity {
                 if (response.isSuccessful() && "success".equals(response.body().getStatus()) && response.body().getFiles() != null) {
                     List<FileMetadata> files = response.body().getFiles();
                     if (files.isEmpty()) {
-                        Toast.makeText(receiveActivity.this, "No files found for this code", Toast.LENGTH_SHORT).show();
+                        error_text.setVisibility(View.VISIBLE);
+                        error_text.setText("No files found for this code");
+                        enable_buttons();
+                        download_progress_container.setVisibility(View.INVISIBLE);
                         download_progress_container.setVisibility(View.GONE);
                         return;
                     }
