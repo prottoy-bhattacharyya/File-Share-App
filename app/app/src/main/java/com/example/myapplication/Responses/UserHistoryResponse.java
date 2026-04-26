@@ -1,6 +1,5 @@
 package com.example.myapplication.Responses;
 
-import com.example.myapplication.Apis.userInfo;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;

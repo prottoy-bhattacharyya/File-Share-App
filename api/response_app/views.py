@@ -6,15 +6,18 @@ import random
 from datetime import timedelta
 from urllib import response
 
+from firebase_admin import messaging
+
 from django.utils import timezone
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
-from django.core.mail import send_mail
+
 
 from file_sharing_project import settings
 from . import dbconfig
+from .utils import send_fcm_notification, send_otp_email
 import mysql.connector
 
 # Create your views here.
@@ -73,6 +76,21 @@ def index(request):
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             INDEX (email), -- For faster lookups
                             INDEX (expires_at) -- For cleanup scripts
+                        );""")
+
+
+        cursor.execute("""CREATE TABLE user_tokens (
+                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            username VARCHAR(255) NOT NULL,
+                            fcm_token TEXT NOT NULL,
+                            device_name VARCHAR(100) DEFAULT 'Android Device',
+                            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            
+                            -- Ensures we don't store the exact same token multiple times
+                            UNIQUE KEY unique_token (fcm_token(255)),
+                            
+                            -- Index for fast lookups when sending notifications to a specific user
+                            INDEX idx_username (username)
                         );""")
         
         conn.commit()
@@ -471,20 +489,65 @@ def save_receiver(request):
                 cursor.execute("""INSERT INTO file_info (sender, receiver, unique_text)
                                VALUES (%s, %s, %s)""",
                                (sender, receiver, unique_text))
+                
                 conn.commit()
+
+                cursor.execute("""SELECT fcm_token FROM user_tokens 
+                               WHERE username = %s""", 
+                               (sender,)
+                            )
+                tokens = cursor.fetchall()
+
+            # 4. Send notification to all devices owned by the Sender
+            if tokens:
+                for token_row in tokens:
+                    send_fcm_notification(
+                        token=token_row[0],
+                        title="File Received!",
+                        body=f"{receiver} just downloaded files using code: {unique_text}"
+                    )
                 
                 return JsonResponse({'status': 'success', 'message': 'Receiver saved successfully.'})
             else:
                 return JsonResponse({'status': 'error', 'message': 'Invalid unique text.'})
 
         except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+            return JsonResponse({'status': 'error', 'message': str(e)})
         finally:
             cursor.close()
             conn.close()
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
+
+@csrf_exempt
+def save_fcm_token(request):
+    if request.method != 'POST':
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+    
+    username = request.POST.get('username')
+    fcm_token = request.POST.get('fcm_token')
+
+    if not username or not fcm_token:
+        return JsonResponse({'status': 'error', 'message': 'Username and FCM token are required.'})
+    
+    conn = get_connection()
+    if not conn:
+        return JsonResponse({'status': 'DB error', 'message': 'Database connection failed.'})
+    
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""INSERT INTO user_tokens (username, fcm_token) 
+                       VALUES (%s, %s) 
+                       ON DUPLICATE KEY UPDATE fcm_token=%s, last_updated=NOW()""", 
+                       (username, fcm_token, fcm_token))
+        conn.commit()
+        return JsonResponse({'status': 'success', 'message': 'FCM token saved successfully.'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+    finally:
+        cursor.close()
+        conn.close()
 
 @csrf_exempt
 def user_history(request):
@@ -527,16 +590,6 @@ def user_history(request):
         ]
     }
     return JsonResponse(response)
-
-def send_otp_email(email, otp):
-    """Background task to send the email."""
-    send_mail(
-        subject='File Share App - Verification Code',
-        message=f'Your 6-digit OTP is: {otp}. It will expire in 5 minutes.',
-        from_email=settings.EMAIL_HOST_USER,
-        recipient_list=[email],
-        fail_silently=False,
-    )
 
 @csrf_exempt
 def send_otp(request):

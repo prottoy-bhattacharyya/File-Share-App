@@ -1,6 +1,7 @@
 // UploadApis.java
 package com.example.myapplication.Apis;
 
+import  com.example.myapplication.Responses.FcmTokenResponse;
 import com.example.myapplication.Responses.FileListResponse;
 import com.example.myapplication.Responses.FindAccoundResponse;
 import com.example.myapplication.Responses.LoginResponse;
@@ -15,6 +16,8 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -38,6 +41,10 @@ public interface UploadApis {
                                 @Part("password") RequestBody password
     );
 
+    @FormUrlEncoded
+    @POST("send_fcm_token/")
+    Call<FcmTokenResponse> sendToken(@Field("fcm_token") String token, @Field("username") String username);
+
     @Multipart
     @POST("upload_file/")
     Call<UploadResponse> uploadFile(@Part MultipartBody.Part file,
@@ -47,7 +54,6 @@ public interface UploadApis {
 
     @GET("get_file_list/")
     Call<FileListResponse> getFileList(@Query("unique_text") String uniqueText);
-
 
     @Streaming
     @GET("download_single_file/")

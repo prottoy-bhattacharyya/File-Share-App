@@ -4,6 +4,6 @@
     <string name="title_item_detail">Item Details</string>
     <string name="download_folder">File Share App</string>
     <string name="guest">Guest</string>
-    <string name="server_url">https://file-share-app-ten.vercel.app</string>
-
+<!--    <string name="server_url">https://file-share-app-ten.vercel.app</string>-->
+    <string name="server_url">http://163.61.156.126:8000</string>
 </resources>

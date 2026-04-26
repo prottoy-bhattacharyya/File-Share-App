@@ -215,14 +215,22 @@ public class UserProfileActivity extends AppCompatActivity {
         });
     }
 
-    public void updateEmailVarification() {
-        if (userLocalStore.getIsVerified()) {
+    private void updateEmailVarificationUi(boolean varified){
+        if (varified){
             btn_verify_email.setText("Verified");
             btn_verify_email.setIcon(getDrawable(R.drawable.ic_check));
             btn_verify_email.setBackgroundColor(Color.GREEN);
             btn_verify_email.setEnabled(false);
+        }
+        else {
+            showError("Please varify your account ");
+        }
 
-            return;
+    }
+
+    public void updateEmailVarification() {
+        if (userLocalStore.getIsVerified()) {
+            updateEmailVarificationUi(true);
         }
 
         UploadApis uploadApis = NetworkClient.getRetrofit(this).create(UploadApis.class);
@@ -233,8 +241,10 @@ public class UserProfileActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     if ("success".equals(response.body().getStatus())) {
                         userLocalStore.setIsVerified(true);
+                        updateEmailVarificationUi(true);
                     } else {
                         userLocalStore.setIsVerified(false);
+                        updateEmailVarificationUi(false);
 
                     }
                 } else {

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -21,7 +22,10 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.Apis.UploadApis;
 import com.example.myapplication.R;
+import com.example.myapplication.Responses.FcmTokenResponse;
+import com.example.myapplication.Services.FcmService;
 import com.example.myapplication.UserLocalStore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (userLocalStore.isLoggedIn()) {
             username.setText(userLocalStore.getFullname());
+
+
+
             getProfileFromServer();
             updateProfileUI();
 
@@ -77,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
                 text_error.setVisibility(View.VISIBLE);
             }
             else {
+                setupNotifications();
                 enableButtons();
                 text_error.setVisibility(View.GONE);
             }
@@ -176,6 +184,12 @@ public class MainActivity extends AppCompatActivity {
             permissions.add(Manifest.permission.READ_MEDIA_IMAGES);
             permissions.add(Manifest.permission.READ_MEDIA_VIDEO);
             permissions.add(Manifest.permission.READ_MEDIA_AUDIO);
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+
+//            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) !=
+//                    PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+//            }
         } else {
             permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -260,6 +274,55 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void setupNotifications() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w("FCM", "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    String token = task.getResult();
+                    Log.d("FCM_TOKEN", token);
+
+                    if (userLocalStore != null && userLocalStore.isLoggedIn() && userLocalStore.getIsVerified()) {
+                        Log.d("Calling send token", "sendTokenToServer function call");
+                        sendTokenToServer(userLocalStore.getUsername(), token);
+                    }
+                });
+
+        FirebaseMessaging.getInstance().subscribeToTopic("broadcast")
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) Log.d("FCM", "Subscribed to broadcast");
+                });
+    }
+
+
+    private void sendTokenToServer(String username, String token) {
+        Log.d("Inside sendTokenToServer", "username :" + username + " Token: " + token);
+        UploadApis api = NetworkClient.getRetrofit(this).create(UploadApis.class);
+        api.sendToken(token, username).enqueue(new Callback<FcmTokenResponse>() {
+            @Override
+            public void onResponse(Call<FcmTokenResponse> call, Response<FcmTokenResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    if ("success".equals(response.body().getStatus())) {
+                        Log.d("FCM", "Token successfully registered for: " + username);
+                    } else {
+                        Log.e("FCM", "Server rejected token: " + response.body().getMessage());
+                    }
+                }
+                else {
+                    Log.e("fcm Failed", "!response.isSuccessful() or response.body() == null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<FcmTokenResponse> call, Throwable t) {
+                Log.e("FCM", "Network failure sending token: " + t.getMessage());
+            }
+        });
     }
 
     @Override

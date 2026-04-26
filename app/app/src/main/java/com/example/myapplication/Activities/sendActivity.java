@@ -261,6 +261,7 @@ public class sendActivity extends AppCompatActivity {
             Retrofit retrofit = NetworkClient.getRetrofit(getApplicationContext());
             UploadApis uploadApis = retrofit.create(UploadApis.class);
 
+            file_count_text.setText("Uploading " + file_name);
 
             Call<UploadResponse> call = uploadApis.uploadFile(parts, unique_text_body, username_body);
             call.enqueue(new Callback<UploadResponse>() {

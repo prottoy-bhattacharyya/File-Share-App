@@ -15,6 +15,9 @@
 # Django media files
 /api/media/*
 
+# Firebase credentials
+/api/Services/Firebase/firebase_credentials.json
+
 # Android Studio files
 /app/*.iml
 /app/.gradle

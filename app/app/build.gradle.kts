@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -59,5 +60,11 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.github.bumptech.glide:glide:4.15.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+// Use platform() for the BOM
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+
+    // Now you can include messaging without a version
+    implementation("com.google.firebase:firebase-messaging")
     annotationProcessor(libs.room.compiler)
 }

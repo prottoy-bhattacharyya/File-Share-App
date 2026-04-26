@@ -17,7 +17,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.myapplication.Apis.NetworkClient;
 import com.example.myapplication.Apis.UploadApis;
-import com.example.myapplication.Apis.userInfo;
+import com.example.myapplication.Responses.userInfo;
 import com.example.myapplication.LocalDb.AppDatabase;
 import com.example.myapplication.LocalDb.LocalFile;
 import com.example.myapplication.R;

@@ -16,6 +16,8 @@ urlpatterns = [
     
     path('save_sender/', views.save_sender, name='save_sender'),
     path('save_receiver/', views.save_receiver, name='save_receiver'),
+
+    path('send_fcm_token/', views.save_fcm_token, name='send_fcm_token'),
     
     path('user_history/', views.user_history, name='user_history'),
 
