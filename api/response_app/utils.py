@@ -4,6 +4,20 @@ from file_sharing_project import settings
 
 from django.core.mail import send_mail
 
+from . import dbconfig
+
+import mysql.connector
+
+def get_connection():
+    config = dbconfig.db()
+    try:
+        conn = mysql.connector.connect(**config)
+        return conn
+    except mysql.connector.Error as err:
+        print(f"Error connecting to MySQL: {err}")
+        return None
+
+
 def send_fcm_notification(token, title, body):
     try:
         message = messaging.Message(

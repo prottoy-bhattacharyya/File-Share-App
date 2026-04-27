@@ -1,12 +1,7 @@
 import io
 import re
-import threading
-import os
 import random
 from datetime import timedelta
-from urllib import response
-
-from firebase_admin import messaging
 
 from django.utils import timezone
 from django.http import FileResponse, HttpResponse, JsonResponse
@@ -15,22 +10,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
 
 
-from file_sharing_project import settings
-from . import dbconfig
-from .utils import send_fcm_notification, send_otp_email
+from .utils import send_fcm_notification, send_otp_email, get_connection
 import mysql.connector
 
 # Create your views here.
-
-def get_connection():
-    config = dbconfig.db()
-    try:
-        conn = mysql.connector.connect(**config)
-        return conn
-    except mysql.connector.Error as err:
-        print(f"Error connecting to MySQL: {err}")
-        return None
-
 
 def index(request):
     conn = get_connection()
