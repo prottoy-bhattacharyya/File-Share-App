@@ -504,6 +504,8 @@ def user_history(request):
                 )
     
     results = cursor.fetchall()
+
+
     cursor.close()
     conn.close()
 
@@ -511,14 +513,55 @@ def user_history(request):
         'status': 'success',
         'data': [
             {'sender': row[0], 
-             'receiver': row[1], 
+             'receiver': row[1],
              'unique_text': row[2],
-             'timestamp': row[3].isoformat() if len(row) > 3 and row[3] else None
+             'timestamp': row[3].strftime('%Y-%m-%d   %H:%M %p') if len(row) > 3 and row[3] else None
             } 
              for row in results
         ]
     }
     return JsonResponse(response)
+
+@csrf_exempt
+def user_sent_history(request):
+    sender = request.GET.get('username')
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # We use a JOIN to get file names and info in one go
+    # Grouping by unique_text helps if there are multiple files per code
+    query = """
+        SELECT fi.unique_text, fi.timestamp, fb.file_name
+        FROM file_info fi
+        LEFT JOIN file_blobs fb ON fi.unique_text = fb.unique_text
+        WHERE fi.sender = %s
+        ORDER BY fi.timestamp DESC
+    """
+    
+    cursor.execute(query, (sender,))
+    results = cursor.fetchall()
+    
+
+    # Organize the flat results into a structured format
+    history_dict = {}
+    for unique_text, timestamp, file_name in results:
+        if unique_text not in history_dict:
+            history_dict[unique_text] = {
+                'unique_text': unique_text,
+                'timestamp': timestamp.isoformat() if timestamp else None,
+                'files': []
+            }
+        if file_name:
+            history_dict[unique_text]['files'].append(file_name)
+    
+    cursor.close()
+    conn.close()
+
+    # Convert the dictionary back to a list for the JSON response
+    return JsonResponse({
+        'status': 'success', 
+        'data': list(history_dict.values())
+    })
 
 @csrf_exempt
 def send_otp(request):

@@ -20,6 +20,7 @@ urlpatterns = [
     path('send_fcm_token/', views.save_fcm_token, name='send_fcm_token'),
     
     path('user_history/', views.user_history, name='user_history'),
+    path('user_sent_history/', views.user_sent_history, name='user_sent_history'),
 
     path('sendOtp/', views.send_otp, name='send_otp'),
     path('verifyOtp/', views.verify_otp, name='verify_otp'),

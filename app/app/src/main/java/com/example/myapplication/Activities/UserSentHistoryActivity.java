@@ -141,6 +141,8 @@ public class UserSentHistoryActivity extends AppCompatActivity {
             for (userInfo row : serverRows) {
                 String code   = row.getUniqueText();
                 String sender = row.getSender();
+                String sendingTime = row.getTimestamp();
+
                 if (code == null || code.isEmpty()) continue;
 
                 // ── Key fix: skip rows where the current user is NOT the sender ──
@@ -148,7 +150,7 @@ public class UserSentHistoryActivity extends AppCompatActivity {
 
                 SentGroup group = grouped.get(code);
                 if (group == null) {
-                    group = new SentGroup(code);
+                    group = new SentGroup(code, sendingTime);
                     grouped.put(code, group);
                 }
 
@@ -191,9 +193,11 @@ public class UserSentHistoryActivity extends AppCompatActivity {
         final String uniqueText;
         final List<String> receivers = new ArrayList<>();
         final List<String> fileNames = new ArrayList<>();
+        final String sendingTime;
 
-        SentGroup(String uniqueText) {
+        SentGroup(String uniqueText, String sendingTime) {
             this.uniqueText = uniqueText;
+            this.sendingTime = sendingTime;
         }
     }
 
@@ -222,6 +226,7 @@ public class UserSentHistoryActivity extends AppCompatActivity {
 
             // ── Unique code ───────────────────────────────────────────────
             h.tvUniqueText.setText(g.uniqueText);
+            h.tvSendingTime.setText(g.sendingTime);
 
             // ── Receiver count chip ───────────────────────────────────────
             int count = g.receivers.size();
@@ -267,13 +272,14 @@ public class UserSentHistoryActivity extends AppCompatActivity {
         }
 
         class VH extends RecyclerView.ViewHolder {
-            final TextView  tvUniqueText, tvReceiverCount, tvFiles, tvNoReceivers;
+            final TextView  tvUniqueText, tvReceiverCount, tvFiles, tvNoReceivers, tvSendingTime;
             final ChipGroup chipGroup;
 
             VH(@NonNull View v) {
                 super(v);
                 tvUniqueText    = v.findViewById(R.id.tvUniqueText);
                 tvReceiverCount = v.findViewById(R.id.tvReceiverCount);
+                tvSendingTime   = v.findViewById(R.id.tvSendingTime);
                 tvFiles         = v.findViewById(R.id.tvFiles);
                 tvNoReceivers   = v.findViewById(R.id.tvNoReceivers);
                 chipGroup       = v.findViewById(R.id.chipGroupReceivers);

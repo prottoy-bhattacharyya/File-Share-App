@@ -66,6 +66,15 @@
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSendingTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="01/01/2004"
+                    android:textColor="?attr/colorSecondary"
+                    android:textSize="12sp"/>
             </LinearLayout>
 
             <!-- Receiver count chip -->
