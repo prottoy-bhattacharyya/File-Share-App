@@ -21,72 +21,18 @@ def index(request):
         return HttpResponse("<h1 style='color: red;'>Database connection failed.</h1>")
     
     cursor = conn.cursor()
-    try:
 
-        cursor.execute("""create table if not exists user_credentials (
-                            id int primary key auto_increment, 
-                            fullname text,
-                            username text,
-                            email text,
-                            is_verified BOOLEAN DEFAULT FALSE,
-                            profile_picture mediumblob,
-                            hashed_password text,
-                            timestamp timestamp default current_timestamp
-                        );""")
-        
-        cursor.execute("""create table if not exists file_info (
-                            id int primary key auto_increment, 
-                            sender text,
-                            unique_text text,
-                            receiver text,
-                            timestamp timestamp default current_timestamp
-                        );""")
-        
-        cursor.execute("""create table if not exists file_blobs (
-                            id int primary key auto_increment, 
-                            unique_text text,
-                            file_name text,
-                            file_blob longblob,
-                            timestamp timestamp default current_timestamp
-                       );""")
-        
-        cursor.execute("""CREATE TABLE IF NOT EXISTS otp_verifications (
-                            id INT PRIMARY KEY AUTO_INCREMENT,
-                            email VARCHAR(255) NOT NULL,
-                            otp_code VARCHAR(6) NOT NULL,
-                            is_verified BOOLEAN DEFAULT FALSE,
-                            expires_at TIMESTAMP NOT NULL,
-                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            INDEX (email), -- For faster lookups
-                            INDEX (expires_at) -- For cleanup scripts
-                        );""")
+    cursor.execute("SHOW TABLES;")
+    result = cursor.fetchall()
 
-
-        cursor.execute("""CREATE TABLE user_tokens (
-                            id INT AUTO_INCREMENT PRIMARY KEY,
-                            username VARCHAR(255) NOT NULL,
-                            fcm_token TEXT NOT NULL,
-                            device_name VARCHAR(100) DEFAULT 'Android Device',
-                            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                            
-                            -- Ensures we don't store the exact same token multiple times
-                            UNIQUE KEY unique_token (fcm_token(255)),
-                            
-                            -- Index for fast lookups when sending notifications to a specific user
-                            INDEX idx_username (username)
-                        );""")
-        
-        conn.commit()
-
-        cursor.execute("SHOW TABLES;")
-        result = cursor.fetchall()
-    except mysql.connector.Error as err:
-        return HttpResponse(f"<h1 style='color: red;'>Database table creation failed: {err}</h1>")
     cursor.close()
     conn.close()
 
     tables = str(result)
-    return HttpResponse("<h1 style='color: green;'>Database Ready. TABLES: </h1>" + "<h1 style='color: blue;'>" + tables + "</h1>")
+    return HttpResponse("<h1 style='color: green;'>Database Ready. TABLES: </h1>" + "<h1 style='color: blue;'>" 
+                        + tables  
+                        + "</h1>"
+                    )
 
 def admin_view(request):
     conn = get_connection()

@@ -232,6 +232,7 @@ public class UserSentHistoryActivity extends AppCompatActivity {
             // ── File names from local DB ──────────────────────────────────
             if (g.fileNames.isEmpty()) {
                 h.tvFiles.setText("Files not found locally");
+
             } else {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < g.fileNames.size(); i++) {
