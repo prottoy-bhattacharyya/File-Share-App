@@ -1,6 +1,7 @@
 package com.example.myapplication.Activities;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -142,6 +143,9 @@ public class UserSentHistoryActivity extends AppCompatActivity {
                 String code   = row.getUniqueText();
                 String sender = row.getSender();
                 String sendingTime = row.getTimestamp();
+                List<String> filenames = row.getFileNames();
+
+                Log.d("sent filenames: ", filenames.toString());
 
                 if (code == null || code.isEmpty()) continue;
 
@@ -150,7 +154,7 @@ public class UserSentHistoryActivity extends AppCompatActivity {
 
                 SentGroup group = grouped.get(code);
                 if (group == null) {
-                    group = new SentGroup(code, sendingTime);
+                    group = new SentGroup(code, sendingTime, filenames);
                     grouped.put(code, group);
                 }
 
@@ -163,14 +167,14 @@ public class UserSentHistoryActivity extends AppCompatActivity {
             }
 
             // For every group, look up local DB for file names stored under that code
-            for (SentGroup group : grouped.values()) {
-                List<LocalFile> localFiles = db.fileDao().getFilesByCode(group.uniqueText);
-                for (LocalFile lf : localFiles) {
-                    if (lf.fileName != null && !lf.fileName.isEmpty()) {
-                        group.fileNames.add(lf.fileName);
-                    }
-                }
-            }
+//            for (SentGroup group : grouped.values()) {
+//                List<LocalFile> localFiles = db.fileDao().getFilesByCode(group.uniqueText);
+//                for (LocalFile lf : localFiles) {
+//                    if (lf.fileName != null && !lf.fileName.isEmpty()) {
+//                        group.fileNames.add(lf.fileName);
+//                    }
+//                }
+//            }
 
             final List<SentGroup> groups = new ArrayList<>(grouped.values());
 
@@ -192,12 +196,13 @@ public class UserSentHistoryActivity extends AppCompatActivity {
     static class SentGroup {
         final String uniqueText;
         final List<String> receivers = new ArrayList<>();
-        final List<String> fileNames = new ArrayList<>();
+        final List<String> fileNames;
         final String sendingTime;
 
-        SentGroup(String uniqueText, String sendingTime) {
+        SentGroup(String uniqueText, String sendingTime, List<String> fileNames) {
             this.uniqueText = uniqueText;
             this.sendingTime = sendingTime;
+            this.fileNames = fileNames;
         }
     }
 

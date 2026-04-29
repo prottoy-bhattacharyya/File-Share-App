@@ -512,10 +512,11 @@ def user_history(request):
     response = {
         'status': 'success',
         'data': [
-            {'sender': row[0], 
-             'receiver': row[1],
-             'unique_text': row[2],
-             'timestamp': row[3].strftime('%Y-%m-%d   %H:%M %p') if len(row) > 3 and row[3] else None
+            {
+                'sender': row[0], 
+                'receiver': row[1],
+                'unique_text': row[2],
+                'timestamp': row[3].strftime('%Y-%m-%d   %H:%M %p') if len(row) > 3 and row[3] else None
             } 
              for row in results
         ]
@@ -524,14 +525,14 @@ def user_history(request):
 
 @csrf_exempt
 def user_sent_history(request):
-    sender = request.GET.get('username')
+    sender = request.POST.get('username')
     conn = get_connection()
     cursor = conn.cursor()
     
     # We use a JOIN to get file names and info in one go
     # Grouping by unique_text helps if there are multiple files per code
     query = """
-        SELECT fi.unique_text, fi.timestamp, fb.file_name
+        SELECT fi.sender, fi.receiver, fi.unique_text, fi.timestamp, fb.file_name
         FROM file_info fi
         LEFT JOIN file_blobs fb ON fi.unique_text = fb.unique_text
         WHERE fi.sender = %s
@@ -544,15 +545,17 @@ def user_sent_history(request):
 
     # Organize the flat results into a structured format
     history_dict = {}
-    for unique_text, timestamp, file_name in results:
+    for sender, receiver, unique_text, timestamp, file_name in results:
         if unique_text not in history_dict:
             history_dict[unique_text] = {
+                'sender': sender,
+                'receiver': receiver,
                 'unique_text': unique_text,
-                'timestamp': timestamp.isoformat() if timestamp else None,
-                'files': []
+                'timestamp': timestamp.strftime('%Y-%m-%d   %H:%M %p') if timestamp else None,
+                'file_names': []
             }
         if file_name:
-            history_dict[unique_text]['files'].append(file_name)
+            history_dict[unique_text]['file_names'].append(file_name)
     
     cursor.close()
     conn.close()
