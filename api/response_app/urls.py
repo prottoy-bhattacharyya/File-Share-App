@@ -21,7 +21,9 @@ urlpatterns = [
     
     path('user_history/', views.user_sent_history, name='user_history'),
     path('user_sent_history/', views.user_sent_history, name='user_sent_history'),
+    path('user_receive_history/', views.user_receive_history, name='user_receive_history'),
 
+    
     path('sendOtp/', views.send_otp, name='send_otp'),
     path('verifyOtp/', views.verify_otp, name='verify_otp'),
     path('resetPassword/', views.reset_password, name='reset_password'),

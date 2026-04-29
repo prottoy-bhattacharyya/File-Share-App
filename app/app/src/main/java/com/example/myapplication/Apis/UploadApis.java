@@ -70,8 +70,12 @@ public interface UploadApis {
                                        @Part("username") RequestBody username);
 
     @Multipart
-    @POST("user_history/")
-    Call<UserHistoryResponse> user_history(@Part("username") RequestBody username);
+    @POST("user_sent_history/")
+    Call<UserHistoryResponse> user_sent_history(@Part("username") RequestBody username);
+
+    @Multipart
+    @POST("user_receive_history/")
+    Call<UserHistoryResponse> user_receive_history(@Part("username") RequestBody username);
 
     @Multipart
     @POST("setUserProfilePicture/")

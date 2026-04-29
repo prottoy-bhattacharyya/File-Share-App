@@ -479,13 +479,13 @@ def save_fcm_token(request):
         conn.close()
 
 @csrf_exempt
-def user_history(request):
+def user_receive_history(request):
     if request.method != 'POST':
         response = {
             'status': 'error',
             'message': 'Invalid request method.'
         }
-        return JsonResponse(response, status=400)
+        return JsonResponse(response)
     
     username = request.POST.get('username')
     conn = get_connection()
@@ -494,7 +494,7 @@ def user_history(request):
             'status': 'DB error',
             'message': 'Database connection failed.'
         }
-        return JsonResponse(response, status=500)
+        return JsonResponse(response)
     
     cursor = conn.cursor()
     cursor.execute("""SELECT sender, receiver, unique_text, timestamp
@@ -526,7 +526,29 @@ def user_history(request):
 @csrf_exempt
 def user_sent_history(request):
     sender = request.POST.get('username')
+
+    if not sender:
+        response = {
+            'status': 'error',
+            'message': 'Username is required.'
+        }
+        return JsonResponse(response)
+
+    if request.method != 'POST':
+        response = {
+            'status': 'error',
+            'message': 'Invalid request method.'
+        }
+        return JsonResponse(response)
+    
     conn = get_connection()
+    if not conn:
+        response = {
+            'status': 'DB error',
+            'message': 'Database connection failed.'
+        }
+        return JsonResponse(response)
+    
     cursor = conn.cursor()
     
     # We use a JOIN to get file names and info in one go
@@ -551,7 +573,7 @@ def user_sent_history(request):
                 'sender': sender,
                 'receiver': receiver,
                 'unique_text': unique_text,
-                'timestamp': timestamp.strftime('%Y-%m-%d   %H:%M %p') if timestamp else None,
+                'timestamp': timestamp.strftime('%Y-%m-%d   %I:%M %p') if timestamp else None,
                 'file_names': []
             }
         if file_name:

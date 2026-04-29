@@ -76,7 +76,7 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
         Retrofit retrofit = NetworkClient.getRetrofit(this);
         UploadApis api = retrofit.create(UploadApis.class);
 
-        api.user_history(usernameBody).enqueue(new Callback<UserHistoryResponse>() {
+        api.user_receive_history(usernameBody).enqueue(new Callback<UserHistoryResponse>() {
             @Override
             public void onResponse(@NonNull Call<UserHistoryResponse> call,
                                    @NonNull Response<UserHistoryResponse> response) {
