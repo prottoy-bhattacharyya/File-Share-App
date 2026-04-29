@@ -6,6 +6,7 @@
 /api/dist/
 /api/wheels/
 /api/*.egg-info
+/api/response_app/__pycache__/*
 
 # Virtual environments
 /api/.venv
