@@ -1,5 +1,6 @@
 # Python-generated files
 /api/__pycache__/
+/api/*.pyc
 /api/*.py[oc]
 /api/build/
 /api/dist/
