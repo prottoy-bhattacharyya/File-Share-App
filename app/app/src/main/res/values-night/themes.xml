@@ -6,6 +6,7 @@
         <item name="colorSurface">#121212</item>
         <item name="colorOnSurface">#E1E2E1</item>
         <item name="colorSecondary">#81C784</item>
+        <item name="colorProfileCard">#121212</item>
         <item name="android:statusBarColor">?attr/colorSurface</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>

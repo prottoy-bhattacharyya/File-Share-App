@@ -212,7 +212,7 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
 
             h.tvUniqueCode.setText("Code: " + g.uniqueText);
 
-            h.tvReceivingTime.setText(g.receivingTime);
+            h.tvReceivingTime.setText(g.receivingTime != null ? g.receivingTime : "Unknown Receive Time");
 
             h.tvSenderName.setText("Sender: " + g.senderName);
 

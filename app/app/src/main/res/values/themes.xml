@@ -6,9 +6,10 @@
         <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">#1A237E</item>
         <item name="colorSecondary">#527132</item>
-        <item name="android:statusBarColor">?attr/colorSurface</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="colorProfileCard">#1835CC</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#0A0F3C</item>
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />

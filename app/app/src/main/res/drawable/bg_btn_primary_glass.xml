@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Glow halo layer -->
+    <item android:top="6dp" android:bottom="-6dp" android:left="6dp" android:right="6dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#405C9EFF" />
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+    <!-- Main gradient fill -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="#5C7CFA"
+                android:centerColor="#3B5BDB"
+                android:endColor="#2244CC"
+                android:type="linear" />
+            <corners android:radius="20dp" />
+            <stroke android:width="1dp" android:color="#80AABBFF" />
+        </shape>
+    </item>
+</layer-list>

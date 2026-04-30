@@ -32,11 +32,14 @@ import com.bumptech.glide.Glide;
 import com.example.myapplication.LocalDb.AppDatabase;
 import com.example.myapplication.LocalDb.LocalFile;
 import com.example.myapplication.R;
+import com.google.android.material.card.MaterialCardView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -46,26 +49,25 @@ public class ReceivedFilesActivity extends AppCompatActivity {
     private FileAdapter adapter;
     private List<SharedFile> fileListFull = new ArrayList<>();
     private SearchView searchView;
-    String uniqueText;
-    TextView tv_unique_text;
+    private String uniqueText;
+    private TextView tv_unique_text;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_received_files);
 
-        recyclerView = findViewById(R.id.recycler_view);
-        searchView = findViewById(R.id.search_view);
+        recyclerView   = findViewById(R.id.recycler_view);
+        searchView     = findViewById(R.id.search_view);
         tv_unique_text = findViewById(R.id.tv_unique_text_value);
 
-         uniqueText = getIntent().getStringExtra("unique_text");
-         if (uniqueText == null) {
-             uniqueText = "";
-             tv_unique_text.setVisibility(View.GONE);
-         }
-         else {
-             tv_unique_text.append(uniqueText);
-         }
+        uniqueText = getIntent().getStringExtra("unique_text");
+        if (uniqueText == null) {
+            uniqueText = "";
+            tv_unique_text.setVisibility(View.GONE);
+        } else {
+            tv_unique_text.append(uniqueText);
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
@@ -77,57 +79,55 @@ public class ReceivedFilesActivity extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        // Add this after setting the LayoutManager
-
-        // Load and apply the animation
-        LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down);
+        LayoutAnimationController animation =
+                AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation_fall_down);
         recyclerView.setLayoutAnimation(animation);
 
         loadFiles();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
+            @Override public boolean onQueryTextSubmit(String query) { return false; }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (adapter != null) {
-                    adapter.getFilter().filter(newText);
-                }
+                if (adapter != null) adapter.getFilter().filter(newText);
                 return true;
             }
         });
     }
 
+    // ── Load files from Room DB + file system ─────────────────────────────────
+
     private void loadFiles() {
-//        fileListFull = fetchFilesFromFolder();
-//
-//        adapter = new FileAdapter(this, new ArrayList<>(fileListFull));
-//        recyclerView.setAdapter(adapter);
-//
-//        if (fileListFull.isEmpty()) {
-//            findViewById(R.id.empty_message).setVisibility(View.VISIBLE);
-//        }
-
-        // Since DB operations are blocking, run them in a background thread
         Executors.newSingleThreadExecutor().execute(() -> {
-
-            // 3. Get allowed filenames from Local DB
             AppDatabase db = AppDatabase.getInstance(this);
-            List<LocalFile> dbFiles = db.fileDao().getFilesByCode(uniqueText);
 
-            // Use a Set for faster lookup (O(1) vs O(n))
-            Set<String> allowedFileNames = new HashSet<>();
-            for (LocalFile f : dbFiles) {
-                allowedFileNames.add(f.fileName);
+            // Fetch all LocalFile records.
+            // If a specific uniqueText was passed in, filter by it;
+            // otherwise load every record so all received files are shown.
+            List<LocalFile> dbFiles;
+            if (uniqueText.isEmpty()) {
+                dbFiles = db.fileDao().getAllFiles();
+            } else {
+                dbFiles = db.fileDao().getFilesByCode(uniqueText);
             }
 
-            // 4. Fetch physical files that match the DB names
-            fileListFull = fetchFilesFromFolder(allowedFileNames);
+            // Build a map: fileName → uniqueText for badge display
+            // (a filename might appear under multiple codes — keep the first/most recent)
+            Map<String, String> fileNameToCode = new HashMap<>();
+            Set<String> allowedFileNames = new HashSet<>();
+            for (LocalFile f : dbFiles) {
+                if (f.fileName != null && !f.fileName.isEmpty()) {
+                    allowedFileNames.add(f.fileName);
+                    // putIfAbsent: keep the first (most-recent-first order from getAllFiles)
+                    if (!fileNameToCode.containsKey(f.fileName)) {
+                        fileNameToCode.put(f.fileName, f.uniqueText != null ? f.uniqueText : "");
+                    }
+                }
+            }
 
-            // 5. Update UI on the main thread
+            fileListFull = fetchFilesFromFolder(allowedFileNames, fileNameToCode);
+
             runOnUiThread(() -> {
                 adapter = new FileAdapter(this, new ArrayList<>(fileListFull));
                 recyclerView.setAdapter(adapter);
@@ -142,78 +142,82 @@ public class ReceivedFilesActivity extends AppCompatActivity {
         });
     }
 
-    private List<SharedFile> fetchFilesFromFolder(Set<String> allowedNames) {
+    // ── Scan the download folder and match against DB records ─────────────────
+
+    private List<SharedFile> fetchFilesFromFolder(Set<String> allowedNames,
+                                                  Map<String, String> fileNameToCode) {
         List<SharedFile> list = new ArrayList<>();
 
-        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "File Share App");
+        File folder = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                "File Share App");
 
-        if (folder.exists() && folder.isDirectory()) {
-            File[] files = folder.listFiles();
+        if (!folder.exists() || !folder.isDirectory()) return list;
 
-            if (allowedNames.isEmpty()) {
-                for (File file : files) {
-                    allowedNames.add(file.getName());
-                }
-            }
+        File[] files = folder.listFiles();
+        if (files == null) return list;
 
-            if (files != null) {
-                for (File file : files) {
-                    // 6. Only add the file if its name exists in our DB set
-                    if (file.isFile() && allowedNames.contains(file.getName())) {
+        // If no DB records exist yet, fall back to showing all files (no badge)
+        boolean noFilter = allowedNames.isEmpty();
 
-                        Uri fileUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
-                        String mimeType = getMimeType(file);
+        for (File file : files) {
+            if (!file.isFile()) continue;
+            if (!noFilter && !allowedNames.contains(file.getName())) continue;
 
-                        list.add(new SharedFile(
-                                file.getName(),
-                                file.length(),
-                                fileUri,
-                                mimeType
-                        ));
-                    }
-                }
-            }
+            Uri fileUri = FileProvider.getUriForFile(
+                    this, getPackageName() + ".fileprovider", file);
+            String mimeType = getMimeType(file);
+
+            // Look up the unique code for this file; empty string if unknown
+            String code = fileNameToCode.getOrDefault(file.getName(), "");
+
+            list.add(new SharedFile(file.getName(), file.length(), fileUri, mimeType, code));
         }
         return list;
     }
 
     private String getMimeType(File file) {
-        Uri uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", file);
-        String fileName = file.getName();
         String extension = "";
-        int i = fileName.lastIndexOf('.');
-        if (i > 0) {
-            extension = fileName.substring(i + 1);
-        }
+        int dot = file.getName().lastIndexOf('.');
+        if (dot > 0) extension = file.getName().substring(dot + 1);
         String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
-        if (mimeType == null) mimeType = "*/*";
-        return mimeType;
+        return mimeType != null ? mimeType : "*/*";
     }
+
+    // ── Data model ────────────────────────────────────────────────────────────
 
     public static class SharedFile {
         private final String name;
         private final long size;
         private final Uri uri;
         private final String mimeType;
+        private final String uniqueText; // code badge shown on the right
 
-        public SharedFile(String name, long size, Uri uri, String mimeType) {
-            this.name = name;
-            this.size = size;
-            this.uri = uri;
-            this.mimeType = mimeType;
+        public SharedFile(String name, long size, Uri uri, String mimeType, String uniqueText) {
+            this.name       = name;
+            this.size       = size;
+            this.uri        = uri;
+            this.mimeType   = mimeType;
+            this.uniqueText = uniqueText;
         }
-        public String getName() { return name; }
-        public long getSize() { return size; }
-        public Uri getUri() { return uri; }
-        public String getMimeType() { return mimeType; }
+
+        public String getName()       { return name; }
+        public long   getSize()       { return size; }
+        public Uri    getUri()        { return uri; }
+        public String getMimeType()   { return mimeType; }
+        public String getUniqueText() { return uniqueText; }
     }
 
-    private class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder> implements Filterable {
+    // ── RecyclerView Adapter ──────────────────────────────────────────────────
+
+    private class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileViewHolder>
+            implements Filterable {
+
         private final Context context;
         private List<SharedFile> filesDisplayed;
 
-        public FileAdapter(Context context, List<SharedFile> files) {
-            this.context = context;
+        FileAdapter(Context context, List<SharedFile> files) {
+            this.context        = context;
             this.filesDisplayed = files;
         }
 
@@ -222,21 +226,18 @@ public class ReceivedFilesActivity extends AppCompatActivity {
             return new Filter() {
                 @Override
                 protected FilterResults performFiltering(CharSequence constraint) {
-                    List<SharedFile> filteredList = new ArrayList<>();
-
+                    List<SharedFile> filtered = new ArrayList<>();
                     if (constraint == null || constraint.length() == 0) {
-                        filteredList.addAll(fileListFull);
+                        filtered.addAll(fileListFull);
                     } else {
-                        String filterPattern = constraint.toString().toLowerCase().trim();
+                        String pattern = constraint.toString().toLowerCase().trim();
                         for (SharedFile item : fileListFull) {
-                            if (item.getName().toLowerCase().contains(filterPattern)) {
-                                filteredList.add(item);
-                            }
+                            if (item.getName().toLowerCase().contains(pattern))
+                                filtered.add(item);
                         }
                     }
-
                     FilterResults results = new FilterResults();
-                    results.values = filteredList;
+                    results.values = filtered;
                     return results;
                 }
 
@@ -258,23 +259,34 @@ public class ReceivedFilesActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull FileViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull FileViewHolder h, int position) {
             SharedFile file = filesDisplayed.get(position);
-            holder.nameTxt.setText(file.getName());
-            holder.sizeTxt.setText(Formatter.formatShortFileSize(context, file.getSize()));
 
+            h.nameTxt.setText(file.getName());
+            h.sizeTxt.setText(Formatter.formatShortFileSize(context, file.getSize()));
 
-
-
-            int iconResId = getIconForFileType(file.getMimeType(), file.getName());
-
-            if (file.getMimeType().startsWith("image/")) {
-                Glide.with(context).load(file.getUri()).placeholder(R.drawable.ic_image).into(holder.imgThumb);
+            // ── Unique-text badge ─────────────────────────────────────────
+            String code = file.getUniqueText();
+            if (code != null && !code.isEmpty()) {
+                h.cardUniqueText.setVisibility(View.VISIBLE);
+                h.tvUniqueText.setText(code);
             } else {
-                holder.imgThumb.setImageResource(iconResId);
+                h.cardUniqueText.setVisibility(View.GONE);
             }
 
-            holder.itemView.setOnClickListener(v -> {
+            // ── Thumbnail ─────────────────────────────────────────────────
+            int iconResId = getIconForFileType(file.getMimeType(), file.getName());
+            if (file.getMimeType().startsWith("image/")) {
+                Glide.with(context)
+                        .load(file.getUri())
+                        .placeholder(R.drawable.ic_image)
+                        .into(h.imgThumb);
+            } else {
+                h.imgThumb.setImageResource(iconResId);
+            }
+
+            // ── Open on tap ───────────────────────────────────────────────
+            h.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(file.getUri(), file.getMimeType());
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -291,29 +303,30 @@ public class ReceivedFilesActivity extends AppCompatActivity {
         public int getItemCount() { return filesDisplayed.size(); }
 
         class FileViewHolder extends RecyclerView.ViewHolder {
-            TextView nameTxt, sizeTxt;
-            ImageView imgThumb;
-            public FileViewHolder(@NonNull View itemView) {
-                super(itemView);
-                nameTxt = itemView.findViewById(R.id.fileName);
-                sizeTxt = itemView.findViewById(R.id.fileSize);
-                imgThumb = itemView.findViewById(R.id.thumbnail);
+            TextView         nameTxt, sizeTxt, tvUniqueText;
+            ImageView        imgThumb;
+            MaterialCardView cardUniqueText;
+
+            FileViewHolder(@NonNull View v) {
+                super(v);
+                nameTxt        = v.findViewById(R.id.fileName);
+                sizeTxt        = v.findViewById(R.id.fileSize);
+                imgThumb       = v.findViewById(R.id.thumbnail);
+                tvUniqueText   = v.findViewById(R.id.fileUniqueText);
+                cardUniqueText = v.findViewById(R.id.cardUniqueText);
             }
         }
 
         private int getIconForFileType(String mimeType, String fileName) {
             if (mimeType == null) mimeType = "*/*";
-
-
-            if (mimeType.startsWith("audio/")) return R.drawable.ic_audio;
+            if (mimeType.startsWith("image/"))   return R.drawable.ic_image;
+            if (mimeType.startsWith("audio/"))   return R.drawable.ic_audio;
             if (mimeType.equals("application/pdf")) return R.drawable.ic_pdf;
-
             String name = fileName.toLowerCase();
-            if (name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z")) return R.drawable.ic_docs;
-            if (name.endsWith(".doc") || name.endsWith(".docx")) return R.drawable.ic_docs;
-            if (name.endsWith(".xls") || name.endsWith(".xlsx")) return R.drawable.ic_docs;
-            if (name.endsWith(".txt")) return R.drawable.ic_docs;
-
+            if (name.endsWith(".zip") || name.endsWith(".rar") || name.endsWith(".7z") ||
+                    name.endsWith(".doc") || name.endsWith(".docx") ||
+                    name.endsWith(".xls") || name.endsWith(".xlsx") ||
+                    name.endsWith(".txt")) return R.drawable.ic_docs;
             return R.drawable.ic_unknown;
         }
     }

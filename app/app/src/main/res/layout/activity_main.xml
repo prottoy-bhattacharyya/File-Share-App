@@ -7,62 +7,101 @@
     android:background="?attr/colorSurface"
     android:paddingHorizontal="24dp">
 
-    <com.google.android.material.card.MaterialCardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/account_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:cardBackgroundColor="?attr/colorSurfaceContainer"
-        app:cardCornerRadius="24dp"
+        android:layout_marginTop="52dp"
+        app:cardBackgroundColor="?attr/colorProfileCard"
+        app:cardCornerRadius="28dp"
         app:cardElevation="0dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/user_profile_btn"
+        <!-- Glass background -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp">
+            android:background="@drawable/bg_glass_card_profile"
+            android:orientation="vertical">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/profile_image"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:padding="2dp"
-                android:src="@drawable/ic_user"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@drawable/circular_background"
-                app:strokeWidth="1dp" />
-
-            <TextView
-                android:id="@+id/text_username"
-                android:layout_width="0dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/user_profile_btn"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="Welcome, Guest"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_logout"
-                app:layout_constraintStart_toEndOf="@id/profile_image"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:padding="14dp">
 
-            <ImageButton
-                android:id="@+id/button_logout"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Logout"
-                android:src="@drawable/ic_logout"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="?attr/colorError" />
+                <!-- Profile picture with glowing ring -->
+                <FrameLayout
+                    android:id="@+id/profile_frame"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+                    <!-- Glow ring -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_profile_ring" />
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/profile_image"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_user"
+                        app:shapeAppearanceOverlay="@drawable/circular_background"
+                        app:strokeWidth="0dp" />
+                </FrameLayout>
+
+                <!-- Username + subtitle -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/button_logout"
+                    app:layout_constraintStart_toEndOf="@id/profile_frame"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/text_username"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Welcome, Guest"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="1dp"
+                        android:alpha="0.6"
+                        android:text="Tap to view profile"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Logout button -->
+                <ImageButton
+                    android:id="@+id/button_logout"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_btn_outlined_glass"
+                    android:contentDescription="Logout"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_logout"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="#FFFFFFFF" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/title_text"
@@ -126,7 +165,7 @@
             android:layout_marginBottom="12dp"
             android:text="Direct Local Transfer"
             app:cornerRadius="16dp"
-            app:icon="@drawable/ic_logout" />
+            app:icon="@drawable/ic_share" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/receive_btn"
