@@ -22,6 +22,12 @@
             android:textSize="12sp"/>
 
         <TextView
+            android:id="@+id/tvUniqueCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Code:"/>
+
+        <TextView
             android:id="@+id/tvSenderName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,18 +37,19 @@
             android:layout_marginTop="4dp"/>
 
         <TextView
+            android:id="@+id/tvReceivingTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="01/01/2004"
+            android:textColor="?attr/colorSecondary"/>
+
+        <TextView
             android:id="@+id/tvFilesReceived"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Files: homework.zip"
             android:layout_marginTop="4dp"
             android:alpha="0.7"/>
-
-        <TextView
-            android:id="@+id/tvUniqueCode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Code:"/>
 
     </LinearLayout>
 

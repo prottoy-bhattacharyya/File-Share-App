@@ -56,7 +56,8 @@ class ResponseAppConfig(AppConfig):
                                 sender text,
                                 unique_text text,
                                 receiver text,
-                                timestamp timestamp default current_timestamp
+                                sending_time timestamp default current_timestamp,
+                                receiving_time timestamp
                             );""")
             
             cursor.execute("""create table if not exists file_blobs (

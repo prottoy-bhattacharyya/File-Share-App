@@ -139,6 +139,8 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
                 String code     = row.getUniqueText();
                 String receiver = row.getReceiver();
                 String sender   = row.getSender();
+                String receivingTime = row.getTimestamp();
+
                 if (code == null || code.isEmpty()) continue;
 
 
@@ -146,7 +148,7 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
 
 
                 if (!grouped.containsKey(code)) {
-                    grouped.put(code, new ReceivedGroup(code, sender != null ? sender : "Unknown"));
+                    grouped.put(code, new ReceivedGroup(code, sender != null ? sender : "Unknown", receivingTime));
                 }
             }
 
@@ -177,11 +179,13 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
     static class ReceivedGroup {
         final String uniqueText;
         final String senderName;
+        final String receivingTime;
         final List<String> fileNames = new ArrayList<>();
 
-        ReceivedGroup(String uniqueText, String senderName) {
+        ReceivedGroup(String uniqueText, String senderName, String receivingTime) {
             this.uniqueText = uniqueText;
             this.senderName = senderName;
+            this.receivingTime = receivingTime;
         }
     }
 
@@ -206,10 +210,11 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
             ReceivedGroup g = items.get(position);
 
 
-            h.tvUniqueCode.setText(g.uniqueText);
+            h.tvUniqueCode.setText("Code: " + g.uniqueText);
 
+            h.tvReceivingTime.setText(g.receivingTime);
 
-            h.tvSenderName.setText(g.senderName);
+            h.tvSenderName.setText("Sender: " + g.senderName);
 
             if (g.fileNames.isEmpty()) {
                 h.tvFilesReceived.setText("Files not found locally");
@@ -227,13 +232,14 @@ public class ReceivedHistoryActivity extends AppCompatActivity {
         public int getItemCount() { return items.size(); }
 
         class VH extends RecyclerView.ViewHolder {
-            final TextView tvUniqueCode, tvSenderName, tvFilesReceived;
+            final TextView tvUniqueCode, tvSenderName, tvFilesReceived, tvReceivingTime;
 
             VH(@NonNull View v) {
                 super(v);
                 tvUniqueCode    = v.findViewById(R.id.tvUniqueCode);
                 tvSenderName    = v.findViewById(R.id.tvSenderName);
                 tvFilesReceived = v.findViewById(R.id.tvFilesReceived);
+                tvReceivingTime = v.findViewById(R.id.tvReceivingTime);
             }
         }
     }

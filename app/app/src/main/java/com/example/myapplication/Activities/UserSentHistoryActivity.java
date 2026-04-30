@@ -166,16 +166,6 @@ public class UserSentHistoryActivity extends AppCompatActivity {
                 }
             }
 
-            // For every group, look up local DB for file names stored under that code
-//            for (SentGroup group : grouped.values()) {
-//                List<LocalFile> localFiles = db.fileDao().getFilesByCode(group.uniqueText);
-//                for (LocalFile lf : localFiles) {
-//                    if (lf.fileName != null && !lf.fileName.isEmpty()) {
-//                        group.fileNames.add(lf.fileName);
-//                    }
-//                }
-//            }
-
             final List<SentGroup> groups = new ArrayList<>(grouped.values());
 
             runOnUiThread(() -> {
@@ -239,7 +229,7 @@ public class UserSentHistoryActivity extends AppCompatActivity {
             else if (count == 1)  h.tvReceiverCount.setText("1 receiver");
             else                  h.tvReceiverCount.setText(count + " receivers");
 
-            // ── File names from local DB ──────────────────────────────────
+            // ── File names from DB ──────────────────────────────────
             if (g.fileNames.isEmpty()) {
                 h.tvFiles.setText("Files not found locally");
 

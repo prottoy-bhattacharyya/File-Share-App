@@ -406,7 +406,7 @@ def save_receiver(request):
             cursor = conn.cursor(buffered=True)
             
             cursor.execute("""SELECT sender FROM file_info 
-                           WHERE unique_text = %s LIMIT 1""", 
+                           WHERE unique_text = %s LIMIT 1;""", 
                            (unique_text,))
             
             result = cursor.fetchone()
@@ -415,14 +415,14 @@ def save_receiver(request):
             if result:
                 sender = result[0]
                 
-                cursor.execute("""INSERT INTO file_info (sender, receiver, unique_text)
-                               VALUES (%s, %s, %s)""",
+                cursor.execute("""INSERT INTO file_info (sender, receiver, unique_text, receiving_time)
+                               VALUES (%s, %s, %s, CURRENT_TIMESTAMP);""",
                                (sender, receiver, unique_text))
                 
                 conn.commit()
 
                 cursor.execute("""SELECT fcm_token FROM user_tokens 
-                               WHERE username = %s""", 
+                               WHERE username = %s;""", 
                                (sender,)
                             )
                 tokens = cursor.fetchall()
@@ -480,6 +480,15 @@ def save_fcm_token(request):
 
 @csrf_exempt
 def user_receive_history(request):
+    receiver = request.POST.get('username')
+
+    if not receiver:
+        response = {
+            'status': 'error',
+            'message': 'Username is required.'
+        }
+        return JsonResponse(response)
+
     if request.method != 'POST':
         response = {
             'status': 'error',
@@ -487,7 +496,6 @@ def user_receive_history(request):
         }
         return JsonResponse(response)
     
-    username = request.POST.get('username')
     conn = get_connection()
     if not conn:
         response = {
@@ -497,31 +505,43 @@ def user_receive_history(request):
         return JsonResponse(response)
     
     cursor = conn.cursor()
-    cursor.execute("""SELECT sender, receiver, unique_text, timestamp
-                   FROM file_info 
-                   WHERE sender = %s OR receiver = %s""", 
-                   (username, username)
-                )
     
+    # We use a JOIN to get file names and info in one go
+    # Grouping by unique_text helps if there are multiple files per code
+    query = """
+        SELECT fi.sender, fi.receiver, fi.unique_text, fi.receiving_time, fb.file_name
+        FROM file_info fi
+        LEFT JOIN file_blobs fb ON fi.unique_text = fb.unique_text
+        WHERE fi.receiver = %s
+        ORDER BY fi.receiving_time DESC
+    """
+    
+    cursor.execute(query, (receiver,))
     results = cursor.fetchall()
+    
 
-
+    # Organize the flat results into a structured format
+    history_dict = {}
+    for sender, receiver, unique_text, timestamp, file_name in results:
+        if unique_text not in history_dict:
+            history_dict[unique_text] = {
+                'sender': sender,
+                'receiver': receiver,
+                'unique_text': unique_text,
+                'timestamp': timestamp.strftime('%Y-%m-%d   %I:%M %p') if timestamp else None,
+                'file_names': []
+            }
+        if file_name:
+            history_dict[unique_text]['file_names'].append(file_name)
+    
     cursor.close()
     conn.close()
 
-    response = {
-        'status': 'success',
-        'data': [
-            {
-                'sender': row[0], 
-                'receiver': row[1],
-                'unique_text': row[2],
-                'timestamp': row[3].strftime('%Y-%m-%d   %H:%M %p') if len(row) > 3 and row[3] else None
-            } 
-             for row in results
-        ]
-    }
-    return JsonResponse(response)
+    # Convert the dictionary back to a list for the JSON response
+    return JsonResponse({
+        'status': 'success', 
+        'data': list(history_dict.values())
+    })
 
 @csrf_exempt
 def user_sent_history(request):
@@ -551,8 +571,7 @@ def user_sent_history(request):
     
     cursor = conn.cursor()
     
-    # We use a JOIN to get file names and info in one go
-    # Grouping by unique_text helps if there are multiple files per code
+
     query = """
         SELECT fi.sender, fi.receiver, fi.unique_text, fi.timestamp, fb.file_name
         FROM file_info fi
@@ -565,7 +584,6 @@ def user_sent_history(request):
     results = cursor.fetchall()
     
 
-    # Organize the flat results into a structured format
     history_dict = {}
     for sender, receiver, unique_text, timestamp, file_name in results:
         if unique_text not in history_dict:
@@ -582,7 +600,7 @@ def user_sent_history(request):
     cursor.close()
     conn.close()
 
-    # Convert the dictionary back to a list for the JSON response
+
     return JsonResponse({
         'status': 'success', 
         'data': list(history_dict.values())
