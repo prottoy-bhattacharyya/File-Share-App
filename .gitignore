@@ -18,6 +18,7 @@
 /api/media/*
 
 # Firebase credentials
+/app/app/google-services.json
 /api/Services/Firebase/firebase_credentials.json
 
 # Android Studio files
