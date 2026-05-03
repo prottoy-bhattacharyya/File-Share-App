@@ -62,8 +62,6 @@ MIDDLEWARE = [
     
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
-
 # CORS_ALLOWED_ORIGINS = [
 #     "http://localhost:2435",
 # ]
@@ -97,6 +95,13 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# 1. This controls how Django interprets 'now()'
+TIME_ZONE = 'Asia/Dhaka'
+
+# 2. Keep this True! It allows Django to store data in UTC (safe for servers)
+# but automatically convert to Dhaka time for your code.
+USE_TZ = True
 
 
 # Password validation
