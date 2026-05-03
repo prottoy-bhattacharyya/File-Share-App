@@ -525,7 +525,8 @@ def user_receive_history(request):
     for sender, receiver, unique_text, timestamp, file_name in results:
         
         if unique_text not in history_dict:
-            timestamp += timedelta(hours=6)  # Add 6 hours to convert UTC to Dhaka time
+            if timestamp:
+                timestamp += timedelta(hours=6)  # Add 6 hours to convert UTC to Dhaka time
             history_dict[unique_text] = {
                 'sender': sender,
                 'receiver': receiver,
@@ -589,7 +590,8 @@ def user_sent_history(request):
     history_dict = {}
     for sender, receiver, unique_text, timestamp, file_name in results:
         if unique_text not in history_dict:
-            timestamp += timedelta(hours=6)  # Convert UTC to Dhaka time
+            if timestamp:
+                timestamp += timedelta(hours=6)  # Convert UTC to Dhaka time
             history_dict[unique_text] = {
                 'sender': sender,
                 'receiver': receiver,
