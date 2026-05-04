@@ -1,3 +1,5 @@
+from turtle import color
+
 from firebase_admin import messaging
 
 from file_sharing_project import settings
@@ -43,7 +45,7 @@ def send_fcm_notification(token, title, body):
         return None
     
 def send_otp_email(email, otp):
-    html_content = render_to_string('otp_email.html', {'otp': otp}) 
+    html_content = render_to_string('otp_template.html', {'otp': otp})
 
     send_mail(
         subject='File Share App - Verification Code',
