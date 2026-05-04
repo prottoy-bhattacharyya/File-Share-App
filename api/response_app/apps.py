@@ -4,6 +4,7 @@ from django.conf import settings
 import os
 import firebase_admin
 from firebase_admin import credentials
+import mysql.connector
 
 from .utils import get_connection
 
@@ -32,6 +33,23 @@ class ResponseAppConfig(AppConfig):
 
     
     def initialize_database_table(self):
+        conn = mysql.connector.connect(
+
+            host=os.environ.get('DB_HOST'),
+            user=os.environ.get('DB_USER'),
+            password=os.environ.get('DB_PASSWORD'),
+            port=os.environ.get('DB_PORT'),
+            
+        )
+
+        cursor = conn.cursor()
+
+        cursor.execute("CREATE DATABASE IF NOT EXISTS file_share_db")
+        cursor.commit()
+
+        cursor.close()
+        conn.close()
+
         conn = get_connection()
         if not conn:
             print("Database connection failed.")
