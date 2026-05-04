@@ -6,7 +6,7 @@ import firebase_admin
 from firebase_admin import credentials
 import mysql.connector
 
-from .utils import get_connection
+from .utils import get_connection, get_connection_without_dbname
 
 class ResponseAppConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
@@ -33,19 +33,15 @@ class ResponseAppConfig(AppConfig):
 
     
     def initialize_database_table(self):
-        conn = mysql.connector.connect(
-
-            host=os.environ.get('DB_HOST'),
-            user=os.environ.get('DB_USER'),
-            password=os.environ.get('DB_PASSWORD'),
-            port=os.environ.get('DB_PORT'),
-            
-        )
+        conn = get_connection_without_dbname()
 
         cursor = conn.cursor()
 
-        cursor.execute("CREATE DATABASE IF NOT EXISTS file_share_db")
-        cursor.commit()
+        try:
+            cursor.execute("CREATE DATABASE IF NOT EXISTS file_share_db")
+            print("Database exists or created successfully.")
+        except mysql.connector.Error as err:
+            print(f"Error creating database: {err}")
 
         cursor.close()
         conn.close()
