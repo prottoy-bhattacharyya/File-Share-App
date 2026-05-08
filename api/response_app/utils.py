@@ -1,5 +1,3 @@
-from turtle import color
-
 from firebase_admin import messaging
 
 from file_sharing_project import settings
