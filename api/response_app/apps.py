@@ -35,6 +35,10 @@ class ResponseAppConfig(AppConfig):
     def initialize_database_table(self):
         conn = get_connection_without_dbname()
 
+        if not conn:
+            print("Database connection failed.")
+            return
+        
         cursor = conn.cursor()
 
         try:
