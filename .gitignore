@@ -17,6 +17,9 @@
 # Django media files
 /api/media/*
 
+# Environment variables
+/api/.env
+
 # Firebase credentials
 /app/app/google-services.json
 /api/Services/Firebase/firebase_credentials.json
