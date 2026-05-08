@@ -10,6 +10,16 @@ from . import dbconfig
 
 import mysql.connector
 
+import firebase_admin
+
+def check_firebase():
+    if firebase_admin._apps:
+        print(f"Firebase is active. App name: {firebase_admin.get_app().name}")
+        return True
+    else:
+        print("Firebase is NOT initialized.")
+        return False
+
 def get_connection():
     config = dbconfig.db()
     try:

@@ -10,28 +10,38 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password, check_password
 
 
-from .utils import send_fcm_notification, send_otp_email, get_connection
+from .utils import send_fcm_notification, send_otp_email, get_connection, check_firebase
 import mysql.connector
 
 # Create your views here.
 
 def index(request):
+    result = ""
+
+    if not check_firebase():
+        result += "<h1 style='color: red;'> Firebase is inactive. </h1>"
+    else:
+        result += "<h1 style='color: green;'> Firebase is initialized. </h1>"
+
     conn = get_connection()
     if not conn:
-        return HttpResponse("<h1 style='color: red;'>Database connection failed.</h1>")
+        result += "<h1 style='color: red;'>Database connection failed.</h1>"
+        return HttpResponse(result)
+    else:
+        result += "<h1 style='color: green;'>Database connection successful.</h1>"
     
     cursor = conn.cursor()
 
     cursor.execute("SHOW TABLES;")
-    result = cursor.fetchall()
+    tables = str(cursor.fetchall())
 
     cursor.close()
     conn.close()
 
-    tables = str(result)
-    return HttpResponse("<h1 style='color: green;'>Database Ready. TABLES: </h1>" + "<h1 style='color: blue;'>" 
-                        + tables  
-                        + "</h1>"
+    return HttpResponse(    result
+                        +   "<h1 style='color: blue;'>" 
+                        +   tables  
+                        +   "</h1>"
                     )
 
 def admin_view(request):
