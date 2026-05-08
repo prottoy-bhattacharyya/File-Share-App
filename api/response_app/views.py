@@ -576,11 +576,11 @@ def user_sent_history(request):
     
 
     query = """
-        SELECT fi.sender, fi.receiver, fi.unique_text, fi.timestamp, fb.file_name
+        SELECT fi.sender, fi.receiver, fi.unique_text, fi.sending_time, fb.file_name
         FROM file_info fi
         LEFT JOIN file_blobs fb ON fi.unique_text = fb.unique_text
         WHERE fi.sender = %s
-        ORDER BY fi.timestamp DESC
+        ORDER BY fi.sending_time DESC
     """
     
     cursor.execute(query, (sender,))
