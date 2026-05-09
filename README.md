@@ -1,25 +1,51 @@
-# File Share Android App
+<div align="center">
+  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
+  <img src="https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white" />
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
 
-A file-sharing Android application that enables users to share files through both way, Server and Directly. Server store the files and Receiver candownload the files by scannin the QR or usin thhe Download Code. This project is built with Java and powered by Django REST API.
+  <h1 align="center">📁 File Share Android App</h1>
 
-## Features
+  <p align="center">
+    A robust cross-platform file-sharing ecosystem. Transfer files via centralized Server storage or Direct connection. 
+    <br />
+    <b>Scan. Download. Share.</b>
+  </p>
+</div>
 
-- **User Authentication**: User can create account and login
-- **Multiple file Upload and Download**: Upload files to database
-- **QR Code Sharing**: Generate QR codes for file sharing - receivers can download files by simply scanning
-- **Account Recovery and Verification**: User can reset or verify the account via OTP sent to email
-- **Transfer History**: Automatically saves and displays user's send and receive history
-- **File Veriication**: Verify files before upload.
+---
 
-## Tech Stack
+## 🚀 Overview
 
-- **Frontend**: Java (Android Native)
-- **Backend**: Django REST Framework
-- **Database**: MySQL 
-- Firebase Cloud Messaging
-- Docker
+This application enables seamless file sharing through a dual-method approach. Users can upload files to a secure server and share access via **QR Codes** or unique **Download Codes**. Built with **Java (Android Native)** and backed by a powerful **Django REST API**.
 
-# Quick Install and Run Server (Docker):
+### ✨ Key Features
+
+- 🔐 **User Authentication**: Secure sign-up and login protocols.
+- 📤 **Bulk Transfers**: Support for multiple file uploads and downloads.
+- 📷 **QR Code Integration**: Instant sharing—receivers just scan and go.
+- 📧 **Account Recovery**: OTP-based verification and password resets via email.
+- 📜 **Transfer History**: Comprehensive logs for both sent and received files.
+- 🛡️ **File Verification**: Pre-upload integrity checks to ensure data safety.
+
+---
+
+## 🛠 Tech Stack
+
+| Component | Technology |
+| :--- | :--- |
+| **Frontend** | Java (Android Native) |
+| **Backend** | Django REST Framework |
+| **Database** | MySQL |
+| **DevOps** | Docker, Docker Compose |
+| **Push Notifications** | Firebase Cloud Messaging (FCM) |
+
+---
+
+## 🐳 Quick Start (Docker)
+
+The fastest way to get your server running.
 
 - **Install Docker**: Download and run `Docker` on your machine.
   
@@ -156,17 +182,48 @@ Firebase initialized successfully.
 
 - Run the app on your device or emulator
 
-## Screenshots
+## 📱 Screenshots
 
-<img src="Screenshots/main.png" alt="Home Page" width="150"> <img src="Screenshots/profile.png" alt="Project Logo" width="150"> <img src="Screenshots/received files.png" alt="Project Logo" width="150">
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="Screenshots/main.png" width="180" alt="Home"></td>
+      <td><img src="Screenshots/upload%20files.png" width="180" alt="Upload"></td>
+      <td><img src="Screenshots/qr%20scan.png" width="180" alt="QR Scan"></td>
+      <td><img src="Screenshots/receiving%20files.png" width="180" alt="Receiving"></td>
+    </tr>
+    <tr>
+      <td align="center"><b>Home</b></td>
+      <td align="center"><b>Upload</b></td>
+      <td align="center"><b>Scanner</b></td>
+      <td align="center"><b>Transfer</b></td>
+    </tr>
+    <tr>
+      <td><img src="Screenshots/profile.png" width="180" alt="Profile"></td>
+      <td><img src="Screenshots/received%20files.png" width="180" alt="Files"></td>
+      <td><img src="Screenshots/sent%20history.jpg" width="180" alt="History Sent"></td>
+      <td><img src="Screenshots/receive%20history.jpg" width="180" alt="History Rec"></td>
+    </tr>
+     <tr>
+      <td align="center"><b>Profile</b></td>
+      <td align="center"><b>File Manager</b></td>
+      <td align="center"><b>Sent Logs</b></td>
+      <td align="center"><b>Receive Logs</b></td>
+    </tr>
+  </table>
+</div>
 
-<img src="Screenshots/upload files.png" alt="Project Logo" width="150"> <img src="Screenshots/qr scan.png" alt="Project Logo" width="150"> <img src="Screenshots/receiving files.png" alt="Project Logo" width="150">
+---
 
-<img src="Screenshots/sent history.jpg" alt="Home Page" width="150" style="border-radius: 15px;"> <img src="Screenshots/receive history.jpg" alt="Home Page" width="150" style="border-radius: 15px;">
+## 📞 Support & Feedback
 
-> [!IMPORTANT]
-> If you found this project helpful, please give it a star!
+<p align="left">
+  If you find this project useful, please consider giving it a <b>⭐ Star</b>! <br><br>
+  <b>Developer:</b> Prottoy Bhattacharyya <br>
+  <b>Email:</b> <a href="mailto:prottoyvhattacharyya@gmail.com">prottoyvhattacharyya@gmail.com</a> <br>
+  <b>Issues:</b> <a href="../../issues">Open a Bug Report</a>
+</p>
 
-## 📞 Support
-
-For support, email prottoyvhattacharyya@gmail.com or open an issue in the repository.
+<div align="center">
+  <sub>Built with ❤️ for the Developer Community</sub>
+</div>
