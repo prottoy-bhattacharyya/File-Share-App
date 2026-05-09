@@ -1,11 +1,11 @@
 # File Share Android App
 
-A file-sharing Android application that enables users to upload and share files through QR code scanning, built with Java and powered by Django REST API.
+A file-sharing Android application that enables users to share files through both way, Server and Directly. Server store the files and Receiver candownload the files by scannin the QR or usin thhe Download Code. This project is built with Java and powered by Django REST API.
 
 ## Features
 
 - **User Authentication**: User can create account and login
-- **Multiple file Upload and Download**: Upload files to database (4.5 MB max size for each file because of free vercel account)
+- **Multiple file Upload and Download**: Upload files to database
 - **QR Code Sharing**: Generate QR codes for file sharing - receivers can download files by simply scanning
 - **Account Recovery and Verification**: User can reset or verify the account via OTP sent to email
 - **Transfer History**: Automatically saves and displays user's send and receive history
