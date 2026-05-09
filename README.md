@@ -15,9 +15,49 @@ A file-sharing Android application that enables users to upload and share files 
 
 - **Frontend**: Java (Android Native)
 - **Backend**: Django REST Framework
-- **Database**: MySQL
+- **Database**: MySQL 
 - Firebase Cloud Messaging
+- Docker
 
+# Quick Install and Run Server (Docker):
+
+- **Install Docker**: Download and run `Docker` on your machine.
+  
+- **Email Setup:** Web Search `goggle apppassword` and get your password
+- **Environment Variables Setup**: goto `api/`
+- add `.env` file and add these lines
+ ```bash
+  DB_HOST=db
+  DB_USER=root
+  DB_PASSWORD=1234
+  DB_PORT=3306
+  DB_NAME=file_share_db
+
+ EMAIL_HOST_PASSWORD=your google app password 
+ EMAIL_HOST_USER=your gmail
+  ```
+
+
+- **Setup FCM Admin:** Goto [Firebase Console](https://console.firebase.google.com/) -> `create new project` -> `Service Accounts` -> Select `Python` -> `Generate New Private Key`
+- create folder `Services/Firebase` inside `api/` and open it.
+- save the private key as `firebase_credentials.json` 
+
+
+- Run this command inside `api/` folder
+ ```bash
+  docker compose up
+  ```
+
+> [!TIP]
+> goto `localhost:8000`, if it shows
+> `Firebase is initialized.
+> Database connection successful.
+> [('file_blobs',), ('file_info',), ('otp_verifications',), ('user_credentials',), ('user_tokens',)]` then the server is successfully initialized everything.
+> else restart the `django_app` container from `Docker` software
+
+- Now begin  [Android App Setup](#android-app-setup)
+
+# Run server without Docker
 ## Prerequisites
 
 Before running this project, ensure you have:
@@ -60,6 +100,8 @@ EMAIL_HOST_PASSWORD = "your password"
 - new json file will be downloaded.
 - rename to `firebase_credentials.json`
 - Save it to `api/Services/Firebase/firebase_credentials.json`
+> [!WARNING]
+> If path does not exists, then create `Services/Firebase` folder
 
 - **Start** the Django server inside `api` folder:
 
