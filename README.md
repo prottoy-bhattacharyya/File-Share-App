@@ -64,9 +64,9 @@ The fastest way to get your server running.
   ```
 
 
-- **Setup FCM Admin:** Goto [Firebase Console](https://console.firebase.google.com/) -> `create new project` -> `Service Accounts` -> Select `Python` -> `Generate New Private Key`
-- create folder `Services/Firebase` inside `api/` and open it.
-- save the private key as `firebase_credentials.json` 
+- **Setup FCM Admin:** create folder `Services/Firebase` inside `api/` and open it.
+- Goto [Firebase Console](https://console.firebase.google.com/) -> `create new project` -> `Service Accounts` -> Select `Python` -> `Generate New Private Key`
+- save the private key as `firebase_credentials.json` inside `Services/Firebase` folder.
 
 
 - Run this command inside `api/` folder
