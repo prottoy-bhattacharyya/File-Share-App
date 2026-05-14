@@ -1,204 +1,198 @@
-<!-- ...existing code... -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>File Count • Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semester CGPA Calculator</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
 
-  <!-- Tailwind CSS (CDN) -->
-  <script src="https://cdn.tailwindcss.com"></script>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
 
-  <style>
-    /* small accent for glass card */
-    .glass {
-      background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
-  </style>
+        .container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .add-btn { background-color: #10b981; color: white; }
+        .calc-btn { background-color: var(--primary-color); color: white; }
+        .remove-btn { background-color: #ef4444; color: white; width: auto; padding: 5px 10px; }
+
+        .result-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #eff6ff;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        #final-cgpa {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+        }
+    </style>
 </head>
+<body>
 
-<body class="min-h-screen bg-gradient-to-br from-sky-800 via-indigo-800 to-purple-700 text-slate-100 antialiased">
-  <main class="min-h-screen flex items-center justify-center p-6">
-    <section class="w-full max-w-2xl">
-      <div class="glass rounded-2xl p-8 shadow-2xl">
-        <div class="flex items-start gap-4">
-          <div class="flex-1">
-            <h1 class="text-3xl font-semibold tracking-tight">Get File Count</h1>
-            <p class="mt-1 text-slate-300">Enter the unique text to query the server for files.</p>
-          </div>
+<div class="container">
+    <h2>Semester CGPA Calculator</h2>
+    
+    <table id="course-table">
+        <thead>
+            <tr>
+                <th>Grade</th>
+                <th>Credits</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="course-list">
+            </tbody>
+    </table>
 
-          <div class="flex items-center gap-3">
-            <div class="text-slate-300 text-sm">Local API</div>
-            <div class="text-xs px-2 py-1 rounded bg-white/10 text-slate-200">v1</div>
-          </div>
-        </div>
+    <div class="btn-group">
+        <button class="add-btn" onclick="addCourse()">+ Add Course</button>
+        <button class="calc-btn" onclick="calculateCGPA()">Calculate CGPA</button>
+    </div>
 
-        <div class="mt-6 grid grid-cols-1 gap-4">
-          <!-- input -->
-          <div class="relative">
-            <label for="unique_text" class="sr-only">Unique text</label>
-            <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <!-- simple icon -->
-                <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M7 7V5a5 5 0 0110 0v2" />
-                </svg>
-              </span>
+    <div class="result-section">
+        <span>Your Semester CGPA</span>
+        <span id="final-cgpa">0.00</span>
+        <small id="total-credits">Total Credits: 0</small>
+    </div>
+</div>
 
-              <input id="unique_text" type="text" placeholder="e.g. user_123_session" autocomplete="off"
-                class="w-full pl-11 pr-28 py-3 rounded-xl bg-white/5 border border-white/6 text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition" />
-              <button id="clear" title="Clear"
-                class="absolute right-24 top-1/2 -translate-y-1/2 text-slate-300 hover:text-white px-3 py-1 rounded-md hidden">
-                Clear
-              </button>
+<script>
+    // Grading scale based on your image
+    const gradingScale = {
+        "A+": 4.00,
+        "A": 3.75,
+        "A-": 3.50,
+        "B+": 3.25,
+        "B": 3.00,
+        "B-": 2.75,
+        "C+": 2.50,
+        "C": 2.25,
+        "D": 2.00,
+        "F": 0.00
+    };
 
-              <div class="absolute right-2 top-1/2 -translate-y-1/2">
-                <button id="submit"
-                  class="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition text-white px-4 py-2 rounded-lg shadow">
-                  <svg id="btnSpinner" class="w-4 h-4 hidden animate-spin" viewBox="0 0 24 24" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.25)" stroke-width="4"></circle>
-                    <path d="M22 12a10 10 0 00-10-10" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
-                  </svg>
-                  <span id="btnText">Get Count</span>
-                </button>
-              </div>
-            </div>
-          </div>
+    function addCourse() {
+        const tbody = document.getElementById('course-list');
+        const row = document.createElement('tr');
+        
+        let options = Object.keys(gradingScale).map(g => `<option value="${gradingScale[g]}">${g} (${gradingScale[g].toFixed(2)})</option>`).join('');
 
-          <!-- result card -->
-          <div id="resultCard" class="mt-1 hidden p-4 rounded-lg bg-gradient-to-r from-white/6 to-white/3 border border-white/5">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="text-sm text-slate-300">Result</div>
-                <div id="message" class="mt-1 text-lg font-medium text-slate-100">Waiting for query...</div>
-              </div>
+        row.innerHTML = `
+            <td>
+                <select class="grade-input">
+                    ${options}
+                </select>
+            </td>
+            <td>
+                <input type="number" class="credit-input" placeholder="e.g. 3" min="0" step="0.5">
+            </td>
+            <td>
+                <button class="remove-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    }
 
-              <div class="text-right">
-                <div id="count" class="text-4xl font-extrabold text-white leading-none">0</div>
-                <div id="meta" class="text-xs text-slate-400 mt-1">—</div>
-              </div>
-            </div>
-          </div>
+    function calculateCGPA() {
+        const grades = document.querySelectorAll('.grade-input');
+        const credits = document.querySelectorAll('.credit-input');
+        
+        let totalPoints = 0;
+        let totalCredits = 0;
 
-          <p class="text-xs text-slate-300 mt-2">This uses the local API at <span class="font-mono">http://192.168.1.138:8000/get_file_count/</span></p>
-        </div>
-      </div>
+        for (let i = 0; i < grades.length; i++) {
+            const gradePoint = parseFloat(grades[i].value);
+            const creditValue = parseFloat(credits[i].value);
 
-      <footer class="mt-6 text-center text-xs text-slate-300">
-        Tip: press Enter to submit · <span id="updatedAt">Not queried yet</span>
-      </footer>
-    </section>
-  </main>
-
-  <script>
-    const uniqueInput = document.getElementById('unique_text');
-    const submitBtn = document.getElementById('submit');
-    const btnSpinner = document.getElementById('btnSpinner');
-    const btnText = document.getElementById('btnText');
-    const resultCard = document.getElementById('resultCard');
-    const messageEl = document.getElementById('message');
-    const countEl = document.getElementById('count');
-    const metaEl = document.getElementById('meta');
-    const updatedAt = document.getElementById('updatedAt');
-    const clearBtn = document.getElementById('clear');
-
-    uniqueInput.addEventListener('input', () => {
-      clearBtn.classList.toggle('hidden', uniqueInput.value.trim().length === 0);
-    });
-
-    clearBtn.addEventListener('click', () => {
-      uniqueInput.value = '';
-      clearBtn.classList.add('hidden');
-      uniqueInput.focus();
-    });
-
-    uniqueInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') submitBtn.click();
-    });
-
-    submitBtn.addEventListener('click', getFileCount);
-
-    async function getFileCount() {
-      const value = uniqueInput.value.trim();
-      if (!value) {
-        showError('Please enter unique text to query.');
-        return;
-      }
-
-      setLoading(true);
-      resultCard.classList.remove('hidden');
-      messageEl.textContent = 'Querying server…';
-      countEl.textContent = '0';
-      metaEl.textContent = '…';
-
-      const apiURL = `http://192.168.1.138:8000/get_file_count/?unique_text=${encodeURIComponent(value)}`;
-
-      try {
-        const resp = await fetch(apiURL, { cache: 'no-store' });
-        const data = await resp.json();
-
-        if (!data || data.status !== 'success') {
-          const msg = data && data.message ? data.message : `Unexpected response (status ${resp.status})`;
-          showError(msg);
-          return;
+            if (!isNaN(creditValue) && creditValue > 0) {
+                totalPoints += (gradePoint * creditValue);
+                totalCredits += creditValue;
+            }
         }
 
-        messageEl.textContent = 'Success';
-        animateCount(0, Number(data.file_count || 0), 800);
-        metaEl.textContent = `queried for "${value}"`;
-        updatedAt.textContent = `Last: ${new Date().toLocaleTimeString()}`;
-      } catch (err) {
-        console.error('Fetch error:', err);
-        showError('Error fetching file count. See console for details.');
-      } finally {
-        setLoading(false);
-      }
+        const cgpa = totalCredits > 0 ? (totalPoints / totalCredits) : 0;
+
+        document.getElementById('final-cgpa').innerText = cgpa.toFixed(2);
+        document.getElementById('total-credits').innerText = `Total Credits: ${totalCredits}`;
     }
 
-    function setLoading(isLoading) {
-      btnSpinner.classList.toggle('hidden', !isLoading);
-      btnText.textContent = isLoading ? 'Loading…' : 'Get Count';
-      submitBtn.disabled = isLoading;
-      submitBtn.classList.toggle('opacity-60', isLoading);
-    }
+    // Add 3 initial rows on load
+    window.onload = () => {
+        for(let i=0; i<3; i++) addCourse();
+    };
+</script>
 
-    function showError(msg) {
-      messageEl.textContent = `Error: ${msg}`;
-      messageEl.classList.add('text-amber-300');
-      countEl.textContent = '—';
-      metaEl.textContent = '';
-      updatedAt.textContent = `Last: ${new Date().toLocaleTimeString()}`;
-      resultCard.classList.remove('hidden');
-    }
-
-    // smooth number increment
-    function animateCount(start, end, duration) {
-      const range = end - start;
-      const startTime = performance.now();
-
-      function step(now) {
-        const elapsed = now - startTime;
-        const t = Math.min(1, elapsed / duration);
-        const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // easeInOutQuad approx
-        const current = Math.round(start + ease * range);
-        countEl.textContent = current.toLocaleString();
-        if (t < 1) {
-          requestAnimationFrame(step);
-        } else {
-          countEl.textContent = end.toLocaleString();
-        }
-      }
-
-      requestAnimationFrame(step);
-    }
-  </script>
 </body>
-
 </html>

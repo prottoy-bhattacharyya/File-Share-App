@@ -1,0 +1,494 @@
+{
+  "D:\\project\\android\\File-Share\\api\\db.sql": {
+    "mtime": 1763756610.0,
+    "hash": "23f112054907609d55c3150836989ff3"
+  },
+  "D:\\project\\android\\File-Share\\api\\manage.py": {
+    "mtime": 1763756610.0,
+    "hash": "7a492c6e2a9467a0a12fb6005d27a267"
+  },
+  "D:\\project\\android\\File-Share\\api\\database_structure.sql": {
+    "mtime": 1776032424.0,
+    "hash": "b917e7f18396bed7c78fcf3fa298f493"
+  },
+  "D:\\project\\android\\File-Share\\api\\file_sharing_project\\__init__.py": {
+    "mtime": 1763756610.0,
+    "hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "D:\\project\\android\\File-Share\\api\\file_sharing_project\\asgi.py": {
+    "mtime": 1763756610.0,
+    "hash": "4df0811b915f899a7ff39ca43d7a3b40"
+  },
+  "D:\\project\\android\\File-Share\\api\\file_sharing_project\\urls.py": {
+    "mtime": 1763756610.0,
+    "hash": "ca9b1ec33230c523676573f6ba2530b4"
+  },
+  "D:\\project\\android\\File-Share\\api\\file_sharing_project\\wsgi.py": {
+    "mtime": 1763792392.0,
+    "hash": "dbe49fed419d5e85160dbf2faf690f5f"
+  },
+  "D:\\project\\android\\File-Share\\api\\file_sharing_project\\settings.py": {
+    "mtime": 1778611412.0,
+    "hash": "841d673347812b3901ce6f47e4061c27"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\__init__.py": {
+    "mtime": 1763756610.0,
+    "hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\admin.py": {
+    "mtime": 1763756610.0,
+    "hash": "ef4c241c5311eee11a93e9366f492a72"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\apps.py": {
+    "mtime": 1778266142.0,
+    "hash": "53c9d1883d30d12c6526c40f8fee5b0d"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\dbconfig.py": {
+    "mtime": 1778272600.0,
+    "hash": "4306f09f4bff4a36243c7e92169182a1"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\models.py": {
+    "mtime": 1763756610.0,
+    "hash": "d66d26e53e7ac2028454d3dd6f7e92ad"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\tests.py": {
+    "mtime": 1763756610.0,
+    "hash": "e08f0582500f6562bf0a931ef9503b39"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\urls.py": {
+    "mtime": 1777496820.0,
+    "hash": "9b4dd6b945c061796b72e69d81cb198e"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\views.py": {
+    "mtime": 1778281626.0,
+    "hash": "d67f94d17f72c1a794c2936e95ea1923"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\utils.py": {
+    "mtime": 1778280652.0,
+    "hash": "4c5cac1d06221daddf5c80baafd8c8dc"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\migrations\\__init__.py": {
+    "mtime": 1763756610.0,
+    "hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\backends\\email_backend.py": {
+    "mtime": 1775833498.0,
+    "hash": "4d732b711f872c344cfc63761e3369ed"
+  },
+  "D:\\project\\android\\File-Share\\api\\test_site\\test_blob_files.py": {
+    "mtime": 1775758628.0,
+    "hash": "de19bf9bc1bb98dd001ece68966b4338"
+  },
+  "D:\\project\\android\\File-Share\\app\\settings.gradle.kts": {
+    "mtime": 1777146122.0,
+    "hash": "960ff477209d5e24a00c1dc671e9df36"
+  },
+  "D:\\project\\android\\File-Share\\app\\build.gradle.kts": {
+    "mtime": 1777146010.0,
+    "hash": "7ff81b57152bedeeee43c17b36c72487"
+  },
+  "D:\\project\\android\\File-Share\\app\\gradlew": {
+    "mtime": 1763756610.0,
+    "hash": "c6ea21dea2d500b277296894708cf792"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\build.gradle.kts": {
+    "mtime": 1777146138.0,
+    "hash": "ca34bdc0106e75bf66605e5767ffd6e9"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\androidTest\\java\\com\\example\\myapplication\\ExampleInstrumentedTest.java": {
+    "mtime": 1763756610.0,
+    "hash": "9af701b504734fe71865a588e04b75a4"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\SmallFunctions.java": {
+    "mtime": 1776045442.0,
+    "hash": "83116dac9abc2feb6980d38e43495ff7"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\UriWorks.java": {
+    "mtime": 1775216948.0,
+    "hash": "cb550f0fabcd634946bb6f2aa7d9c79a"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\UserLocalStore.java": {
+    "mtime": 1776035304.0,
+    "hash": "b9d9e24ed1fdd9a09079e2088726e381"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\FileSignatureChecker.java": {
+    "mtime": 1777104726.0,
+    "hash": "70492781d79b13455ae1e1bbc6c4b2cb"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\directTransferActivity.java": {
+    "mtime": 1776754082.0,
+    "hash": "4652e9a5a6c14b7a59f679b836f116c8"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\loginActivity.java": {
+    "mtime": 1775870918.0,
+    "hash": "ddb899701f80e7aca74f0ef739b2ed13"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\MainActivity.java": {
+    "mtime": 1778272076.0,
+    "hash": "bafc37ecbddc740e573884d355f471bc"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\qrActivity.java": {
+    "mtime": 1777150124.0,
+    "hash": "e996d3004ffbba908477ef345493a0ab"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\receiveActivity.java": {
+    "mtime": 1776963808.0,
+    "hash": "45a0bf96c62b787571728424ace47bfe"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\signupActivity.java": {
+    "mtime": 1776387824.0,
+    "hash": "24aed4be88ae379ecb5805bfb0375a11"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\UserSentHistoryActivity.java": {
+    "mtime": 1777497742.0,
+    "hash": "fdafc6bbaf1d0f424c02ad6c6b5a16d7"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\FindAccountActivity.java": {
+    "mtime": 1776045442.0,
+    "hash": "8ba79b33d9bffe0ad4205efddb1567d9"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\CheckOtpActivity.java": {
+    "mtime": 1776045442.0,
+    "hash": "ec09d6b583a0070e1fc36fe8ec085055"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\NewPasswordActivity.java": {
+    "mtime": 1776942278.0,
+    "hash": "50e4096a760a6b42cc2d63f1a13f5619"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\ReceivedFilesActivity.java": {
+    "mtime": 1777531076.0,
+    "hash": "5861bdd326d859b2fb46a096844d1db8"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\UserProfileActivity.java": {
+    "mtime": 1777098396.0,
+    "hash": "64a21da55d738f1078e42737fedaf172"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\ReceivedHistoryActivity.java": {
+    "mtime": 1777523622.0,
+    "hash": "3acdefa872cbc8559617122f5cde25f7"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Activities\\sendActivity.java": {
+    "mtime": 1777105236.0,
+    "hash": "76f9b12473dea3387e92b723a08403c0"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\LoginResponse.java": {
+    "mtime": 1775208342.0,
+    "hash": "5ece66c3256bc465977c31ea3470978f"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\UploadResponse.java": {
+    "mtime": 1775208344.0,
+    "hash": "d67e1d3af31a88dd32f09b7fc5c71800"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\UserHistoryResponse.java": {
+    "mtime": 1777097892.0,
+    "hash": "597030e12e52c4bcc5dbdfbbd2f52205"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\ProfilePicUploadResponse.java": {
+    "mtime": 1775989296.0,
+    "hash": "4729c9aacda020beff4a783c78943a3f"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\FindAccoundResponse.java": {
+    "mtime": 1775904820.0,
+    "hash": "76d1443b8b1990016e2f56ce28e350a9"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\VarifyOtpResponse.java": {
+    "mtime": 1775904864.0,
+    "hash": "6c020d5dd2802d0392afbb2f7f38e42b"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\ResetPasswordResponse.java": {
+    "mtime": 1775904892.0,
+    "hash": "35c4a837fc4e24dff8fe5eeb982b74d7"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\getFileCountResponse.java": {
+    "mtime": 1776002866.0,
+    "hash": "7920f7c31785cbe60d788525432480ff"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\FileMetadata.java": {
+    "mtime": 1776004954.0,
+    "hash": "b3ebb73a5aa19797ee8edd1fc88c0af4"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\FileListResponse.java": {
+    "mtime": 1776005376.0,
+    "hash": "c2cc94df80c8f3bbd9fd2e98ce5ad660"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\VerifyEmailResponse.java": {
+    "mtime": 1776034366.0,
+    "hash": "0c2f4fe64458ae3a1a85d3ec400693a5"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\userInfo.java": {
+    "mtime": 1777496400.0,
+    "hash": "bd96a3dd8ab488fbb66ef6d794b3aa73"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Responses\\FcmTokenResponse.java": {
+    "mtime": 1777157588.0,
+    "hash": "65932996d1d4af563165a3567560e57a"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Apis\\NetworkClient.java": {
+    "mtime": 1775210574.0,
+    "hash": "ae705036a9612d1765e150158c65e8d7"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Apis\\UploadApis.java": {
+    "mtime": 1777496950.0,
+    "hash": "89b553880fb468d617f10b1a9b8596e6"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Apis\\ProgressRequestBody.java": {
+    "mtime": 1777099678.0,
+    "hash": "6b0e474c470c9e7228c1a0c97fe67b8a"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\LocalDb\\FileDao.java": {
+    "mtime": 1776538692.0,
+    "hash": "65e3cb45bb2c0fea17ce6d2f4dcf7a16"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\LocalDb\\AppDatabase.java": {
+    "mtime": 1776945906.0,
+    "hash": "c17fca4acd88bee88373d2e14ad75ddb"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\LocalDb\\LocalFile.java": {
+    "mtime": 1776691504.0,
+    "hash": "969f836701d29cb88e1bcda2cce31350"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\java\\com\\example\\myapplication\\Services\\FcmService.java": {
+    "mtime": 1777184234.0,
+    "hash": "1404597608cd87496bbab1403d8e1d86"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\test\\java\\com\\example\\myapplication\\ExampleUnitTest.java": {
+    "mtime": 1763756610.0,
+    "hash": "d36a27f434721708de0ca0dc9a39f8a1"
+  },
+  "D:\\project\\android\\File-Share\\README.md": {
+    "mtime": 1778288286.0,
+    "hash": "e1815aef91297f92a12d2e0b386d9e10"
+  },
+  "D:\\project\\android\\File-Share\\GEMINI.md": {
+    "mtime": 1778720438.0,
+    "hash": "747e73a5e1af4b72c0d65c9169c23199"
+  },
+  "D:\\project\\android\\File-Share\\api\\requirements.txt": {
+    "mtime": 1778250984.0,
+    "hash": "77709f8596ce2d1af8e251413058caf1"
+  },
+  "D:\\project\\android\\File-Share\\api\\docker-compose.yml": {
+    "mtime": 1778255234.0,
+    "hash": "b77a28fa67bd65547c5cafc7803f383b"
+  },
+  "D:\\project\\android\\File-Share\\api\\response_app\\templates\\response_app\\admin.html": {
+    "mtime": 1775667312.0,
+    "hash": "691c475c7a230072c63db3a207fc5e70"
+  },
+  "D:\\project\\android\\File-Share\\api\\test_site\\index.html": {
+    "mtime": 1778515864.0,
+    "hash": "524114a638dc8c6b6caf091983bff02f"
+  },
+  "D:\\project\\android\\File-Share\\api\\templates\\base.html": {
+    "mtime": 1763756808.0,
+    "hash": "be1b8bafd79be44975c79c9ca55b1258"
+  },
+  "D:\\project\\android\\File-Share\\api\\templates\\otp_template.html": {
+    "mtime": 1777913192.0,
+    "hash": "569368ee783067b4da5a19f0d5dea22b"
+  },
+  "D:\\project\\android\\File-Share\\api\\media\\kceRzh\\WhatsApp Image 2025-12-03 at 14.08.52_d6cb384e.jpg": {
+    "mtime": 1775208400.0,
+    "hash": "a7fffb630da71f82952843b4410acbb7"
+  },
+  "D:\\project\\android\\File-Share\\api\\media\\exteGt\\download.png": {
+    "mtime": 1775210588.0,
+    "hash": "95002fb6f304da91fe2dafd2236c2901"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\ic_launcher-playstore.png": {
+    "mtime": 1763756610.0,
+    "hash": "3cecbc54db24d22f892a114e26921282"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_audio.png": {
+    "mtime": 1763756610.0,
+    "hash": "fe13116e2563a4fccb32767fc3b6f9a0"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_back.png": {
+    "mtime": 1763756610.0,
+    "hash": "48cb7069fc4e1738ab7983832fe4dbc5"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_docs.png": {
+    "mtime": 1763756610.0,
+    "hash": "776533f30c4ef6dc078a7a1d04928f55"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_download.png": {
+    "mtime": 1763756610.0,
+    "hash": "fc2d31e5ab3223a93432077e76e18956"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_folder.png": {
+    "mtime": 1763756610.0,
+    "hash": "40a5659aab04c39726bc9e217c4a99dc"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_loading.png": {
+    "mtime": 1763756610.0,
+    "hash": "ea516346b892c1d404fbfc54f9a878b1"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_pdf.png": {
+    "mtime": 1763756610.0,
+    "hash": "9a85752042ae270b88114895b82da2c1"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_qr_code.png": {
+    "mtime": 1763756610.0,
+    "hash": "b4bb0c461465e5cbb41171c88aa5ba62"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_send.png": {
+    "mtime": 1763756610.0,
+    "hash": "671b27615d9253be601cd5e5ca43beea"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\shadow.png": {
+    "mtime": 1763756610.0,
+    "hash": "fc161f15233f2deab42bf8357b1f6a33"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_share.png": {
+    "mtime": 1763756610.0,
+    "hash": "715f65bc8faf6a0768ac2f902575ac7d"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_user.png": {
+    "mtime": 1763756610.0,
+    "hash": "1a817a95a42d8c43031378d122a05ffe"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\logo_no_shadow_8k.png": {
+    "mtime": 1763756610.0,
+    "hash": "fe984df4ca79bc54b3f99998427ad0be"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\logo_8k_circle.png": {
+    "mtime": 1763756610.0,
+    "hash": "32f64c3db40e70694cd036c27e755977"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\logo_8k.png": {
+    "mtime": 1763756610.0,
+    "hash": "df37d91cb3e3d8c5cef5bdf2a1c1a580"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_image.png": {
+    "mtime": 1775000564.0,
+    "hash": "487c4fbaf08c4ecd7c9f284dc4c7656e"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_search.png": {
+    "mtime": 1776021718.0,
+    "hash": "8e80249b18cd60894d5a0accb5971d19"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\goku.png": {
+    "mtime": 1776022336.0,
+    "hash": "a534a22adb91377692a8570d75e8e22b"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_check.png": {
+    "mtime": 1776040704.0,
+    "hash": "f4da675670d7e4f8dffa84908d678067"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\drawable\\ic_unknown.png": {
+    "mtime": 1776478210.0,
+    "hash": "08af3667c087ad9e5990a91002edfcae"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.webp": {
+    "mtime": 1763756610.0,
+    "hash": "154b4999781edab74a0ab3b4eee437a0"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_background.webp": {
+    "mtime": 1763756610.0,
+    "hash": "8004c1142ab49db9ff5140cedb4b9225"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_foreground.webp": {
+    "mtime": 1763756610.0,
+    "hash": "9e22e0f08da2976c044b2c5ae95a22f2"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.webp": {
+    "mtime": 1763756610.0,
+    "hash": "be48640db7ed3b8ad97e3d5e92f647a9"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.webp": {
+    "mtime": 1763756610.0,
+    "hash": "40c235d0fd39e8eae8845a055aedc4c2"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_background.webp": {
+    "mtime": 1763756610.0,
+    "hash": "524ab742adaa6ec2b9ca532dbbb86d71"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_foreground.webp": {
+    "mtime": 1763756610.0,
+    "hash": "b2cf3acf023230372a0b376e35ba78f0"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_round.webp": {
+    "mtime": 1763756610.0,
+    "hash": "e1fc68a2959ac6d98baec92b6545ced9"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.webp": {
+    "mtime": 1763756610.0,
+    "hash": "6fa878fc800fbde34b67d1d50a02801a"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_background.webp": {
+    "mtime": 1763756610.0,
+    "hash": "8be8baff76176bae938cc1846be26308"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_foreground.webp": {
+    "mtime": 1763756610.0,
+    "hash": "e9f83f66358d28cd146673a2458dc6e0"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_round.webp": {
+    "mtime": 1763756610.0,
+    "hash": "64397c7397a1b5461c95d97107eb0be2"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.webp": {
+    "mtime": 1763756610.0,
+    "hash": "c79018811f6d508370231e202d73c628"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_background.webp": {
+    "mtime": 1763756610.0,
+    "hash": "4632b0ddef181c6b8ce307e52be06585"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_foreground.webp": {
+    "mtime": 1763756610.0,
+    "hash": "ceb292a565d1d16a25f23900a7d2426c"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_round.webp": {
+    "mtime": 1763756610.0,
+    "hash": "4b7c05e740fd162022db8037a4a35545"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.webp": {
+    "mtime": 1763756610.0,
+    "hash": "72ebf846b0880d9c99cc0dc6a614e2ea"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_background.webp": {
+    "mtime": 1763756610.0,
+    "hash": "4f0d8fdfd33379db9c61f26c1574a5bf"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_foreground.webp": {
+    "mtime": 1763756610.0,
+    "hash": "2b035e27f46c124793faa82ed08b01c0"
+  },
+  "D:\\project\\android\\File-Share\\app\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_round.webp": {
+    "mtime": 1763756610.0,
+    "hash": "d574e03c6b79711f88afdb0ac411dbf5"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\main.png": {
+    "mtime": 1776043494.0,
+    "hash": "55c72095ea27f266eded73c5835471d6"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\profile.png": {
+    "mtime": 1776043522.0,
+    "hash": "a166edcdef0804b9b3526ce3864a1638"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\received files.png": {
+    "mtime": 1776043552.0,
+    "hash": "ac29b6fa1f81b80e507db8da38c36921"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\upload files.png": {
+    "mtime": 1776043600.0,
+    "hash": "b5a1f5ab0c24aee9916518a7bf016f4f"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\qr scan.png": {
+    "mtime": 1776043640.0,
+    "hash": "8c7ea2d09ec1003e641845b596d2e018"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\receiving files.png": {
+    "mtime": 1776043728.0,
+    "hash": "2be2afc18c1adffee14cb5ec3276d7b3"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\receive history.jpg": {
+    "mtime": 1778158396.0,
+    "hash": "e9ae2c472a54eaa68fdc9b321dd1cc45"
+  },
+  "D:\\project\\android\\File-Share\\Screenshots\\sent history.jpg": {
+    "mtime": 1778158396.0,
+    "hash": "0b4d376388dd3f7a6decb978f125a1ff"
+  }
+}
