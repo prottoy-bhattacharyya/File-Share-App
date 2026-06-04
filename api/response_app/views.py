@@ -91,25 +91,30 @@ def login(request):
     
     cursor = conn.cursor()
 
-    email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._%+-]+\.[a-zA-Z]{2,}$"
+    try:
+        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._%+-]+\.[a-zA-Z]{2,}$"
 
-    if re.match(email_pattern, username_or_email):
-        email = username_or_email
-        cursor.execute("""SELECT username, fullname, email, hashed_password
-                        FROM user_credentials
-                        WHERE email = %s""", 
-                        (email,)
-                    )
-        
-    else:
-        username = username_or_email
-        cursor.execute("""SELECT username, fullname, email, hashed_password
-                        FROM user_credentials
-                        WHERE username = %s""", 
-                        (username,)
-                    )
-    
-    result = cursor.fetchone()
+        if re.match(email_pattern, username_or_email):
+            email = username_or_email
+            cursor.execute("""SELECT username, fullname, email, hashed_password
+                            FROM user_credentials
+                            WHERE email = %s""", 
+                            (email,)
+                        )
+        else:
+            username = username_or_email
+            cursor.execute("""SELECT username, fullname, email, hashed_password
+                            FROM user_credentials
+                            WHERE username = %s""", 
+                            (username,)
+                        )
+
+        result = cursor.fetchone()
+    except mysql.connector.Error as err:
+        cursor.close()
+        conn.close()
+        return JsonResponse({'status': 'DB error', 'message': str(err)}, status=500)
+
     cursor.close()
     conn.close()
 
@@ -120,12 +125,7 @@ def login(request):
             'status': 'user error',
             'message': 'User not found.'
         }
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
         return JsonResponse(response)
-    
 
     if check_password(password, valid_hashed_password):
         response = {
@@ -140,11 +140,7 @@ def login(request):
             'status': 'credentials error',
             'message': 'Incorrect username or password.'
         }
-    if cursor:
-        cursor.close()
-    if conn:
-        conn.close()
-    
+
     return JsonResponse(response)
 
 @csrf_exempt

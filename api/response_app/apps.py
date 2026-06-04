@@ -1,10 +1,11 @@
+import os
+import time
+
+import firebase_admin
+import mysql.connector
 from django.apps import AppConfig
 from django.conf import settings
-
-import os
-import firebase_admin
 from firebase_admin import credentials
-import mysql.connector
 
 from .utils import get_connection, get_connection_without_dbname
 
@@ -33,10 +34,20 @@ class ResponseAppConfig(AppConfig):
 
     
     def initialize_database_table(self):
-        conn = get_connection_without_dbname()
+        max_retries = 15
+        retry_delay = 2
+        conn = None
+
+        for attempt in range(max_retries):
+            conn = get_connection_without_dbname()
+            if conn:
+                print(f"MySQL connected on attempt {attempt + 1}.")
+                break
+            print(f"Waiting for MySQL... attempt {attempt + 1}/{max_retries}")
+            time.sleep(retry_delay)
 
         if not conn:
-            print("Database connection failed.")
+            print("Database connection failed after retries.")
             return
         
         cursor = conn.cursor()

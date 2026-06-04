@@ -10,6 +10,12 @@ services:
       - "3307:3306" # Connect to 3307 on your host to avoid conflict with local MySQL
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
 
   web:
     build: .
@@ -21,7 +27,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   mysql_data:
